@@ -19,7 +19,7 @@ namespace API.Controllers
             _tipoParametroRepositorio = tipoParametroRepositorio;
             _mapper = mapper;
         }
-
+        //insertar usuarios
         [HttpPost]
         public async Task<IActionResult> InsertarTipoParametro([FromBody] TipoParametroDTO tipoParametroDTO)
         {
@@ -28,7 +28,6 @@ namespace API.Controllers
                 return BadRequest("Datos inválidos.");
             }
 
-            // Mapeo del DTO a la entidad del modelo si es necesario
             var tipoParametro = new TipoParametro
             {
                 TIPO_PARAMETRO = tipoParametroDTO.TIPO_PARAMETRO,
@@ -37,23 +36,33 @@ namespace API.Controllers
                 FECHA_CREACION = tipoParametroDTO.FECHA_CREACION
             };
 
-            var result = await _tipoParametroRepositorio.InsertarTipoParametro(tipoParametro);
+            try
+            {
+                var result = await _tipoParametroRepositorio.InsertarTipoParametro(tipoParametro);
 
-            if (result > 0)
-            {
-                return Ok("TipoParametro insertado correctamente.");
+                if (result > 0)
+                {
+                    return Ok("TipoParametro insertado correctamente.");
+                }
+                else
+                {
+                    return StatusCode(500, "Error al insertar el TipoParametro.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return StatusCode(500, "Error al insertar el TipoParametro.");
+                return BadRequest(ex.Message);
             }
         }
-
-        //funcion actualiar
+        //editar usuarios
         [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarTipoParametro(int id, TipoParametroDTO tipoParametroDto)
+        public async Task<IActionResult> ActualizarTipoParametro(int id, [FromBody] TipoParametroDTO tipoParametroDto)
         {
-            // Mapear DTO a entidad
+            if (tipoParametroDto == null)
+            {
+                return BadRequest("Datos inválidos.");
+            }
+
             var tipoParametro = new TipoParametro
             {
                 ID = id,
@@ -63,19 +72,25 @@ namespace API.Controllers
                 FECHA_CREACION = tipoParametroDto.FECHA_CREACION
             };
 
-            var response = await _tipoParametroRepositorio.ActualizarTipoParametro(tipoParametro);
+            try
+            {
+                var response = await _tipoParametroRepositorio.ActualizarTipoParametro(tipoParametro);
 
-            if (response > 0) // Si el número de filas afectadas es mayor a 0
-            {
-                return Ok("TipoParametro actualizado correctamente.");
+                if (response > 0)
+                {
+                    return Ok("TipoParametro actualizado correctamente.");
+                }
+                else
+                {
+                    return BadRequest("Error al actualizar el TipoParametro.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("Error al actualizar el TipoParametro.");
+                return BadRequest(ex.Message);
             }
         }
-
-        //Funcion listar
+        //listar usuarios
         [HttpGet]
         public async Task<ActionResult<List<TipoParametroDTO>>> ListAll()
         {
@@ -89,7 +104,27 @@ namespace API.Controllers
             return Ok(tipoParametroDTOs);
         }
 
+        // Método para eliminar TipoParametro por ID
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> EliminarTipoParametro(int id)
+        {
+            try
+            {
+                var result = await _tipoParametroRepositorio.EliminarTipoParametro(id);
 
-
+                if (result != 0)
+                {
+                    return Ok("TipoParametro eliminado correctamente." + result);
+                }
+                else
+                {
+                    return NotFound("TipoParametro no encontrado.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-
+using System.Collections.Generic;
 
 namespace Data.Repositories
 {
@@ -15,31 +15,79 @@ namespace Data.Repositories
             _connectionString = connectionString;
         }
 
-        // Función para insertar un nuevo TipoParametro
+        // Verificar unicidad
+        //public async Task<bool> TipoParametroExists(string tipoParametro)
+        //{
+        //    if (string.IsNullOrWhiteSpace(tipoParametro))
+        //    {
+        //        throw new ArgumentNullException(nameof(tipoParametro), "El tipo de parámetro no puede ser nulo o vacío.");
+        //    }
+
+        //    using (SqlConnection sql = new SqlConnection(_connectionString))
+        //    {
+        //        using (SqlCommand cmd = new SqlCommand("SELECT COUNT(1) FROM TIPO_PARAMETRO2 WHERE TIPO_PARAMETRO_LOWER = @TipoParametro", sql))
+        //        {
+        //            cmd.Parameters.AddWithValue("@TipoParametro", tipoParametro.ToLower());
+        //            await sql.OpenAsync();
+
+        //            var count = (int)await cmd.ExecuteScalarAsync();
+        //            return count > 0;
+        //        }
+        //    }
+        //}
+
+
+        // Método para eliminar TipoParametro por ID
+        public async Task<int> EliminarTipoParametro(int id)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("EliminarTipoParametro", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ID", id);
+
+                    await sql.OpenAsync();
+                    return await cmd.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
+
+        // Insertar TipoParametro con validación
         public async Task<int> InsertarTipoParametro(TipoParametro tipoParametro)
         {
+            //if (await TipoParametroExists(tipoParametro.TIPO_PARAMETRO))
+            //{
+            //    throw new Exception("El tipo de parámetro ya existe.");
+            //}
+
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
                 using (SqlCommand cmd = new SqlCommand("InsertarTipoParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    // Añadir parámetros al procedimiento almacenado
                     cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", tipoParametro.TIPO_PARAMETRO);
                     cmd.Parameters.AddWithValue("@USUARIO_CREACION", tipoParametro.USUARIO_CREACION);
                     cmd.Parameters.AddWithValue("@ESTADO", tipoParametro.ESTADO);
                     cmd.Parameters.AddWithValue("@FECHA_CREACION", tipoParametro.FECHA_CREACION);
 
                     await sql.OpenAsync();
-                    // Ejecutar el comando y obtener el número de filas afectadas
                     return await cmd.ExecuteNonQueryAsync();
                 }
             }
         }
 
-        //funcion para actualizar
+        // Actualizar TipoParametro con validación
         public async Task<int> ActualizarTipoParametro(TipoParametro tipoParametro)
         {
+            // Verificar la existencia del tipo de parámetro antes de actualizar (opcional, si se necesita)
+            //if (await TipoParametroExists(tipoParametro.TIPO_PARAMETRO))
+            //{
+            //    throw new Exception("El tipo de parámetro ya existe.");
+            //}
+
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
                 using (SqlCommand cmd = new SqlCommand("ActualizarTipoParametro", sql))
@@ -58,7 +106,7 @@ namespace Data.Repositories
             }
         }
 
-        //Funcion para listar
+        // Función para listar
         public async Task<List<TipoParametro>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -94,9 +142,5 @@ namespace Data.Repositories
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
             };
         }
-
-
     }
-
 }
-
