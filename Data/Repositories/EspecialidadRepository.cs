@@ -60,6 +60,21 @@ namespace Data.Repositories
             }
         }
 
+        // Procedimiento almacenado para eliminar especialidad
+        public async Task<int> EliminarEspecialidad(int id)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_EliminarEspecialidad", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ID", id);
+
+                    await sql.OpenAsync();
+                    return await cmd.ExecuteNonQueryAsync();
+                }
+            }
+        }
         private Especialidad MapToEspecialidad(SqlDataReader reader)
         {
             return new Especialidad()

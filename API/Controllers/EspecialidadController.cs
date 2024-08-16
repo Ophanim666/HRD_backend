@@ -69,5 +69,28 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // Eliminar especialidades
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> EliminarEspecialidad(int id)
+        {
+            try
+            {
+                var result = await _especialidadRepository.EliminarEspecialidad(id);
+
+                if (result != 0)
+                {
+                    return Ok("Especialidad eliminada correctamente.");
+                }
+                else
+                {
+                    return NotFound("Especialidad no encontrado.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
