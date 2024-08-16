@@ -6,6 +6,7 @@ using AutoMapper;
 using DTO.Usuario;
 using Models.Entidades;
 using API;
+using Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,7 @@ builder.Services.AddAutoMapper(typeof(Automapping));
 // Configurar la cadena de conexión
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddScoped<UsuarioRepository>(provider => new UsuarioRepository(connectionString));
+builder.Services.AddScoped<EspecialidadRepository>(provider => new EspecialidadRepository(connectionString));
 
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
