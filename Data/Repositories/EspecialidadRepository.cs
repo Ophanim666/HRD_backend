@@ -40,6 +40,26 @@ namespace Data.Repositories
             }
         }
 
+        // Función para añadir
+        public async Task<int> AñadirEspecialidad(Especialidad especialidad)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_AñadirEspecialidad", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@NOMBRE", especialidad.NOMBRE);
+                    cmd.Parameters.AddWithValue("@ESTADO", especialidad.ESTADO);
+                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
+                    cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
+
+                    await sql.OpenAsync();
+                    return await cmd.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
         private Especialidad MapToEspecialidad(SqlDataReader reader)
         {
             return new Especialidad()
