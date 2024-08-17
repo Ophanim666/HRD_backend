@@ -86,5 +86,27 @@ namespace Data.Repositories
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
             };
         }
+
+        // Procedimiento almacenado para actualizar especialidad
+        public async Task<int> ActualizarEspecialidad(Especialidad especialidad)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("SP_ActualizarEspecialidad", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@ID", especialidad.ID);
+                    cmd.Parameters.AddWithValue("@NOMBRE", especialidad.NOMBRE);
+                    cmd.Parameters.AddWithValue("@ESTADO", especialidad.ESTADO);
+                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
+                    cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
+
+                    await sql.OpenAsync();
+                    return await cmd.ExecuteNonQueryAsync();
+                }
+            }
+        }
+
     }
 }

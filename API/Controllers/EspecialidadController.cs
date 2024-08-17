@@ -92,5 +92,42 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // SP para actualizar especialidad
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ActualizarEspecialidad(int id, [FromBody] EspecialidadDTO especialidadDTO)
+        {
+            if (especialidadDTO == null)
+            {
+                return BadRequest("Datos inválidos.");
+            }
+
+            var especialidad = new Especialidad
+            {
+                ID = id,
+                NOMBRE = especialidadDTO.NOMBRE,
+                ESTADO = especialidadDTO.ESTADO,
+                USUARIO_CREACION = especialidadDTO.USUARIO_CREACION,
+                FECHA_CREACION = especialidadDTO.FECHA_CREACION
+            };
+
+            try
+            {
+                var response = await _especialidadRepository.ActualizarEspecialidad(especialidad);
+
+                if (response != 0)
+                {
+                    return Ok("Especialidad actualizada correctamente.");
+                }
+                else
+                {
+                    return BadRequest("Error al actualizar la especialidad.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
