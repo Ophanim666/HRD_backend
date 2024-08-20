@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using DTO;
-using DTO.Usuario;
+using DTO.Proveedor;
 using Models.Entidades;
 
 namespace API
@@ -8,7 +8,7 @@ namespace API
     public class Automapping : Profile
     {
         public Automapping() {
-            CreateMap<Usuario, UsuarioDTO>()/*.ReverseMap()*/;
+            CreateMap<Proveedor, ProveedorDTO>()/*.ReverseMap()*/;
         }
     }
 }

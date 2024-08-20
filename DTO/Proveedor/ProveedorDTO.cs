@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.Entidades
+namespace DTO.Proveedor
 {
-    public class Proveedor
+    public class ProveedorDTO
     {
         public int ID { get; set; }
         public string NOMBRE { get; set; }
@@ -20,6 +20,5 @@ namespace Models.Entidades
         public int ESTADO { get; set; }
         public string USUARIO_CREACION { get; set; }
         public DateTime FECHA_CREACION { get; set; }
-        
     }
 }
