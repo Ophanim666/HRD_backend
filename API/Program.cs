@@ -19,6 +19,9 @@ builder.Services.AddAutoMapper(typeof(Automapping));
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddScoped<UsuarioRepository>(provider => new UsuarioRepository(connectionString));
 
+// Registrar TareaRepository
+builder.Services.AddScoped<TareaRepository>(provider => new TareaRepository(connectionString));
+
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
