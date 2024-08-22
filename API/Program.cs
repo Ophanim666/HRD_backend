@@ -23,6 +23,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddScoped<UsuarioRepository>(provider => new UsuarioRepository(connectionString));
 //TipoParametro
 builder.Services.AddScoped<TipoParametroRepository>(provider => new TipoParametroRepository(connectionString));
+//Parametro
+builder.Services.AddScoped<ParametroRepository>(provider => new ParametroRepository(connectionString));
 
 
 // Configurar Swagger

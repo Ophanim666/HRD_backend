@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DTO;
 using DTO.TipoParametro;
+using DTO.Parametro;
 using DTO.Usuario;
 using Models.Entidades;
 
@@ -11,6 +12,7 @@ namespace API
         public Automapping() {
             CreateMap<Usuario, UsuarioDTO>()/*.ReverseMap()*/;
             CreateMap<TipoParametro, TipoParametroDTO>();
+            CreateMap<Parametro, ParametroDTO>();
         }
     }
 }
