@@ -35,7 +35,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//esto lo ponemos aqui pq debe ir antes de la autorizacion
+// Esto lo ponemos aqui pq debe ir antes de la autorizacion
 app.UseCors(x => x.AllowAnyOrigin()
                    .AllowAnyHeader()
                    .AllowAnyMethod()
