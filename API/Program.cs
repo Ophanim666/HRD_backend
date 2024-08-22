@@ -6,6 +6,7 @@ using AutoMapper;
 using DTO.Usuario;
 using Models.Entidades;
 using API;
+using Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 

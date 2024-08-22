@@ -1,68 +1,136 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Data.Repositorios;
 using Models.Entidades;
+using Data.Repositories;
 using System.Threading.Tasks;
+using DTO.Tarea;
+using AutoMapper;
 using System.Collections.Generic;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class TareaController : ControllerBase
     {
-        private readonly TareaRepository _tareaRepository;
+        private readonly TareaRepository _tareaRepositorio;
+        private readonly IMapper _mapper;
 
-        public TareaController(TareaRepository tareaRepository)
+        public TareaController(TareaRepository tareaRepositorio, IMapper mapper)
         {
-            _tareaRepository = tareaRepository;
+            _tareaRepositorio = tareaRepositorio;
+            _mapper = mapper;
         }
 
-        // GET: api/tarea
+        // Listar todas las tareas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Tarea>>> GetTareas()
+        public async Task<ActionResult<List<TareaDTO>>> ListAll()
         {
-            var tareas = await _tareaRepository.ListAll();
-            return Ok(tareas);
+            var response = await _tareaRepositorio.ListAll();
+            if (response == null || response.Count == 0)
+            {
+                return NotFound();
+            }
+
+            var tareaDTOs = _mapper.Map<List<TareaDTO>>(response);
+            return Ok(tareaDTOs);
         }
 
-        // POST: api/tarea
+        // Listar tarea por ID
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TareaDTO>> ListarPorId(int id)
+        {
+            var response = await _tareaRepositorio.ListarPorId(id);
+            if (response == null)
+            {
+                return NotFound();
+            }
+
+            var tareaDTO = _mapper.Map<TareaDTO>(response);
+            return Ok(tareaDTO);
+        }
+
+        // Insertar nueva tarea
         [HttpPost]
-        public async Task<ActionResult> InsertTarea([FromBody] Tarea tarea)
+        public async Task<IActionResult> InsertarTarea([FromBody] TareaDTO tareaDTO)
         {
-            if (tarea == null)
+            if (tareaDTO == null)
             {
-                return BadRequest("Tarea no puede ser nula.");
+                return BadRequest("Datos inválidos.");
             }
 
-            await _tareaRepository.Insert(tarea);
-            return Ok("Tarea insertada exitosamente.");
-        }
-        // PUT: api/tarea
-        [HttpPut]
-        public async Task<ActionResult> UpdateTarea([FromBody] Tarea tarea)
-        {
-            if (tarea == null)
-            {
-                return BadRequest("Tarea no puede ser nula.");
-            }
+            var tarea = _mapper.Map<Tarea>(tareaDTO);
 
             try
             {
-                await _tareaRepository.Update(tarea);
-                return Ok("Tarea actualizada exitosamente.");
+                var result = await _tareaRepositorio.InsertarTarea(tarea);
+
+                if (result > 0)
+                {
+                    return Ok("Tarea insertada correctamente.");
+                }
+                else
+                {
+                    return StatusCode(500, "Error al insertar la tarea.");
+                }
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error al actualizar la tarea: {ex.Message}");
+                return BadRequest(ex.Message);
             }
         }
 
-        // DELETE: api/tarea/{id}
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteTarea(int id)
+        // Actualizar tarea
+        [HttpPut("{id}")]
+        public async Task<IActionResult> ActualizarTarea(int id, [FromBody] TareaDTO tareaDTO)
         {
-            await _tareaRepository.Delete(id);
-            return Ok("Tarea eliminada exitosamente.");
+            if (tareaDTO == null)
+            {
+                return BadRequest("Datos inválidos.");
+            }
+
+            var tarea = _mapper.Map<Tarea>(tareaDTO);
+            tarea.ID = id;
+
+            try
+            {
+                var response = await _tareaRepositorio.ActualizarTarea(tarea);
+
+                if (response != 0)
+                {
+                    return Ok("Tarea actualizada correctamente.");
+                }
+                else
+                {
+                    return BadRequest("Error al actualizar la tarea.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        // Eliminar tarea por ID
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> EliminarTarea(int id)
+        {
+            try
+            {
+                var result = await _tareaRepositorio.EliminarTarea(id);
+
+                if (result != 0)
+                {
+                    return Ok("Tarea eliminada correctamente.");
+                }
+                else
+                {
+                    return NotFound("Tarea no encontrada.");
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
