@@ -27,6 +27,10 @@ builder.Services.AddScoped<TipoParametroRepository>(provider => new TipoParametr
 builder.Services.AddScoped<ParametroRepository>(provider => new ParametroRepository(connectionString));
 
 
+
+//ProveedorRepository
+builder.Services.AddScoped<ProveedorRepository>(provider => new ProveedorRepository(connectionString));
+
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
