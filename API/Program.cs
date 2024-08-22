@@ -6,8 +6,6 @@ using AutoMapper;
 using DTO.Usuario;
 using Models.Entidades;
 using API;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,9 +16,11 @@ builder.Services.AddControllers();
 // Configurar AutoMapper
 builder.Services.AddAutoMapper(typeof(Automapping));
 
-// Configurar la cadena de conexión
+// Configurar la cadena de conexiÃ³n
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddScoped<UsuarioRepository>(provider => new UsuarioRepository(connectionString));
+//Especialidad
+builder.Services.AddScoped<EspecialidadRepository>(provider => new EspecialidadRepository(connectionString));
 //TipoParametro
 builder.Services.AddScoped<TipoParametroRepository>(provider => new TipoParametroRepository(connectionString));
 //Parametro
@@ -41,7 +41,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//esto lo ponemos aqui pq debe ir antes de la autorizacion
+// Esto lo ponemos aqui pq debe ir antes de la autorizacion
 app.UseCors(x => x.AllowAnyOrigin()
                    .AllowAnyHeader()
                    .AllowAnyMethod()
