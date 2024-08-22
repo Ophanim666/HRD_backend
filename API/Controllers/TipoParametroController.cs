@@ -19,7 +19,33 @@ namespace API.Controllers
             _tipoParametroRepositorio = tipoParametroRepositorio;
             _mapper = mapper;
         }
-        //insertar usuarios
+        //listar tipoparametros
+        [HttpGet]
+        public async Task<ActionResult<List<TipoParametroDTO>>> ListAll()
+        {
+            var response = await _tipoParametroRepositorio.ListAll();
+            if (response == null || response.Count == 0)
+            {
+                return NotFound();
+            }
+
+            var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
+            return Ok(tipoParametroDTOs);
+        }
+        //Listar tipode parametros por ID ---------------------------------------ELIMINAR SI NO FUNCIONA-----------------------------------------
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TipoParametroDTO>> ListarPorId(int id)
+        {
+            var response = await _tipoParametroRepositorio.ListarPorId(id);
+            if (response == null)
+            {
+                return NotFound();
+            }
+
+            var tipoParametroDTO = _mapper.Map<TipoParametroDTO>(response);
+            return Ok(tipoParametroDTO);
+        }
+        //insertar tipoparametros
         [HttpPost]
         public async Task<IActionResult> InsertarTipoParametro([FromBody] TipoParametroDTO tipoParametroDTO)
         {
@@ -54,7 +80,7 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //editar usuarios
+        //editar tipo parametros
         [HttpPut("{id}")]
         public async Task<IActionResult> ActualizarTipoParametro(int id, [FromBody] TipoParametroDTO tipoParametroDto)
         {
@@ -76,7 +102,7 @@ namespace API.Controllers
             {
                 var response = await _tipoParametroRepositorio.ActualizarTipoParametro(tipoParametro);
 
-                if (response > 0)
+                if (response != 0)
                 {
                     return Ok("TipoParametro actualizado correctamente.");
                 }
@@ -90,20 +116,6 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //listar usuarios
-        [HttpGet]
-        public async Task<ActionResult<List<TipoParametroDTO>>> ListAll()
-        {
-            var response = await _tipoParametroRepositorio.ListAll();
-            if (response == null || response.Count == 0)
-            {
-                return NotFound();
-            }
-
-            var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
-            return Ok(tipoParametroDTOs);
-        }
-
         // Método para eliminar TipoParametro por ID
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarTipoParametro(int id)

@@ -14,29 +14,6 @@ namespace Data.Repositories
         {
             _connectionString = connectionString;
         }
-
-        // Verificar unicidad
-        //public async Task<bool> TipoParametroExists(string tipoParametro)
-        //{
-        //    if (string.IsNullOrWhiteSpace(tipoParametro))
-        //    {
-        //        throw new ArgumentNullException(nameof(tipoParametro), "El tipo de parámetro no puede ser nulo o vacío.");
-        //    }
-
-        //    using (SqlConnection sql = new SqlConnection(_connectionString))
-        //    {
-        //        using (SqlCommand cmd = new SqlCommand("SELECT COUNT(1) FROM TIPO_PARAMETRO2 WHERE TIPO_PARAMETRO_LOWER = @TipoParametro", sql))
-        //        {
-        //            cmd.Parameters.AddWithValue("@TipoParametro", tipoParametro.ToLower());
-        //            await sql.OpenAsync();
-
-        //            var count = (int)await cmd.ExecuteScalarAsync();
-        //            return count > 0;
-        //        }
-        //    }
-        //}
-
-
         // Método para eliminar TipoParametro por ID
         public async Task<int> EliminarTipoParametro(int id)
         {
@@ -82,15 +59,10 @@ namespace Data.Repositories
         // Actualizar TipoParametro con validación
         public async Task<int> ActualizarTipoParametro(TipoParametro tipoParametro)
         {
-            // Verificar la existencia del tipo de parámetro antes de actualizar (opcional, si se necesita)
-            //if (await TipoParametroExists(tipoParametro.TIPO_PARAMETRO))
-            //{
-            //    throw new Exception("El tipo de parámetro ya existe.");
-            //}
-
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ActualizarTipoParametro", sql))
+                // AQUI SE CAMBIO EL PROCEDIMIENTO ALMACENADO YA QUE ESTE ACTUALIZA Y NO DA ERROR SI EL TIPOPARAMETRO NO SE ALTERA
+                using (SqlCommand cmd = new SqlCommand("SP_ActualizarTipoParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -130,6 +102,32 @@ namespace Data.Repositories
                 }
             }
         }
+        //Listar por ID -------------------------------------------------------ELIMINAR SI NO FUNCIONA---------------------------------
+        public async Task<TipoParametro> ListarPorId(int id)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("ListarTipoParametroPorId", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ID", id);
+
+                    TipoParametro response = null;
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            response = MapToTipoParametro(reader);
+                        }
+                    }
+
+                    return response;
+                }
+            }
+        }
+//...........................................................MAPEO....................................................
 
         private TipoParametro MapToTipoParametro(SqlDataReader reader)
         {
