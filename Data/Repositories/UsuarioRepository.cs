@@ -3,12 +3,13 @@ using DTO.Usuario;
 using Models.Entidades;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Data.Repositorios 
+namespace Data.Repositorios
 {
     public class UsuarioRepository
     {
@@ -18,37 +19,15 @@ namespace Data.Repositorios
         {
             _connectionString = connectionString;
         }
+        //Funcion para eliminar usuarios esta funcion quedara como softdelete que no eliminara a los usaurios de la base de datos 
+        
 
-        ////public IEnumerable<Usuario> GetUsuarios()
-        ////{
-        ////    var usuarios = new List<Usuario>();
-
-        ////    using (var connection = new SqlConnection(_connectionString))
-        ////    {
-        ////        var command = new SqlCommand("SELECT Id, UserName FROM Usuarios", connection);
-        ////        connection.Open();
-        ////        using (var reader = command.ExecuteReader())
-        ////        {
-        ////            while (reader.Read())
-        ////            {
-        ////                var usuario = new Usuario
-        ////                {
-        ////                    Id = reader.GetInt32(0),
-        ////                    UserName = reader.GetString(1),
-        ////                };
-        ////                usuarios.Add(usuario);
-        ////            }
-        ////        }
-        ////    }
-
-        ////    return usuarios;
-        ////}
-
+        //Funciion listar
         public async Task<List<Usuario>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                //Lo llama por procedimiento almacenado
+                // Lo llama por procedimiento almacenado
                 using (SqlCommand cmd = new SqlCommand("AAAGetUsuarios", sql))
                 {
                     var response = new List<Usuario>();
@@ -66,16 +45,23 @@ namespace Data.Repositorios
                 }
             }
         }
-
+        // DE MOMENTO EL SISTEMA NO PUDE TRATAR CON VALORES NULOS Y SE DEBE VERIFICAR QUE EN LA BASE DE DATOS NO TENGA VALORES NULOS SINO NO FUNCIONARA LA EJECUCION
         private Usuario MapToUsuario(SqlDataReader reader)
         {
             return new Usuario()
             {
                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                UserName = reader.GetString(reader.GetOrdinal("UserName"))
+                Rut = reader.GetString(reader.GetOrdinal("Rut")),
+                Primer_Nombre = reader.GetString(reader.GetOrdinal("Primer_Nombre")),
+                Segundo_Nombre = reader.GetString(reader.GetOrdinal("Segundo_Nombre")),
+                Primer_Apellido = reader.GetString(reader.GetOrdinal("Primer_Apellido")),
+                Segundo_Apellido = reader.GetString(reader.GetOrdinal("Segundo_Apellido")),
+                Fecha_de_nacimiento = reader.GetDateTime(reader.GetOrdinal("Fecha_nacimiento")),
+                Rol = reader.GetString(reader.GetOrdinal("Rol")),
+                Especialidad = reader.GetString(reader.GetOrdinal("Especialidad"))
             };
-
         }
     }
 }
+
 

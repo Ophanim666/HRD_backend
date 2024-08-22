@@ -16,9 +16,20 @@ builder.Services.AddControllers();
 // Configurar AutoMapper
 builder.Services.AddAutoMapper(typeof(Automapping));
 
-// Configurar la cadena de conexión
+// Configurar la cadena de conexiÃ³n
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddScoped<UsuarioRepository>(provider => new UsuarioRepository(connectionString));
+//Especialidad
+builder.Services.AddScoped<EspecialidadRepository>(provider => new EspecialidadRepository(connectionString));
+//TipoParametro
+builder.Services.AddScoped<TipoParametroRepository>(provider => new TipoParametroRepository(connectionString));
+//Parametro
+builder.Services.AddScoped<ParametroRepository>(provider => new ParametroRepository(connectionString));
+
+
+
+//ProveedorRepository
+builder.Services.AddScoped<ProveedorRepository>(provider => new ProveedorRepository(connectionString));
 
 // Registrar TareaRepository
 builder.Services.AddScoped<TareaRepository>(provider => new TareaRepository(connectionString));
@@ -37,7 +48,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//esto lo ponemos aqui pq debe ir antes de la autorizacion
+// Esto lo ponemos aqui pq debe ir antes de la autorizacion
 app.UseCors(x => x.AllowAnyOrigin()
                    .AllowAnyHeader()
                    .AllowAnyMethod()
