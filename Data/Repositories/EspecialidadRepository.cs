@@ -51,8 +51,9 @@ namespace Data.Repositories
 
                     cmd.Parameters.AddWithValue("@NOMBRE", especialidad.NOMBRE);
                     cmd.Parameters.AddWithValue("@ESTADO", especialidad.ESTADO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
+                    // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
+                    //cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
+                    //cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
 
                     await sql.OpenAsync();
                     return await cmd.ExecuteNonQueryAsync();
@@ -75,18 +76,7 @@ namespace Data.Repositories
                 }
             }
         }
-        private Especialidad MapToEspecialidad(SqlDataReader reader)
-        {
-            return new Especialidad()
-            {
-                ID = reader.GetInt32(reader.GetOrdinal("ID")),
-                NOMBRE = reader.GetString(reader.GetOrdinal("NOMBRE")),
-                ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
-                USUARIO_CREACION = reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
-                FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
-            };
-        }
-
+        
         // Procedimiento almacenado para actualizar especialidad
         public async Task<int> ActualizarEspecialidad(Especialidad especialidad)
         {
@@ -99,13 +89,34 @@ namespace Data.Repositories
                     cmd.Parameters.AddWithValue("@ID", especialidad.ID);
                     cmd.Parameters.AddWithValue("@NOMBRE", especialidad.NOMBRE);
                     cmd.Parameters.AddWithValue("@ESTADO", especialidad.ESTADO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
+                    // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
+                    //cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
+                    //cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
 
                     await sql.OpenAsync();
                     return await cmd.ExecuteNonQueryAsync();
                 }
             }
+        }
+
+
+
+        //Mapeo de la especialidad
+        private Especialidad MapToEspecialidad(SqlDataReader reader)
+        {
+            return new Especialidad()
+            {
+                // SE MODDIFICO PARA QUE PUEDA ACEPTAR NULOS
+                ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                NOMBRE = reader.IsDBNull(reader.GetOrdinal("NOMBRE")) ? null : reader.GetString(reader.GetOrdinal("NOMBRE")),
+                // DE MOENTO ESTADO NO PUEDE QUEDAR SIENDO NULO POR SER UN INT ------> nota: Tipos Nullable: En caso de tipos de datos como int, DateTime, etc., que no pueden ser nulos de forma predeterminada, los manejamos utilizando tipos nullable (por ejemplo, int?, DateTime?), que permiten asignar null.
+                ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
+                //ESTOS OBLIGATOEIMENTE DEBEN QUEDAR COMO NULOS (IsDBNull confirma que esta nullo en la d) 
+                USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                //implementacion de DateTime.Now como este valor no uede ser nulo se entregara la fecha actual como solucion a null
+                //FECHA_CREACION utiliza la fecha y hora actuales en caso de que el valor de la base de datos sea nulo, se asignara DateTime.Now cuando se detecte un valor nulo.
+                FECHA_CREACION = reader.IsDBNull(reader.GetOrdinal("FECHA_CREACION")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
+            };
         }
 
     }

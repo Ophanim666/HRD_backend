@@ -47,8 +47,9 @@ namespace API.Controllers
             {
                 NOMBRE = especialidadDTO.NOMBRE,
                 ESTADO = especialidadDTO.ESTADO,
-                USUARIO_CREACION = especialidadDTO.USUARIO_CREACION,
-                FECHA_CREACION = especialidadDTO.FECHA_CREACION
+                // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
+                //USUARIO_CREACION = especialidadDTO.USUARIO_CREACION,
+                //FECHA_CREACION = especialidadDTO.FECHA_CREACION
             };
 
             try
@@ -107,8 +108,9 @@ namespace API.Controllers
                 ID = id,
                 NOMBRE = especialidadDTO.NOMBRE,
                 ESTADO = especialidadDTO.ESTADO,
-                USUARIO_CREACION = especialidadDTO.USUARIO_CREACION,
-                FECHA_CREACION = especialidadDTO.FECHA_CREACION
+                // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
+                //USUARIO_CREACION = especialidadDTO.USUARIO_CREACION,
+                //FECHA_CREACION = especialidadDTO.FECHA_CREACION
             };
 
             try
