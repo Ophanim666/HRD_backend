@@ -1,10 +1,12 @@
-﻿using Models.Entidades;
-using System.Data;
+﻿using Data.Repositorios;
+using DTO.Tarea;
+using Models.Entidades;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
-namespace Data.Repositories
+namespace Data.Repositorios
 {
     public class TareaRepository
     {
@@ -15,74 +17,14 @@ namespace Data.Repositories
             _connectionString = connectionString;
         }
 
-        // Método para eliminar Tarea por ID
-        public async Task<int> EliminarTarea(int id)
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("EliminarTarea", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
-
-                    await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
-                }
-            }
-        }
-
-        // Insertar Tarea
-        public async Task<int> InsertarTarea(Tarea tarea)
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("InsertarTarea", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.AddWithValue("@NOMBRE", tarea.Nombre);
-                    cmd.Parameters.AddWithValue("@CODIGO", tarea.Codigo);
-                    cmd.Parameters.AddWithValue("@ESTADO", tarea.Estado);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", tarea.Usuario_Creacion);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", tarea.Fecha_Creacion);
-
-                    await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
-                }
-            }
-        }
-
-        // Actualizar Tarea
-        public async Task<int> ActualizarTarea(Tarea tarea)
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("ActualizarTarea", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.AddWithValue("@ID", tarea.ID);
-                    cmd.Parameters.AddWithValue("@NOMBRE", tarea.Nombre);
-                    cmd.Parameters.AddWithValue("@CODIGO", tarea.Codigo);
-                    cmd.Parameters.AddWithValue("@ESTADO", tarea.Estado);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", tarea.Usuario_Creacion);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", tarea.Fecha_Creacion);
-
-                    await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
-                }
-            }
-        }
-
-        // Función para listar todas las tareas
+        // Listar todas las tareas
         public async Task<List<Tarea>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ListarTareas", sql))
+                using (SqlCommand cmd = new SqlCommand("ListarTareas", sql)) // Procedimiento almacenado correcto
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     var response = new List<Tarea>();
                     await sql.OpenAsync();
 
@@ -99,44 +41,81 @@ namespace Data.Repositories
             }
         }
 
-        // Listar Tarea por ID
-        public async Task<Tarea> ListarPorId(int id)
+        // Insertar una nueva tarea
+        public async Task Insert(Tarea tarea)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ListarTareaPorId", sql))
+                using (SqlCommand cmd = new SqlCommand("InsertarTarea", sql)) // Procedimiento almacenado correcto
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@NOMBRE", tarea.Nombre);
+                    cmd.Parameters.AddWithValue("@CODIGO", tarea.Codigo);
+                    cmd.Parameters.AddWithValue("@ESTADO", tarea.Estado);
+                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", tarea.Usuario_Creacion);
+                    cmd.Parameters.AddWithValue("@FECHA_CREACION", tarea.Fecha_Creacion == default(DateTime) ? DateTime.Now : tarea.Fecha_Creacion);
 
-                    Tarea response = null;
                     await sql.OpenAsync();
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (await reader.ReadAsync())
-                        {
-                            response = MapToTarea(reader);
-                        }
-                    }
-
-                    return response;
+                    await cmd.ExecuteNonQueryAsync();
                 }
             }
         }
 
-        // Mapeo de datos desde el DataReader a la entidad Tarea
+        // Eliminar una tarea por ID
+        public async Task Delete(int id)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("EliminarTarea", sql)) // Procedimiento almacenado correcto
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ID", id);
+
+                    await sql.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+                }
+            }
+        }
+        // Actualizar una tarea por ID
+        public async Task Update(Tarea tarea)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("ActualizarTarea", sql)) // Procedimiento almacenado correcto
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ID", tarea.ID);
+                    cmd.Parameters.AddWithValue("@NOMBRE", tarea.Nombre);
+                    cmd.Parameters.AddWithValue("@CODIGO", tarea.Codigo);
+                    cmd.Parameters.AddWithValue("@ESTADO", tarea.Estado);
+                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", tarea.Usuario_Creacion);
+                    cmd.Parameters.AddWithValue("@FECHA_CREACION", tarea.Fecha_Creacion);
+
+                    await sql.OpenAsync();
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    if (rowsAffected == 0)
+                    {
+                        throw new Exception("No se pudo actualizar el registro.");
+                    }
+                }
+            }
+        }
+
+        // Mapeo de los resultados
         private Tarea MapToTarea(SqlDataReader reader)
         {
             return new Tarea()
             {
-                ID = reader.GetInt32(reader.GetOrdinal("ID")),
-                Nombre = reader.GetString(reader.GetOrdinal("NOMBRE")),
-                Codigo = reader.GetString(reader.GetOrdinal("CODIGO")),
-                Estado = reader.GetInt32(reader.GetOrdinal("ESTADO")),
-                Usuario_Creacion = reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
-                Fecha_Creacion = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
+                ID = reader.GetInt32(reader.GetOrdinal("Id")),
+                Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
+                Codigo = reader.GetString(reader.GetOrdinal("Codigo")),
+                Estado = reader.GetInt32(reader.GetOrdinal("Estado")),
+                Usuario_Creacion = reader.GetString(reader.GetOrdinal("Usuario_creacion")),
+                Fecha_Creacion = reader.GetDateTime(reader.GetOrdinal("Fecha_creacion")),
             };
         }
     }
+
+
 }
