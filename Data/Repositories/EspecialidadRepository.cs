@@ -106,6 +106,8 @@ namespace Data.Repositories
         {
             return new Especialidad()
             {
+                //OJO el mapeo solo sirve para listar si son nulos si se quiere insertar un dato nulo eso se debe ver en otra situacion, lo que hara la fecha creacion en esta situcaion 
+                //seria poner la fecha actual en el listado para que no quede nulo y el listado si funcione
                 // SE MODDIFICO PARA QUE PUEDA ACEPTAR NULOS
                 ID = reader.GetInt32(reader.GetOrdinal("ID")),
                 NOMBRE = reader.IsDBNull(reader.GetOrdinal("NOMBRE")) ? null : reader.GetString(reader.GetOrdinal("NOMBRE")),

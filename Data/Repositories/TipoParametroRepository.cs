@@ -31,14 +31,9 @@ namespace Data.Repositories
         }
 
 
-        // Insertar TipoParametro con validación
+        // Insertar TipoParametro 
         public async Task<int> InsertarTipoParametro(TipoParametro tipoParametro)
         {
-            //if (await TipoParametroExists(tipoParametro.TIPO_PARAMETRO))
-            //{
-            //    throw new Exception("El tipo de parámetro ya existe.");
-            //}
-
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
                 using (SqlCommand cmd = new SqlCommand("InsertarTipoParametro", sql))
@@ -56,7 +51,7 @@ namespace Data.Repositories
             }
         }
 
-        // Actualizar TipoParametro con validación
+        // Actualizar TipoParametro
         public async Task<int> ActualizarTipoParametro(TipoParametro tipoParametro)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -133,6 +128,17 @@ namespace Data.Repositories
         {
             return new TipoParametro()
             {
+                ////OJO el mapeo solo sirve para listar si son nulos si se quiere insertar un dato nulo eso se debe ver en otra situacion 
+                //ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                ////esto se hace para que se puedan aceptar valores nulos
+                //TIPO_PARAMETRO = reader.IsDBNull(reader.GetOrdinal("TIPO_PARAMETRO")) ? null : reader.GetString(reader.GetOrdinal("TIPO_PARAMETRO")),
+                //ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
+                ////para los valores nulos se hace el mismo procedimiento
+                //USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                ////aqui pondra la fecha actual ya que datetime no puede qudar nulo
+                //FECHA_CREACION = reader.IsDBNull(reader.GetOrdinal("FECHA_CREACION")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
+
+                //En caso de errores se veia asi antes de la aceptacion de los valores nulos
                 ID = reader.GetInt32(reader.GetOrdinal("ID")),
                 TIPO_PARAMETRO = reader.GetString(reader.GetOrdinal("TIPO_PARAMETRO")),
                 ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
