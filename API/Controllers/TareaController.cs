@@ -41,6 +41,8 @@ namespace API.Controllers
         // PUT: api/tarea
         [HttpPut("{id}")]
         public async Task<ActionResult> UpdateTarea([FromBody] Tarea tarea)
+        public async Task<IActionResult> ActualizarTarea(int id, [FromBody] TareaDTO tareaDTO)
+        public async Task<IActionResult> ActualizarTarea(int id, [FromBody] TareaDTO tareaDTO)
         {
             if (tarea == null)
             {
