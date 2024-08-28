@@ -20,7 +20,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("USP_ObtenerEspecialidad", sql))
+                using (SqlCommand cmd = new SqlCommand("ObtenerEspecialidad", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
