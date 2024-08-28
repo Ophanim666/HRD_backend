@@ -45,7 +45,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("SP_AñadirEspecialidad", sql))
+                using (SqlCommand cmd = new SqlCommand("USP_InsertarEspecialidad", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
