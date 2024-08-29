@@ -1,8 +1,11 @@
 ﻿using Models.Entidades;
 using System.Data;
 using System.Data.SqlClient;
+using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+//Importamos el dto
+using DTO.TipoParametro;
 
 namespace Data.Repositories
 {
@@ -14,6 +17,9 @@ namespace Data.Repositories
         {
             _connectionString = connectionString;
         }
+        //aqui poneos los codErr y desErr para poder trabajarlos
+        public int codError;
+        public string desError; 
 
         //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
         public async Task<int> EliminarTipoParametro(int id)
@@ -33,7 +39,7 @@ namespace Data.Repositories
 
 
         //---------------------------------------------------------------Insertar TipoParametro--------------------------------------------------------------- 
-        public async Task<int> InsertarTipoParametro(TipoParametro tipoParametro)
+        public async Task<(int codErr, string desErr)> InsertarTipoParametro(TipoParametroInsertDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -41,19 +47,27 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", tipoParametro.TIPO_PARAMETRO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", tipoParametro.USUARIO_CREACION);
-                    cmd.Parameters.AddWithValue("@ESTADO", tipoParametro.ESTADO);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", tipoParametro.FECHA_CREACION);
-
+                    cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", value.TIPO_PARAMETRO);
+                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", value.USUARIO_CREACION);
+                    cmd.Parameters.AddWithValue("@ESTADO", value.ESTADO);
+                    cmd.Parameters.AddWithValue("@FECHA_CREACION", value.FECHA_CREACION);
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
 
         //---------------------------------------------------------------Actualizar TipoParametro---------------------------------------------------------------
-        public async Task<int> ActualizarTipoParametro(TipoParametro tipoParametro)
+        public async Task<(int codErr, string desErr)> ActualizarTipoParametro(TipoParametroUpdateDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -62,14 +76,22 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@ID", tipoParametro.ID);
-                    cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", tipoParametro.TIPO_PARAMETRO);
-                    cmd.Parameters.AddWithValue("@ESTADO", tipoParametro.ESTADO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", tipoParametro.USUARIO_CREACION);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", tipoParametro.FECHA_CREACION);
-
+                    cmd.Parameters.AddWithValue("@ID", value.ID);
+                    cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", value.TIPO_PARAMETRO);
+                    cmd.Parameters.AddWithValue("@ESTADO", value.ESTADO);
+                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", value.USUARIO_CREACION);
+                    cmd.Parameters.AddWithValue("@FECHA_CREACION", value.FECHA_CREACION);
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }

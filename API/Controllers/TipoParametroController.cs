@@ -4,6 +4,10 @@ using Data.Repositories;
 using System.Threading.Tasks;
 using DTO.TipoParametro;
 using AutoMapper;
+using DTO;
+//nuevos usings necesarios
+using System.Collections.Generic;
+using System;
 
 namespace API.Controllers
 {
@@ -33,91 +37,44 @@ namespace API.Controllers
             return Ok(tipoParametroDTOs);
         }
 
-        //---------------------------------------------------------------Listar tipode parametros por ID---------------------------------------------------------------
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TipoParametroDTO>> ListarPorId(int id)
-        {
-            var response = await _tipoParametroRepositorio.ListarPorId(id);
-            if (response == null)
-            {
-                return NotFound();
-            }
-
-            var tipoParametroDTO = _mapper.Map<TipoParametroDTO>(response);
-            return Ok(tipoParametroDTO);
-        }
-
         //---------------------------------------------------------------Insertar tipoparametros---------------------------------------------------------------
-        [HttpPost]
-        public async Task<IActionResult> InsertarTipoParametro([FromBody] TipoParametroDTO tipoParametroDTO)
-        {
-            if (tipoParametroDTO == null)
-            {
-                return BadRequest("Datos inválidos.");
-            }
+        [HttpPost("add")]
+        public async Task<ActionResult<ObjetoRequest>> InsertarTipoParametro([FromBody] TipoParametroInsertDTO value)
+        {   
+            var response = await _tipoParametroRepositorio.InsertarTipoParametro(value);
 
-            var tipoParametro = new TipoParametro
-            {
-                TIPO_PARAMETRO = tipoParametroDTO.TIPO_PARAMETRO,
-                ESTADO = tipoParametroDTO.ESTADO,
-                USUARIO_CREACION = tipoParametroDTO.USUARIO_CREACION,
-                FECHA_CREACION = tipoParametroDTO.FECHA_CREACION
-            };
 
-            try
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+            objetoRequest.Estado.ErrDes = response.desErr.ToString();
+            if (response.codErr != 0)
             {
-                var result = await _tipoParametroRepositorio.InsertarTipoParametro(tipoParametro);
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[controller]";
+            }
+                return objetoRequest;
 
-                if (result > 0)
-                {
-                    return Ok("TipoParametro insertado correctamente.");
-                }
-                else
-                {
-                    return StatusCode(500, "Error al insertar el TipoParametro.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
-        //---------------------------------------------------------------Editar tipo parametros---------------------------------------------------------------
+        //---------------------------------------------------------------Actualizar tipo parametros---------------------------------------------------------------
         [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarTipoParametro(int id, [FromBody] TipoParametroDTO tipoParametroDto)
+        public async Task<ActionResult<ObjetoRequest>> ActualizarTipoParametro(int id, [FromBody] TipoParametroUpdateDTO value)
         {
-            if (tipoParametroDto == null)
-            {
-                return BadRequest("Datos inválidos.");
-            }
+            var response = await _tipoParametroRepositorio.ActualizarTipoParametro(value);
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+            objetoRequest.Estado.ErrDes = response.desErr.ToString();
 
-            var tipoParametro = new TipoParametro
+            if (response.codErr != 0)
             {
-                ID = id,
-                TIPO_PARAMETRO = tipoParametroDto.TIPO_PARAMETRO,
-                ESTADO = tipoParametroDto.ESTADO,
-                USUARIO_CREACION = tipoParametroDto.USUARIO_CREACION,
-                FECHA_CREACION = tipoParametroDto.FECHA_CREACION
-            };
-
-            try
-            {
-                var response = await _tipoParametroRepositorio.ActualizarTipoParametro(tipoParametro);
-
-                if (response != 0)
-                {
-                    return Ok("TipoParametro actualizado correctamente.");
-                }
-                else
-                {
-                    return BadRequest("Error al actualizar el TipoParametro.");
-                }
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[controller]";
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return objetoRequest;
         }
 
         //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
