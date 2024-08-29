@@ -19,7 +19,7 @@ namespace API.Controllers
             _tipoParametroRepositorio = tipoParametroRepositorio;
             _mapper = mapper;
         }
-        //listar tipoparametros
+        //---------------------------------------------------------------Listar tipoparametros---------------------------------------------------------------
         [HttpGet]
         public async Task<ActionResult<List<TipoParametroDTO>>> ListAll()
         {
@@ -32,7 +32,8 @@ namespace API.Controllers
             var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
             return Ok(tipoParametroDTOs);
         }
-        //Listar tipode parametros por ID ---------------------------------------ELIMINAR SI NO FUNCIONA-----------------------------------------
+
+        //---------------------------------------------------------------Listar tipode parametros por ID---------------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<ActionResult<TipoParametroDTO>> ListarPorId(int id)
         {
@@ -45,7 +46,8 @@ namespace API.Controllers
             var tipoParametroDTO = _mapper.Map<TipoParametroDTO>(response);
             return Ok(tipoParametroDTO);
         }
-        //insertar tipoparametros
+
+        //---------------------------------------------------------------Insertar tipoparametros---------------------------------------------------------------
         [HttpPost]
         public async Task<IActionResult> InsertarTipoParametro([FromBody] TipoParametroDTO tipoParametroDTO)
         {
@@ -80,7 +82,8 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        //editar tipo parametros
+
+        //---------------------------------------------------------------Editar tipo parametros---------------------------------------------------------------
         [HttpPut("{id}")]
         public async Task<IActionResult> ActualizarTipoParametro(int id, [FromBody] TipoParametroDTO tipoParametroDto)
         {
@@ -116,7 +119,8 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        // Método para eliminar TipoParametro por ID
+
+        //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
         [HttpDelete("{id}")]
         public async Task<IActionResult> EliminarTipoParametro(int id)
         {

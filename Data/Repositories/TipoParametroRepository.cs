@@ -14,7 +14,8 @@ namespace Data.Repositories
         {
             _connectionString = connectionString;
         }
-        // Método para eliminar TipoParametro por ID
+
+        //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
         public async Task<int> EliminarTipoParametro(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -31,7 +32,7 @@ namespace Data.Repositories
         }
 
 
-        // Insertar TipoParametro 
+        //---------------------------------------------------------------Insertar TipoParametro--------------------------------------------------------------- 
         public async Task<int> InsertarTipoParametro(TipoParametro tipoParametro)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -51,7 +52,7 @@ namespace Data.Repositories
             }
         }
 
-        // Actualizar TipoParametro
+        //---------------------------------------------------------------Actualizar TipoParametro---------------------------------------------------------------
         public async Task<int> ActualizarTipoParametro(TipoParametro tipoParametro)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -73,7 +74,7 @@ namespace Data.Repositories
             }
         }
 
-        // Función para listar
+        //---------------------------------------------------------------Función para listar---------------------------------------------------------------
         public async Task<List<TipoParametro>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -97,7 +98,7 @@ namespace Data.Repositories
                 }
             }
         }
-        //Listar por ID -------------------------------------------------------ELIMINAR SI NO FUNCIONA---------------------------------
+        //---------------------------------------------------------------Listar por ID---------------------------------------------------------------
         public async Task<TipoParametro> ListarPorId(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -122,7 +123,7 @@ namespace Data.Repositories
                 }
             }
         }
-//...........................................................MAPEO....................................................
+        //---------------------------------------------------------------MAPEO---------------------------------------------------------------
 
         private TipoParametro MapToTipoParametro(SqlDataReader reader)
         {
