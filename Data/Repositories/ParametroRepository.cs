@@ -28,7 +28,7 @@ namespace Data.Repositories
 
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("InsertarParametro", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_InsertarParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -50,7 +50,7 @@ namespace Data.Repositories
 
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ActualizarParametro", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ActualizarParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -71,7 +71,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ObtenerParametros", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerParametros", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -96,7 +96,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("EliminarParametro", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_EliminarParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
