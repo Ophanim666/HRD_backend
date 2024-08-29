@@ -32,19 +32,6 @@ namespace API.Controllers
             var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
             return Ok(tipoParametroDTOs);
         }
-        //Listar tipode parametros por ID ---------------------------------------ELIMINAR SI NO FUNCIONA-----------------------------------------
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TipoParametroDTO>> ListarPorId(int id)
-        {
-            var response = await _tipoParametroRepositorio.ListarPorId(id);
-            if (response == null)
-            {
-                return NotFound();
-            }
-
-            var tipoParametroDTO = _mapper.Map<TipoParametroDTO>(response);
-            return Ok(tipoParametroDTO);
-        }
         //insertar tipoparametros
         [HttpPost]
         public async Task<IActionResult> InsertarTipoParametro([FromBody] TipoParametroDTO tipoParametroDTO)
