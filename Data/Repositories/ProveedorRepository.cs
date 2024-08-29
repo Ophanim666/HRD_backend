@@ -19,7 +19,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("EliminarProveedor", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_EliminarProveedor", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
@@ -38,7 +38,7 @@ namespace Data.Repositories
 
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("InsertarProveedor", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_InsertarProveedor", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -67,7 +67,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ActualizarProveedor", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ActualizarProveedor", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -95,7 +95,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ListarProveedor", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedor", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -119,7 +119,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ListarProveedorPorId", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedorPorId", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);

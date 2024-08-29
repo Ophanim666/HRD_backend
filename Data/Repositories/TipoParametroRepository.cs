@@ -20,7 +20,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("EliminarTipoParametro", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_EliminarTipoParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
@@ -37,7 +37,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("InsertarTipoParametro", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_InsertarTipoParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -58,7 +58,7 @@ namespace Data.Repositories
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
                 // AQUI SE CAMBIO EL PROCEDIMIENTO ALMACENADO YA QUE ESTE ACTUALIZA Y NO DA ERROR SI EL TIPOPARAMETRO NO SE ALTERA
-                using (SqlCommand cmd = new SqlCommand("SP_ActualizarTipoParametro", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ActualizarTipoParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -79,7 +79,7 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ListarTipoParametros", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerTipoParametros", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
@@ -98,32 +98,8 @@ namespace Data.Repositories
                 }
             }
         }
-        //---------------------------------------------------------------Listar por ID---------------------------------------------------------------
-        public async Task<TipoParametro> ListarPorId(int id)
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("ListarTipoParametroPorId", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
 
-                    TipoParametro response = null;
-                    await sql.OpenAsync();
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (await reader.ReadAsync())
-                        {
-                            response = MapToTipoParametro(reader);
-                        }
-                    }
-
-                    return response;
-                }
-            }
-        }
-        //---------------------------------------------------------------MAPEO---------------------------------------------------------------
+//...........................................................MAPEO....................................................
 
         private TipoParametro MapToTipoParametro(SqlDataReader reader)
         {
