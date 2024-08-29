@@ -22,7 +22,7 @@ namespace Data.Repositorios
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ListarTareas", sql)) // Procedimiento almacenado correcto
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerTareas", sql)) // Procedimiento almacenado correcto
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     var response = new List<Tarea>();
@@ -46,7 +46,7 @@ namespace Data.Repositorios
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("InsertarTarea", sql)) // Procedimiento almacenado correcto
+                using (SqlCommand cmd = new SqlCommand("usp_InsertarTarea", sql)) // Procedimiento almacenado correcto
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@NOMBRE", tarea.Nombre);
@@ -66,7 +66,7 @@ namespace Data.Repositorios
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("EliminarTarea", sql)) // Procedimiento almacenado correcto
+                using (SqlCommand cmd = new SqlCommand("usp_EliminarTarea", sql)) // Procedimiento almacenado correcto
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
@@ -81,7 +81,7 @@ namespace Data.Repositorios
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("ActualizarTarea", sql)) // Procedimiento almacenado correcto
+                using (SqlCommand cmd = new SqlCommand("usp_ActualizarTarea", sql)) // Procedimiento almacenado correcto
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", tarea.ID);
