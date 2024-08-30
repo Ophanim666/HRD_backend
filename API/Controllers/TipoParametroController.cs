@@ -46,7 +46,8 @@ namespace API.Controllers
 
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
-            objetoRequest.Estado.ErrDes = response.desErr.ToString();
+            //Ya no es necesario ya que se soluciono en el procedimiento almacenado
+            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
             if (response.codErr != 0)
             {
                 objetoRequest.Estado.Ack = false;
@@ -65,7 +66,7 @@ namespace API.Controllers
             var response = await _tipoParametroRepositorio.ActualizarTipoParametro(value);
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
-            objetoRequest.Estado.ErrDes = response.desErr.ToString();
+            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
 
             if (response.codErr != 0)
             {
