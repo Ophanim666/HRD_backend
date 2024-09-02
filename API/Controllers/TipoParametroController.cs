@@ -25,16 +25,27 @@ namespace API.Controllers
         }
         //---------------------------------------------------------------Listar tipoparametros---------------------------------------------------------------
         [HttpGet]
-        public async Task<ActionResult<List<TipoParametroDTO>>> ListAll()
+        public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
             var response = await _tipoParametroRepositorio.ListAll();
-            if (response == null || response.Count == 0)
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null /*|| response.Count == 0*/)
             {
-                return NotFound();
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay tipo parametro registrados";
+                objetoRequest.Estado.ErrCon = "[Controller]";
             }
 
             var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
-            return Ok(tipoParametroDTOs);
+
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = tipoParametroDTOs
+            };
+            return objetoRequest;
         }
 
         //---------------------------------------------------------------Insertar tipoparametros---------------------------------------------------------------
@@ -63,7 +74,7 @@ namespace API.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarTipoParametro(int id, [FromBody] TipoParametroUpdateDTO value)
         {
-            var response = await _tipoParametroRepositorio.ActualizarTipoParametro(value);
+            var response = await _tipoParametroRepositorio.ActualizarTipoParametro(id, value);
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
             //objetoRequest.Estado.ErrDes = response.desErr.ToString();
@@ -80,25 +91,22 @@ namespace API.Controllers
 
         //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
         [HttpDelete("{id}")]
-        public async Task<IActionResult> EliminarTipoParametro(int id)
+        public async Task<ActionResult<ObjetoRequest>> EliminarTipoParametro(int id)
         {
-            try
-            {
-                var result = await _tipoParametroRepositorio.EliminarTipoParametro(id);
+            var response = await _tipoParametroRepositorio.EliminarTipoParametro(id);
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
 
-                if (result != 0)
-                {
-                    return Ok("TipoParametro eliminado correctamente." + result);
-                }
-                else
-                {
-                    return NotFound("TipoParametro no encontrado.");
-                }
-            }
-            catch (Exception ex)
+            if (response.codErr != 0)
             {
-                return BadRequest(ex.Message);
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[controller]";
             }
+            return objetoRequest;
+
         }
     }
 }

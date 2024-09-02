@@ -17,12 +17,12 @@ namespace Data.Repositories
         {
             _connectionString = connectionString;
         }
-        //aqui poneos los codErr y desErr para poder trabajarlos
+        //aqui ponemos los codErr y desErr para poder trabajarlos
         public int codError;
         public string desError; 
 
         //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
-        public async Task<int> EliminarTipoParametro(int id)
+        public async Task<(int codErr, string desErr)> EliminarTipoParametro(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -31,8 +31,17 @@ namespace Data.Repositories
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
 
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
@@ -67,7 +76,7 @@ namespace Data.Repositories
         }
 
         //---------------------------------------------------------------Actualizar TipoParametro---------------------------------------------------------------
-        public async Task<(int codErr, string desErr)> ActualizarTipoParametro(TipoParametroUpdateDTO value)
+        public async Task<(int codErr, string desErr)> ActualizarTipoParametro(int id, TipoParametroUpdateDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -76,11 +85,10 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@ID", value.ID);
-                    cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", value.TIPO_PARAMETRO);
-                    cmd.Parameters.AddWithValue("@ESTADO", value.ESTADO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", value.USUARIO_CREACION);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", value.FECHA_CREACION);
+                    cmd.Parameters.Add(new SqlParameter("@ID", id));
+                    cmd.Parameters.Add(new SqlParameter("@TIPO_PARAMETRO", value.TIPO_PARAMETRO));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
+
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
