@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using DTO.Especialidad;
 
 namespace Data.Repositories
 {
@@ -15,7 +16,11 @@ namespace Data.Repositories
             _connectionString = connectionString;
         }
 
-        // Función para listar
+        //aqui ponemos los codErr y desErr para poder trabajarlos
+        public int codError;
+        public string desError;
+
+        //---------------------------------------------------Función para listar---------------------------------------------------
         public async Task<List<Especialidad>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -40,8 +45,8 @@ namespace Data.Repositories
             }
         }
 
-        // Función para añadir
-        public async Task<int> AñadirEspecialidad(Especialidad especialidad)
+        //---------------------------------------------------Función para añadir---------------------------------------------------
+        public async Task<(int codErr, string desErr)> AñadirEspecialidad(EspecialidadInsertDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -49,20 +54,29 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@NOMBRE", especialidad.NOMBRE);
-                    cmd.Parameters.AddWithValue("@ESTADO", especialidad.ESTADO);
+                    cmd.Parameters.AddWithValue("@NOMBRE", value.NOMBRE);
+                    cmd.Parameters.AddWithValue("@ESTADO", value.ESTADO);
                     // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
                     //cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
                     //cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
 
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
 
-        // Procedimiento almacenado para eliminar especialidad
-        public async Task<int> EliminarEspecialidad(int id)
+        //---------------------------------------------------Eliminar especialidad---------------------------------------------------
+        public async Task<(int codErr, string desErr)> EliminarEspecialidad(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -71,14 +85,23 @@ namespace Data.Repositories
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
 
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
-        
-        // Procedimiento almacenado para actualizar especialidad
-        public async Task<int> ActualizarEspecialidad(Especialidad especialidad)
+
+        //---------------------------------------------------Actualizar especialidad---------------------------------------------------
+        public async Task<(int codErr, string desErr)> ActualizarEspecialidad(int id, EspecialidadUpdateDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -86,22 +109,28 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@ID", especialidad.ID);
-                    cmd.Parameters.AddWithValue("@NOMBRE", especialidad.NOMBRE);
-                    cmd.Parameters.AddWithValue("@ESTADO", especialidad.ESTADO);
-                    // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
-                    //cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
-                    //cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
-
+                    cmd.Parameters.Add(new SqlParameter("@ID", id));
+                    cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
+                    
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
 
 
 
-        //Mapeo de la especialidad
+        //---------------------------------------------------Mapeo de la especialidad---------------------------------------------------
         private Especialidad MapToEspecialidad(SqlDataReader reader)
         {
             return new Especialidad()

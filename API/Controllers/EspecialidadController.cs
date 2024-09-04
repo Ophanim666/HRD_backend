@@ -4,6 +4,7 @@ using Data.Repositories;
 using System.Threading.Tasks;
 using DTO.Especialidad;
 using AutoMapper;
+using DTO;
 
 namespace API.Controllers
 {
@@ -19,117 +20,90 @@ namespace API.Controllers
             _especialidadRepository = especialidadRepository;
             _mapper = mapper;
         }
-        
-        // Listar especialidades
+
+        //---------------------------------------------------Listar especialidades---------------------------------------------------
         [HttpGet]
-        public async Task<ActionResult<List<EspecialidadDTO>>> ListAll()
+        public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
             var response = await _especialidadRepository.ListAll();
-            if (response == null || response.Count == 0)
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null /*|| response.Count == 0*/)
             {
-                return NotFound();
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay tipo parametro registrados";
+                objetoRequest.Estado.ErrCon = "[Especialidadcontroller]";
             }
 
             var EspecialidadDTOs = _mapper.Map<List<EspecialidadDTO>>(response);
-            return Ok(EspecialidadDTOs);
+
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = EspecialidadDTOs
+            };
+            return objetoRequest;
         }
 
-        // Añadir especialidades
+        //---------------------------------------------------Añadir especialidades---------------------------------------------------
         [HttpPost]
-        public async Task<IActionResult> AñadirEspecialidad([FromBody] EspecialidadDTO especialidadDTO)
+        public async Task<ActionResult<ObjetoRequest>> AñadirEspecialidad([FromBody] EspecialidadInsertDTO value)
         {
-            if (especialidadDTO == null)
-            {
-                return BadRequest("Datos inválidos.");
-            }
+            var response = await _especialidadRepository.AñadirEspecialidad(value);
 
-            var tipoParametro = new Especialidad
-            {
-                NOMBRE = especialidadDTO.NOMBRE,
-                ESTADO = especialidadDTO.ESTADO,
-                // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
-                //USUARIO_CREACION = especialidadDTO.USUARIO_CREACION,
-                //FECHA_CREACION = especialidadDTO.FECHA_CREACION
-            };
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
 
-            try
+            if (response.codErr != 0)
             {
-                var result = await _especialidadRepository.AñadirEspecialidad(tipoParametro);
-
-                if (result > 0)
-                {
-                    return Ok("Especialidad añadida correctamente.");
-                }
-                else
-                {
-                    return StatusCode(500, "Error al añadir especialidad.");
-                }
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[Especialidadcontroller]";
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return objetoRequest;
         }
 
-        // Eliminar especialidades
+        //---------------------------------------------------Eliminar especialidades---------------------------------------------------
         [HttpDelete("{id}")]
-        public async Task<IActionResult> EliminarEspecialidad(int id)
+        public async Task<ActionResult<ObjetoRequest>> EliminarEspecialidad(int id)
         {
-            try
-            {
-                var result = await _especialidadRepository.EliminarEspecialidad(id);
+            var response = await _especialidadRepository.EliminarEspecialidad(id);
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
 
-                if (result != 0)
-                {
-                    return Ok("Especialidad eliminada correctamente.");
-                }
-                else
-                {
-                    return NotFound("Especialidad no encontrado.");
-                }
-            }
-            catch (Exception ex)
+
+            if (response.codErr != 0)
             {
-                return BadRequest(ex.Message);
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[EspecialidadController]";
             }
+            return objetoRequest;
         }
 
-        // SP para actualizar especialidad
+
+        //---------------------------------------------------SP para actualizar especialidad---------------------------------------------------
         [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarEspecialidad(int id, [FromBody] EspecialidadDTO especialidadDTO)
+        public async Task<ActionResult<ObjetoRequest>> ActualizarEspecialidad(int id, [FromBody] EspecialidadUpdateDTO value)
         {
-            if (especialidadDTO == null)
-            {
-                return BadRequest("Datos inválidos.");
-            }
+            var response = await _especialidadRepository.ActualizarEspecialidad(id, value);
 
-            var especialidad = new Especialidad
-            {
-                ID = id,
-                NOMBRE = especialidadDTO.NOMBRE,
-                ESTADO = especialidadDTO.ESTADO,
-                // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
-                //USUARIO_CREACION = especialidadDTO.USUARIO_CREACION,
-                //FECHA_CREACION = especialidadDTO.FECHA_CREACION
-            };
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
 
-            try
+            if (response.codErr != 0)
             {
-                var response = await _especialidadRepository.ActualizarEspecialidad(especialidad);
-
-                if (response != 0)
-                {
-                    return Ok("Especialidad actualizada correctamente.");
-                }
-                else
-                {
-                    return BadRequest("Error al actualizar la especialidad.");
-                }
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[Especialidadcontroller]";
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return objetoRequest;
         }
     }
 }
+    
+

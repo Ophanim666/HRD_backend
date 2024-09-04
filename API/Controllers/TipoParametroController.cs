@@ -36,7 +36,7 @@ namespace API.Controllers
                 objetoRequest.Estado.Ack = false;
                 objetoRequest.Estado.ErrNo = "001.01";
                 objetoRequest.Estado.ErrDes = "No hay tipo parametro registrados";
-                objetoRequest.Estado.ErrCon = "[Controller]";
+                objetoRequest.Estado.ErrCon = "[TipoParametroController]";
             }
 
             var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
@@ -64,7 +64,7 @@ namespace API.Controllers
                 objetoRequest.Estado.Ack = false;
                 objetoRequest.Estado.ErrNo = response.codErr.ToString();
                 objetoRequest.Estado.ErrDes = response.desErr.ToString();
-                objetoRequest.Estado.ErrCon = "[controller]";
+                objetoRequest.Estado.ErrCon = "[TipoParametroController]";  
             }
                 return objetoRequest;
 
@@ -84,7 +84,7 @@ namespace API.Controllers
                 objetoRequest.Estado.Ack = false;
                 objetoRequest.Estado.ErrNo = response.codErr.ToString();
                 objetoRequest.Estado.ErrDes = response.desErr.ToString();
-                objetoRequest.Estado.ErrCon = "[controller]";
+                objetoRequest.Estado.ErrCon = "[TipoParametroController]";
             }
             return objetoRequest;
         }
@@ -103,7 +103,7 @@ namespace API.Controllers
                 objetoRequest.Estado.Ack = false;
                 objetoRequest.Estado.ErrNo = response.codErr.ToString();
                 objetoRequest.Estado.ErrDes = response.desErr.ToString();
-                objetoRequest.Estado.ErrCon = "[controller]";
+                objetoRequest.Estado.ErrCon = "[TipoParametroController]";
             }
             return objetoRequest;
 
