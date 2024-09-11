@@ -1,8 +1,11 @@
 ﻿using Models.Entidades;
 using System.Data;
 using System.Data.SqlClient;
+using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+//Importamos el dto
+using DTO.TipoParametro;
 
 namespace Data.Repositories
 {
@@ -14,8 +17,12 @@ namespace Data.Repositories
         {
             _connectionString = connectionString;
         }
-        // Método para eliminar TipoParametro por ID
-        public async Task<int> EliminarTipoParametro(int id)
+        //aqui ponemos los codErr y desErr para poder trabajarlos
+        public int codError;
+        public string desError; 
+
+        //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
+        public async Task<(int codErr, string desErr)> EliminarTipoParametro(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -24,40 +31,52 @@ namespace Data.Repositories
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
 
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
 
 
-        // Insertar TipoParametro con validación
-        public async Task<int> InsertarTipoParametro(TipoParametro tipoParametro)
+        //---------------------------------------------------------------Insertar TipoParametro--------------------------------------------------------------- 
+        public async Task<(int codErr, string desErr)> InsertarTipoParametro(TipoParametroInsertDTO value)
         {
-            //if (await TipoParametroExists(tipoParametro.TIPO_PARAMETRO))
-            //{
-            //    throw new Exception("El tipo de parámetro ya existe.");
-            //}
-
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
                 using (SqlCommand cmd = new SqlCommand("usp_InsertarTipoParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", tipoParametro.TIPO_PARAMETRO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", tipoParametro.USUARIO_CREACION);
-                    cmd.Parameters.AddWithValue("@ESTADO", tipoParametro.ESTADO);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", tipoParametro.FECHA_CREACION);
-
+                    cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", value.TIPO_PARAMETRO);
+                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", value.USUARIO_CREACION);
+                    cmd.Parameters.AddWithValue("@ESTADO", value.ESTADO);
+                    cmd.Parameters.AddWithValue("@FECHA_CREACION", value.FECHA_CREACION);
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
 
-        // Actualizar TipoParametro con validación
-        public async Task<int> ActualizarTipoParametro(TipoParametro tipoParametro)
+        //---------------------------------------------------------------Actualizar TipoParametro---------------------------------------------------------------
+        public async Task<(int codErr, string desErr)> ActualizarTipoParametro(int id, TipoParametroUpdateDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -66,19 +85,26 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@ID", tipoParametro.ID);
-                    cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", tipoParametro.TIPO_PARAMETRO);
-                    cmd.Parameters.AddWithValue("@ESTADO", tipoParametro.ESTADO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", tipoParametro.USUARIO_CREACION);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", tipoParametro.FECHA_CREACION);
+                    cmd.Parameters.Add(new SqlParameter("@ID", id));
+                    cmd.Parameters.Add(new SqlParameter("@TIPO_PARAMETRO", value.TIPO_PARAMETRO));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
 
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
 
-        // Función para listar
+        //---------------------------------------------------------------Función para listar---------------------------------------------------------------
         public async Task<List<TipoParametro>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -109,6 +135,17 @@ namespace Data.Repositories
         {
             return new TipoParametro()
             {
+                ////OJO el mapeo solo sirve para listar si son nulos si se quiere insertar un dato nulo eso se debe ver en otra situacion 
+                //ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                ////esto se hace para que se puedan aceptar valores nulos
+                //TIPO_PARAMETRO = reader.IsDBNull(reader.GetOrdinal("TIPO_PARAMETRO")) ? null : reader.GetString(reader.GetOrdinal("TIPO_PARAMETRO")),
+                //ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
+                ////para los valores nulos se hace el mismo procedimiento
+                //USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                ////aqui pondra la fecha actual ya que datetime no puede qudar nulo
+                //FECHA_CREACION = reader.IsDBNull(reader.GetOrdinal("FECHA_CREACION")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
+
+                //En caso de errores se veia asi antes de la aceptacion de los valores nulos
                 ID = reader.GetInt32(reader.GetOrdinal("ID")),
                 TIPO_PARAMETRO = reader.GetString(reader.GetOrdinal("TIPO_PARAMETRO")),
                 ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
