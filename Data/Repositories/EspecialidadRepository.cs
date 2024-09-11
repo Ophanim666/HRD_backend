@@ -130,7 +130,7 @@ namespace Data.Repositories
 
 
 
-        //---------------------------------------------------Mapeo de la especialidad---------------------------------------------------
+        //---------------------------------------------------Mapeo de la especialidad (recordar sacar lo de vaores nulos)---------------------------------------------------
         private Especialidad MapToEspecialidad(SqlDataReader reader)
         {
             return new Especialidad()

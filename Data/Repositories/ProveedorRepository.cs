@@ -3,6 +3,8 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+//Importamos el dto
+using DTO.Proveedor;
 
 namespace Data.Repositories
 {
@@ -14,8 +16,12 @@ namespace Data.Repositories
         {
             _connectionString = connectionString;
         }
-        // Método para eliminar proveedores por ID
-        public async Task<int> EliminarProveedor(int id)
+        //aqui ponemos los codErr y desErr para poder trabajarlos
+        public int codError;
+        public string desError;
+
+        //----------------------------------------------------------eliminar proveedores por ID-------------------------------------------------
+        public async Task<(int codErr, string desErr)> EliminarProveedor(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -24,46 +30,58 @@ namespace Data.Repositories
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
 
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
 
-
-        // Insertar proveedor con validación
-        public async Task<int> InsertarProveedor(Proveedor proveedor)
+        //----------------------------------------------------------Insertar proveedor----------------------------------------------------------
+        public async Task<(int codErr, string desErr)> InsertarProveedor(ProveedorInsertDTO value)
         {
-       
-
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
                 using (SqlCommand cmd = new SqlCommand("usp_InsertarProveedor", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                   // cmd.Parameters.AddWithValue("@ID", proveedor.ID);
-                    cmd.Parameters.AddWithValue("@NOMBRE", proveedor.NOMBRE);
-                    cmd.Parameters.AddWithValue("@RAZON_SOCIAL", proveedor.RAZON_SOCIAL);
-                    cmd.Parameters.AddWithValue("@RUT", proveedor.RUT);
-                    cmd.Parameters.AddWithValue("@DV", proveedor.DV);
-                    cmd.Parameters.AddWithValue("@NOMBRE_CONTACTO_PRINCIPAL", proveedor.NOMBRE_CONTACTO_PRINCIPAL);
-                    cmd.Parameters.AddWithValue("@NUMERO_CONTACTO_PRINCIPAL", proveedor.NUMERO_CONTACTO_PRINCIPAL);
-                    cmd.Parameters.AddWithValue("@NOMBRE_CONTACTO_SECUNDARIO", proveedor.NOMBRE_CONTACTO_SECUNDARIO);
-                    cmd.Parameters.AddWithValue("@NUMERO_CONTACTO_SECUNDARIO", proveedor.NUMERO_CONTACTO_SECUNDARIO);
-                    cmd.Parameters.AddWithValue("@ESTADO", proveedor.ESTADO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", proveedor.USUARIO_CREACION);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", proveedor.FECHA_CREACION);
+                    //añadimos valores a los parametros
+                    cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
+                    cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.RAZON_SOCIAL));
+                    cmd.Parameters.Add(new SqlParameter("@RUT", value.RUT));
+                    cmd.Parameters.Add(new SqlParameter("@DV", value.DV));
+                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_PRINCIPAL", value.NOMBRE_CONTACTO_PRINCIPAL));
+                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_PRINCIPAL", value.NUMERO_CONTACTO_PRINCIPAL));
+                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_SECUNDARIO", value.NOMBRE_CONTACTO_SECUNDARIO));
+                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
 
-
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
 
-        // Actualizar TipoParametro con validación
-        public async Task<int> ActualizarProveedor(Proveedor proveedor)
+        //----------------------------------------------------------Actualizar TipoParametro----------------------------------------------------
+        public async Task<(int codErr, string desErr)> ActualizarProveedor(int id,ProveedorUpdateDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -71,27 +89,35 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@ID", proveedor.ID);
-                    cmd.Parameters.AddWithValue("@NOMBRE", proveedor.NOMBRE);
-                    cmd.Parameters.AddWithValue("@RAZON_SOCIAL", proveedor.RAZON_SOCIAL);
-                    cmd.Parameters.AddWithValue("@RUT", proveedor.RUT);
-                    cmd.Parameters.AddWithValue("@DV", proveedor.DV);
-                    cmd.Parameters.AddWithValue("@NOMBRE_CONTACTO_PRINCIPAL", proveedor.NOMBRE_CONTACTO_PRINCIPAL);
-                    cmd.Parameters.AddWithValue("@NUMERO_CONTACTO_PRINCIPAL", proveedor.NUMERO_CONTACTO_PRINCIPAL);
-                    cmd.Parameters.AddWithValue("@NOMBRE_CONTACTO_SECUNDARIO", proveedor.NOMBRE_CONTACTO_SECUNDARIO);
-                    cmd.Parameters.AddWithValue("@NUMERO_CONTACTO_SECUNDARIO", proveedor.NUMERO_CONTACTO_SECUNDARIO);
-                    cmd.Parameters.AddWithValue("@ESTADO", proveedor.ESTADO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", proveedor.USUARIO_CREACION);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", proveedor.FECHA_CREACION);
+                    //con esto agregamos valores a los parametros
+                    cmd.Parameters.Add(new SqlParameter("@ID", id));
+                    cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
+                    cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.RAZON_SOCIAL));
+                    cmd.Parameters.Add(new SqlParameter("@RUT", value.RUT));
+                    cmd.Parameters.Add(new SqlParameter("@DV", value.DV));
+                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_PRINCIPAL", value.NOMBRE_CONTACTO_PRINCIPAL));
+                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_PRINCIPAL", value.NUMERO_CONTACTO_PRINCIPAL));
+                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_SECUNDARIO", value.NOMBRE_CONTACTO_SECUNDARIO));
+                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
 
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
 
-        // Función para listar
-        public async Task<List<Proveedor>> ListAll()
+        //----------------------------------------------------------Función para listar----------------------------------------------------------
+        public async Task<List<Proveedor>> ListAll() //revisar para ver si debe usar el mapeo o el DTO
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -106,16 +132,16 @@ namespace Data.Repositories
                     {
                         while (await reader.ReadAsync())
                         {
-                            response.Add(MapToTipoParametro(reader));
+                            response.Add(MapToProveedor(reader));
                         }
                     }
-
                     return response;
                 }
             }
         }
-        //Listar por ID -------------------------------------------------------ELIMINAR SI NO FUNCIONA---------------------------------
-        public async Task<Proveedor> ListarPorIdProveedor(int id)
+
+        //----------------------------------------------------------Listar por ID----------------------------------------------------------------
+        public async Task<Proveedor> ListarPorIdProveedor(int id) //revisar para ver si debe usar el mapeo o el DTO
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -131,7 +157,7 @@ namespace Data.Repositories
                     {
                         if (await reader.ReadAsync())
                         {
-                            response = MapToTipoParametro(reader);
+                            response = MapToProveedor(reader);
                         }
                     }
 
@@ -139,9 +165,9 @@ namespace Data.Repositories
                 }
             }
         }
-        //...........................................................MAPEO....................................................
-
-        private Proveedor MapToTipoParametro(SqlDataReader reader)
+        
+        //...........................................................MAPEO (recordar sacar lo de vaores nulos)....................................................
+        private Proveedor MapToProveedor(SqlDataReader reader)
         {
             return new Proveedor()
             {
@@ -155,7 +181,8 @@ namespace Data.Repositories
                 NOMBRE_CONTACTO_SECUNDARIO = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_SECUNDARIO")),
                 NUMERO_CONTACTO_SECUNDARIO = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_SECUNDARIO")),
                 ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
-                USUARIO_CREACION = reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                //eliminar mas adelante cuando usuario creacion este habilitado ya que el mapeo no acepta valores nulos y los metodos de insercion no contemplan insertar usuario_creacion
+                USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
 
 
