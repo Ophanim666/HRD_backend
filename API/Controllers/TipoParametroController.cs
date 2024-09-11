@@ -27,10 +27,10 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
-            var response = await _tipoParametroRepositorio.ListAll();
+            var response = await _tipoParametroRepositorio.ListAll();        
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
-
+            
             if (response == null /*|| response.Count == 0*/)
             {
                 objetoRequest.Estado.Ack = false;
@@ -40,7 +40,6 @@ namespace API.Controllers
             }
 
             var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
-
             objetoRequest.Body = new BodyRequest()
             {
                 Response = tipoParametroDTOs
