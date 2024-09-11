@@ -50,7 +50,6 @@ namespace Data.Repositorios
                 {
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@NOMBRE", tarea.Nombre);
-                    cmd.Parameters.AddWithValue("@CODIGO", tarea.Codigo);
                     cmd.Parameters.AddWithValue("@ESTADO", tarea.Estado);
                     cmd.Parameters.AddWithValue("@USUARIO_CREACION", tarea.Usuario_Creacion);
                     cmd.Parameters.AddWithValue("@FECHA_CREACION", tarea.Fecha_Creacion == default(DateTime) ? DateTime.Now : tarea.Fecha_Creacion);
@@ -86,7 +85,6 @@ namespace Data.Repositorios
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", tarea.ID);
                     cmd.Parameters.AddWithValue("@NOMBRE", tarea.Nombre);
-                    cmd.Parameters.AddWithValue("@CODIGO", tarea.Codigo);
                     cmd.Parameters.AddWithValue("@ESTADO", tarea.Estado);
                     cmd.Parameters.AddWithValue("@USUARIO_CREACION", tarea.Usuario_Creacion);
                     cmd.Parameters.AddWithValue("@FECHA_CREACION", tarea.Fecha_Creacion);
@@ -109,7 +107,6 @@ namespace Data.Repositorios
             {
                 ID = reader.GetInt32(reader.GetOrdinal("Id")),
                 Nombre = reader.GetString(reader.GetOrdinal("Nombre")),
-                Codigo = reader.GetString(reader.GetOrdinal("Codigo")),
                 Estado = reader.GetInt32(reader.GetOrdinal("Estado")),
                 Usuario_Creacion = reader.GetString(reader.GetOrdinal("Usuario_creacion")),
                 Fecha_Creacion = reader.GetDateTime(reader.GetOrdinal("Fecha_creacion")),
