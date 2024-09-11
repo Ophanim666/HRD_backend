@@ -47,7 +47,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Añadir especialidades---------------------------------------------------
-        [HttpPost]
+        [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> AñadirEspecialidad([FromBody] EspecialidadInsertDTO value)
         {
             var response = await _especialidadRepository.AñadirEspecialidad(value);
