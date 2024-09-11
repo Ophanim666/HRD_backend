@@ -53,8 +53,6 @@ namespace API.Controllers
         public async Task<ActionResult<ObjetoRequest>> InsertarTipoParametro([FromBody] TipoParametroInsertDTO value)
         {   
             var response = await _tipoParametroRepositorio.InsertarTipoParametro(value);
-
-
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
             //Ya no es necesario ya que se soluciono en el procedimiento almacenado
