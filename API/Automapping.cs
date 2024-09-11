@@ -13,12 +13,27 @@ namespace API
     public class Automapping : Profile
     {
         public Automapping() {
-            CreateMap<Usuario, UsuarioDTO>()/*.ReverseMap()*/;
-            CreateMap<Tarea, TareaDTO>()/*.ReverseMap()*/;
+            //Automapero para usuarios
+            CreateMap<Usuario, UsuarioDTO>().ReverseMap();
+
+            //Automapeo para tareas
+            CreateMap<Tarea, TareaDTO>().ReverseMap();
+
+            //Automapeo para especialidad
             CreateMap<Especialidad, EspecialidadDTO>().ReverseMap();
-            CreateMap<TipoParametro, TipoParametroDTO>();
-            CreateMap<Parametro, ParametroDTO>();
-            CreateMap<Proveedor, ProveedorDTO>()/*.ReverseMap()*/;
+            CreateMap<Especialidad, EspecialidadInsertDTO>().ReverseMap();
+            CreateMap<Especialidad, EspecialidadUpdateDTO>().ReverseMap();
+
+            //Automapero de tipo parametro
+            CreateMap<TipoParametro, TipoParametroDTO>().ReverseMap();
+            CreateMap<TipoParametro, TipoParametroInsertDTO>().ReverseMap();
+            CreateMap<TipoParametro, TipoParametroUpdateDTO>().ReverseMap();
+
+            //Automapeo de parametro
+            CreateMap<Parametro, ParametroDTO>().ReverseMap();
+
+            //Automapeo de provveodr
+            CreateMap<Proveedor, ProveedorDTO>().ReverseMap();
         }
     }
 }
