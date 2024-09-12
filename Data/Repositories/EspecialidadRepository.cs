@@ -54,8 +54,8 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@NOMBRE", value.NOMBRE);
-                    cmd.Parameters.AddWithValue("@ESTADO", value.ESTADO);
+                    cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
                     // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
                     //cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
                     //cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
@@ -83,7 +83,7 @@ namespace Data.Repositories
                 using (SqlCommand cmd = new SqlCommand("SP_EliminarEspecialidad", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
+                    cmd.Parameters.Add(new SqlParameter("@ID", id));
 
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
