@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Data.Repositories;
+using DTO;
 using DTO.Parametro;
 using DTO.TipoParametro;
 using Microsoft.AspNetCore.Mvc;
@@ -18,116 +19,86 @@ namespace API.Controllers
             _parametroRepositorio = parametroRepositorio;
             _mapper = mapper;
         }
-        //insertar parametros
-        [HttpPost]
-        public async Task<IActionResult> InsertarParametro([FromBody] ParametroDTO parametroDTO)
+        //---------------------------------------------------------------Insertar parametro---------------------------------------------------------------
+        [HttpPost("add")]
+        public async Task<ActionResult<ObjetoRequest>> InsertarParametro([FromBody] ParametroInsertDTO value)
         {
-            if (parametroDTO == null)
-            {
-                return BadRequest("Datos inválidos.");
-            }
+            var response = await _parametroRepositorio.InsertarParametro(value);
 
-            var parametro = new Parametro
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+            if (response.codErr != 0)
             {
-                PARAMETRO = parametroDTO.PARAMETRO,
-                VALOR = parametroDTO.VALOR,
-                ID_TIPO_PARAMETRO=parametroDTO.ID_TIPO_PARAMETRO,
-                USUARIO_CREACION = parametroDTO.USUARIO_CREACION,
-            };
-
-            try
-            {
-                var result = await _parametroRepositorio.InsertarParametro(parametro);
-
-                if (result > 0)
-                {
-                    return Ok("Parametro insertado correctamente.");
-                }
-                else
-                {
-                    return StatusCode(500, "Error al insertar el Parametro.");
-                }
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ParametroController]";
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return objetoRequest;
         }
 
-        //editar PARAMETROS
+        //---------------------------------------------------------------Actualizar parametro---------------------------------------------------------------
         [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarParametro(int id, [FromBody] ParametroDTO parametroDto)
+        public async Task<ActionResult<ObjetoRequest>> ActualizarParametro(int id, [FromBody] ParametroUpdateDTO value)
         {
-            if (parametroDto == null)
-            {
-                return BadRequest("Datos inválidos.");
-            }
+            var response = await _parametroRepositorio.ActualizarParametro(id, value);
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
 
-            var parametro = new Parametro
+            if (response.codErr != 0)
             {
-                ID = id,
-                PARAMETRO = parametroDto.PARAMETRO,
-                VALOR = parametroDto.VALOR,
-                ID_TIPO_PARAMETRO = parametroDto.ID_TIPO_PARAMETRO,
-                ESTADO = parametroDto.ESTADO
-            };
-
-            try
-            {
-                var response = await _parametroRepositorio.ActualizarParametro(parametro);
-
-                if (response > 0)
-                {
-                    return Ok("TipoParametro actualizado correctamente.");
-                }
-                else
-                {
-                    return BadRequest("Error al actualizar el TipoParametro.");
-                }
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ParametroController]";
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return objetoRequest;
+
         }
 
-        //obtener parametros
+        //---------------------------------------------------------------Obtener Parametro---------------------------------------------------------------
         [HttpGet]
-        public async Task<ActionResult<List<ParametroDTO>>> ListAll()
+        public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
             var response = await _parametroRepositorio.ListAll();
-            if (response == null || response.Count == 0)
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null /*|| response.Count == 0*/)
             {
-                return NotFound();
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay parametro registrados";
+                objetoRequest.Estado.ErrCon = "[ParametroController]";
             }
 
-            var parametroDTOs = _mapper.Map<List<ParametroDTO>>(response);
-            return Ok(parametroDTOs);
+            var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = tipoParametroDTOs
+            };
+            return objetoRequest;
         }
 
-        // eliminar Parametro
+        //---------------------------------------------------------------Eliminar Parametro---------------------------------------------------------------
         [HttpDelete("{id}")]
-        public async Task<IActionResult> EliminarParametro(int id)
+        public async Task<ActionResult<ObjetoRequest>> EliminarParametro(int id)
         {
-            try
-            {
-                var result = await _parametroRepositorio.EliminarParametro(id);
+            var response = await _parametroRepositorio.EliminarParametro(id);
 
-                if (result != 0)
-                {
-                    return Ok("Parametro eliminado correctamente." + result);
-                }
-                else
-                {
-                    return NotFound("Parametro no encontrado.");
-                }
-            }
-            catch (Exception ex)
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response.codErr != 0)
             {
-                return BadRequest(ex.Message);
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ParametroController]";
             }
+            return objetoRequest;
+
+
         }
-
-
     }
 }
