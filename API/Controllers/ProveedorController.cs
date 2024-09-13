@@ -64,20 +64,30 @@ namespace API.Controllers
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarProveedor([FromBody] ProveedorInsertDTO value)
         {
-            var response = await _proveedorRepository.InsertarProveedor(value);
-
+            var responseProveedor = await _proveedorRepository.InsertarProveedor(value);
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
-            //Ya no es necesario ya que se soluciono en el procedimiento almacenado
-            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
-            if (response.codErr != 0)
+
+            if (responseProveedor.codErr != 0)
             {
                 objetoRequest.Estado.Ack = false;
-                objetoRequest.Estado.ErrNo = response.codErr.ToString();
-                objetoRequest.Estado.ErrDes = response.desErr.ToString();
-                objetoRequest.Estado.ErrCon = "[TipoParametroController]";
+                objetoRequest.Estado.ErrNo = responseProveedor.codErr.ToString();
+                objetoRequest.Estado.ErrDes = responseProveedor.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
+                return BadRequest(objetoRequest);
             }
-            return objetoRequest;
+
+            var responseEspecialidades = await _proveedorRepository.InsertarProveedorXEspecialidad(responseProveedor.proveedorId.Value, value.ListaEspecialidades);
+
+            if (responseEspecialidades.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = responseEspecialidades.codErr.ToString();
+                objetoRequest.Estado.ErrDes = responseEspecialidades.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
+                return BadRequest(objetoRequest);
+            }
+            return Ok(objetoRequest);
 
         }
 

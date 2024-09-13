@@ -20,6 +20,9 @@ namespace Data.Repositories
         public int codError;
         public string desError;
 
+        //agregamos para traer el id de proveedor
+        public int proveedorId;
+
         //----------------------------------------------------------eliminar proveedores por ID-------------------------------------------------
         public async Task<(int codErr, string desErr)> EliminarProveedor(int id)
         {
@@ -46,7 +49,7 @@ namespace Data.Repositories
         }
 
         //----------------------------------------------------------Insertar proveedor----------------------------------------------------------
-        public async Task<(int codErr, string desErr)> InsertarProveedor(ProveedorInsertDTO value)
+        public async Task<(int codErr, string desErr, int? proveedorId)> InsertarProveedor(ProveedorInsertDTO value) //recordar el ?
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -68,6 +71,43 @@ namespace Data.Repositories
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+                    //PARA tratar especialidades
+                    cmd.Parameters.Add(new SqlParameter("@ID_PROVEEDOR", SqlDbType.Int)).Direction = ParameterDirection.Output;
+
+
+                    await sql.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+                    //
+                    int? proveedorId = codError == 0 ? (int?)Convert.ToInt32(cmd.Parameters["@ID_PROVEEDOR"].Value) : null;
+
+                    return (codError, desError, proveedorId);
+                }
+            }
+        }
+
+        //----------------------------------------------------------Añadir proveedor x especialidad-----------------------------------------------
+        public async Task<(int codErr, string desErr)> InsertarProveedorXEspecialidad(int proveedorId, List<int> especialidadesIds)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("USP_InsertarProveedorEspecialidades", sql)) //cambiar procedimiento
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    //añadimos valores a los parametros
+                    cmd.Parameters.Add(new SqlParameter("@ID_PROVEEDOR", proveedorId));
+                    string especialidadesIdsStr = string.Join(",", especialidadesIds);
+                    cmd.Parameters.Add(new SqlParameter("@LISTA_ESPECIALIDADES", especialidadesIdsStr));
+
+
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+
                     await sql.OpenAsync();
                     await cmd.ExecuteNonQueryAsync();
 

@@ -19,5 +19,8 @@ namespace DTO.Proveedor
         public string NOMBRE_CONTACTO_SECUNDARIO { get; set; }
         public int NUMERO_CONTACTO_SECUNDARIO { get; set; }
         public int ESTADO { get; set; }
+
+        //
+        public List<int> ListaEspecialidades { get; set; } // IDs de especialidades seleccionadas
     }
 }
