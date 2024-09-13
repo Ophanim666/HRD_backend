@@ -57,9 +57,11 @@ namespace Data.Repositories
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", value.TIPO_PARAMETRO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", value.USUARIO_CREACION);
                     cmd.Parameters.AddWithValue("@ESTADO", value.ESTADO);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", value.FECHA_CREACION);
+                    //se deshabilitaron en la bd
+                    //cmd.Parameters.AddWithValue("@FECHA_CREACION", value.FECHA_CREACION);
+                    //cmd.Parameters.AddWithValue("@USUARIO_CREACION", value.USUARIO_CREACION);
+
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
@@ -129,7 +131,7 @@ namespace Data.Repositories
             }
         }
 
-//...........................................................MAPEO....................................................
+//...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................
 
         private TipoParametro MapToTipoParametro(SqlDataReader reader)
         {
@@ -149,7 +151,7 @@ namespace Data.Repositories
                 ID = reader.GetInt32(reader.GetOrdinal("ID")),
                 TIPO_PARAMETRO = reader.GetString(reader.GetOrdinal("TIPO_PARAMETRO")),
                 ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
-                USUARIO_CREACION = reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
             };
         }
