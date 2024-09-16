@@ -91,6 +91,32 @@ namespace API.Controllers
 
         }
 
+        //----------------------------------------------------------------listar proveedores con especialidades---------------------------------------------------------------- TESTING
+        [HttpGet("con-especialidades")]
+        public async Task<ActionResult<ObjetoRequest>> ListarProveedoresConEspecialidades()
+        {
+            var response = await _proveedorRepository.ListarProveedoresConEspecialidades();
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null || response.Count == 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay proveedores con especialidades registrados";
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
+                return NotFound(objetoRequest);
+            }
+
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = response
+            };
+
+            return Ok(objetoRequest);
+        }
+
+
         //----------------------------------------------------------------editar Proveedores--------------------------------------------------------------
         [HttpPut("{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarProveedor(int id, [FromBody] ProveedorUpdateDTO value)

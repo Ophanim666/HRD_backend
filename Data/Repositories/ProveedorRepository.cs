@@ -120,6 +120,36 @@ namespace Data.Repositories
             }
         }
 
+        //----------------------------------------------------------Listar proveedores con sus especialidades---------------------------------------------------------- TESTING
+        //en los DTO recordareliminar ProveedorConEspecialidadDTO despues de las pruebas
+        public async Task<List<ProveedorConEspecialidadDTO>> ListarProveedoresConEspecialidades()
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ListarProveedoresConEspecialidades", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var response = new List<ProveedorConEspecialidadDTO>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var proveedorConEspecialidad = new ProveedorConEspecialidadDTO
+                            {
+                                ProveedorNombre = reader.GetString(reader.GetOrdinal("Nombre Proveedor")),
+                                EspecialidadNombre = reader.GetString(reader.GetOrdinal("Nombre Especialidad"))
+                            };
+                            response.Add(proveedorConEspecialidad);
+                        }
+                    }
+                    return response;
+                }
+            }
+        }
+
         //----------------------------------------------------------Actualizar TipoParametro----------------------------------------------------
         public async Task<(int codErr, string desErr)> ActualizarProveedor(int id,ProveedorUpdateDTO value)
         {
