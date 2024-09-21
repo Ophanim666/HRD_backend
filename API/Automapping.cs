@@ -23,6 +23,8 @@ namespace API
             CreateMap<Especialidad, EspecialidadDTO>().ReverseMap();
             CreateMap<Especialidad, EspecialidadInsertDTO>().ReverseMap();
             CreateMap<Especialidad, EspecialidadUpdateDTO>().ReverseMap();
+            //este es solo para mapear (id, nombre)
+            CreateMap<Especialidad, LstEspecialidadDTO>().ReverseMap();
 
             //Automapero de tipo parametro
             CreateMap<TipoParametro, TipoParametroDTO>().ReverseMap();

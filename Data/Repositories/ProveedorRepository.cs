@@ -150,7 +150,7 @@ namespace Data.Repositories
             }
         }
 
-        //----------------------------------------------------------Actualizar TipoParametro----------------------------------------------------
+        //----------------------------------------------------------Actualizar Proveedor----------------------------------------------------
         public async Task<(int codErr, string desErr)> ActualizarProveedor(int id,ProveedorUpdateDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))

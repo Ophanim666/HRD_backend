@@ -8,6 +8,7 @@ namespace DTO.Proveedor
 {
     public class ProveedorConEspecialidadDTO //TESTING
     {
+        //este se utiliza en "Listar proveedores con sus especialidades"
         public string ProveedorNombre { get; set; }
         public string EspecialidadNombre { get; set; }
     }

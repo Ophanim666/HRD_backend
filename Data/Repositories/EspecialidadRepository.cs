@@ -45,6 +45,31 @@ namespace Data.Repositories
             }
         }
 
+        //---------------------------------------------------Listar especialidades simple (nombre, id) para listarlos y asignar a proveedores---------------------------------------------------
+        public async Task<List<LstEspecialidadDTO>> LstEspecialidad()
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_LstEspecialidades", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var response = new List<LstEspecialidadDTO>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            response.Add(MapToEspecialidadSimp(reader));
+                        }
+                    }
+
+                    return response;
+                }
+            }
+        }
+
         //---------------------------------------------------Función para añadir---------------------------------------------------
         public async Task<(int codErr, string desErr)> AñadirEspecialidad(EspecialidadInsertDTO value)
         {
@@ -147,6 +172,16 @@ namespace Data.Repositories
                 //implementacion de DateTime.Now como este valor no uede ser nulo se entregara la fecha actual como solucion a null
                 //FECHA_CREACION utiliza la fecha y hora actuales en caso de que el valor de la base de datos sea nulo, se asignara DateTime.Now cuando se detecte un valor nulo.
                 FECHA_CREACION = reader.IsDBNull(reader.GetOrdinal("FECHA_CREACION")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
+            };
+        }
+
+        //se utilizo dto en vez del modelo
+        private LstEspecialidadDTO MapToEspecialidadSimp(SqlDataReader reader)
+        {
+            return new LstEspecialidadDTO()
+            {
+                ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                NOMBRE = reader.IsDBNull(reader.GetOrdinal("NOMBRE")) ? null : reader.GetString(reader.GetOrdinal("NOMBRE")),
             };
         }
 
