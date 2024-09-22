@@ -19,6 +19,31 @@ namespace API.Controllers
             _parametroRepositorio = parametroRepositorio;
             _mapper = mapper;
         }
+
+        //---------------------------------------------------------------Listar Parametro---------------------------------------------------------------
+        [HttpGet]
+        public async Task<ActionResult<ObjetoRequest>> ListAll()
+        {
+            var response = await _parametroRepositorio.ListAll();
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null /*|| response.Count == 0*/)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay parametro registrados";
+                objetoRequest.Estado.ErrCon = "[ParametroController]";
+            }
+
+            var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = tipoParametroDTOs
+            };
+            return objetoRequest;
+        }
+
         //---------------------------------------------------------------Insertar parametro---------------------------------------------------------------
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarParametro([FromBody] ParametroInsertDTO value)
@@ -54,30 +79,6 @@ namespace API.Controllers
             }
             return objetoRequest;
 
-        }
-
-        //---------------------------------------------------------------Obtener Parametro---------------------------------------------------------------
-        [HttpGet]
-        public async Task<ActionResult<ObjetoRequest>> ListAll()
-        {
-            var response = await _parametroRepositorio.ListAll();
-            ObjetoRequest objetoRequest = new ObjetoRequest();
-            objetoRequest.Estado = new EstadoRequest();
-
-            if (response == null /*|| response.Count == 0*/)
-            {
-                objetoRequest.Estado.Ack = false;
-                objetoRequest.Estado.ErrNo = "001.01";
-                objetoRequest.Estado.ErrDes = "No hay parametro registrados";
-                objetoRequest.Estado.ErrCon = "[ParametroController]";
-            }
-
-            var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
-            objetoRequest.Body = new BodyRequest()
-            {
-                Response = tipoParametroDTOs
-            };
-            return objetoRequest;
         }
 
         //---------------------------------------------------------------Eliminar Parametro---------------------------------------------------------------

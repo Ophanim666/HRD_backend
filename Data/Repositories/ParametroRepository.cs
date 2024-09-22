@@ -20,9 +20,35 @@ namespace Data.Repositories
         {
             _connectionString = connectionString;
         }
+
         //aqui ponemos los codErr y desErr para poder trabajarlos
         public int codError;
         public string desError;
+
+        //---------------------------------------------------------------Listar parametro-----------------------------------------------------------------
+        public async Task<List<Parametro>> ListAll()
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerParametros", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var response = new List<Parametro>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            response.Add(MapToParametro(reader));
+                        }
+                    }
+
+                    return response;
+                }
+            }
+        }
 
         //---------------------------------------------------------------Insertar Parametro--------------------------------------------------------------- 
         public async Task<(int codErr, string desErr)> InsertarParametro(ParametroInsertDTO value)
@@ -80,31 +106,6 @@ namespace Data.Repositories
                     desError = (cmd.Parameters["@des_err"].Value).ToString();
 
                     return (codError, desError);
-                }
-            }
-        }
-
-        //---------------------------------------------------------------Listar parametro-----------------------------------------------------------------
-        public async Task<List<Parametro>> ListAll()
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("usp_ObtenerParametros", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    var response = new List<Parametro>();
-                    await sql.OpenAsync();
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            response.Add(MapToParametro(reader));
-                        }
-                    }
-
-                    return response;
                 }
             }
         }
