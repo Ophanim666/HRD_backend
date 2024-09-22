@@ -139,8 +139,10 @@ namespace Data.Repositories
                         {
                             var proveedorConEspecialidad = new ProveedorConEspecialidadDTO
                             {
+                                IDproveedor = reader.GetInt32(reader.GetOrdinal("ID proveedor")),
                                 ProveedorNombre = reader.GetString(reader.GetOrdinal("Nombre Proveedor")),
-                                EspecialidadNombre = reader.GetString(reader.GetOrdinal("Nombre Especialidad"))
+                                IDespecialidad = reader.GetInt32(reader.GetOrdinal("ID especialidad")), 
+                                EspecialidadNombre = reader.GetString(reader.GetOrdinal("Nombre Especialidad")) 
                             };
                             response.Add(proveedorConEspecialidad);
                         }
@@ -151,7 +153,7 @@ namespace Data.Repositories
         }
 
         //----------------------------------------------------------Actualizar Proveedor----------------------------------------------------
-        public async Task<(int codErr, string desErr)> ActualizarProveedor(int id,ProveedorUpdateDTO value)
+        public async Task<(int codErr, string desErr)> ActualizarProveedor(int id, ProveedorUpdateDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -159,7 +161,7 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    //con esto agregamos valores a los parametros
+                    // Agregar parámetros
                     cmd.Parameters.Add(new SqlParameter("@ID", id));
                     cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
                     cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.RAZON_SOCIAL));
@@ -171,20 +173,51 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
 
-                    //agregamos nuestro manejo de errores
+                    // Manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+
                     await sql.OpenAsync();
                     await cmd.ExecuteNonQueryAsync();
 
-                    //lo que debemos retornar
+                    // Retornar los códigos de error
                     codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
-                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+                    desError = cmd.Parameters["@des_err"].Value.ToString();
 
                     return (codError, desError);
                 }
             }
         }
+
+        //----------------------------------------------------------Actualizar Proveedor por Especialidades----------------------------------------------------
+        public async Task<(int codErr, string desErr)> ActualizarProveedorXEspecialidad(int proveedorId, List<int> especialidadesIds)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ActualizarProveedorEspecialidades", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // Parámetros
+                    cmd.Parameters.Add(new SqlParameter("@ID_PROVEEDOR", proveedorId));
+                    string especialidadesIdsStr = string.Join(",", especialidadesIds);
+                    cmd.Parameters.Add(new SqlParameter("@LISTA_ESPECIALIDADES", especialidadesIdsStr));
+
+                    // Manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 200)).Direction = ParameterDirection.Output;
+
+                    await sql.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = cmd.Parameters["@des_err"].Value.ToString();
+
+                    return (codError, desError);
+                }
+            }
+        }
+
 
         //----------------------------------------------------------Función para listar----------------------------------------------------------
         public async Task<List<Proveedor>> ListAll() //revisar para ver si debe usar el mapeo o el DTO

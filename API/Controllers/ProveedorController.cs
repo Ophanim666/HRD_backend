@@ -124,7 +124,6 @@ namespace API.Controllers
             var response = await _proveedorRepository.ActualizarProveedor(id, value);
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
-            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
 
             if (response.codErr != 0)
             {
@@ -132,9 +131,24 @@ namespace API.Controllers
                 objetoRequest.Estado.ErrNo = response.codErr.ToString();
                 objetoRequest.Estado.ErrDes = response.desErr.ToString();
                 objetoRequest.Estado.ErrCon = "[ProveedorController]";
+                return BadRequest(objetoRequest);
             }
-            return objetoRequest;
+
+            var responseEspecialidades = await _proveedorRepository.ActualizarProveedorXEspecialidad(id, value.ListaEspecialidades);
+
+            if (responseEspecialidades.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = responseEspecialidades.codErr.ToString();
+                objetoRequest.Estado.ErrDes = responseEspecialidades.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
+                return BadRequest(objetoRequest);
+            }
+
+            objetoRequest.Estado.Ack = true;
+            return Ok(objetoRequest);
         }
+
 
         //----------------------------------------------------------------eliminar el Proveedor por ID----------------------------------------------------
         [HttpDelete("{id}")]
@@ -150,7 +164,7 @@ namespace API.Controllers
                 objetoRequest.Estado.Ack = false;
                 objetoRequest.Estado.ErrNo = response.codErr.ToString();
                 objetoRequest.Estado.ErrDes = response.desErr.ToString();
-                objetoRequest.Estado.ErrCon = "[TipoParametroController]";
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
             }
             return objetoRequest;
         }
