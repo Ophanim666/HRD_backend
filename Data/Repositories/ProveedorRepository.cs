@@ -16,34 +16,90 @@ namespace Data.Repositories
         {
             _connectionString = connectionString;
         }
+        
         //aqui ponemos los codErr y desErr para poder trabajarlos
         public int codError;
         public string desError;
-
         //agregamos para traer el id de proveedor
         public int proveedorId;
 
-        //----------------------------------------------------------eliminar proveedores por ID-------------------------------------------------
-        public async Task<(int codErr, string desErr)> EliminarProveedor(int id)
+        //----------------------------------------------------------Listar proveedores----------------------------------------------------------
+        public async Task<List<Proveedor>> ListAll() //revisar para ver si debe usar el mapeo o el DTO
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("usp_EliminarProveedor", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedor", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var response = new List<Proveedor>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            response.Add(MapToProveedor(reader));
+                        }
+                    }
+                    return response;
+                }
+            }
+        }
+
+        //----------------------------------------------------------Listar proveedores por ID----------------------------------------------------------------
+        public async Task<Proveedor> ListarPorIdProveedor(int id) //revisar para ver si debe usar el mapeo o el DTO
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedorPorId", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
 
-                    //agregamos nuestro manejo de errores
-                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+                    Proveedor response = null;
                     await sql.OpenAsync();
-                    await cmd.ExecuteNonQueryAsync();
 
-                    //lo que debemos retornar
-                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
-                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            response = MapToProveedor(reader);
+                        }
+                    }
 
-                    return (codError, desError);
+                    return response;
+                }
+            }
+        }
+
+        //----------------------------------------------------------Listar proveedores con sus especialidades---------------------------------------------------------- 
+        public async Task<List<ProveedorConEspecialidadDTO>> ListarProveedoresConEspecialidades()
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ListarProveedoresConEspecialidades", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var response = new List<ProveedorConEspecialidadDTO>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var proveedorConEspecialidad = new ProveedorConEspecialidadDTO
+                            {
+                                IDproveedor = reader.GetInt32(reader.GetOrdinal("ID proveedor")),
+                                ProveedorNombre = reader.GetString(reader.GetOrdinal("Nombre Proveedor")),
+                                IDespecialidad = reader.GetInt32(reader.GetOrdinal("ID especialidad")),
+                                EspecialidadNombre = reader.GetString(reader.GetOrdinal("Nombre Especialidad"))
+                            };
+                            response.Add(proveedorConEspecialidad);
+                        }
+                    }
+                    return response;
                 }
             }
         }
@@ -89,7 +145,7 @@ namespace Data.Repositories
             }
         }
 
-        //----------------------------------------------------------Añadir proveedor x especialidad-----------------------------------------------
+        //----------------------------------------------------------Insertar proveedor x especialidad-----------------------------------------------
         public async Task<(int codErr, string desErr)> InsertarProveedorXEspecialidad(int proveedorId, List<int> especialidadesIds)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -104,7 +160,7 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@LISTA_ESPECIALIDADES", especialidadesIdsStr));
 
 
-                    //agregamos nuestro manejo de errores
+                    // Manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
 
@@ -116,38 +172,6 @@ namespace Data.Repositories
                     desError = (cmd.Parameters["@des_err"].Value).ToString();
 
                     return (codError, desError);
-                }
-            }
-        }
-
-        //----------------------------------------------------------Listar proveedores con sus especialidades---------------------------------------------------------- TESTING
-        //en los DTO recordareliminar ProveedorConEspecialidadDTO despues de las pruebas
-        public async Task<List<ProveedorConEspecialidadDTO>> ListarProveedoresConEspecialidades()
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("usp_ListarProveedoresConEspecialidades", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    var response = new List<ProveedorConEspecialidadDTO>();
-                    await sql.OpenAsync();
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            var proveedorConEspecialidad = new ProveedorConEspecialidadDTO
-                            {
-                                IDproveedor = reader.GetInt32(reader.GetOrdinal("ID proveedor")),
-                                ProveedorNombre = reader.GetString(reader.GetOrdinal("Nombre Proveedor")),
-                                IDespecialidad = reader.GetInt32(reader.GetOrdinal("ID especialidad")), 
-                                EspecialidadNombre = reader.GetString(reader.GetOrdinal("Nombre Especialidad")) 
-                            };
-                            response.Add(proveedorConEspecialidad);
-                        }
-                    }
-                    return response;
                 }
             }
         }
@@ -189,7 +213,7 @@ namespace Data.Repositories
             }
         }
 
-        //----------------------------------------------------------Actualizar Proveedor por Especialidades----------------------------------------------------
+        //----------------------------------------------------------Actualizar Proveedor con Especialidades----------------------------------------------------
         public async Task<(int codErr, string desErr)> ActualizarProveedorXEspecialidad(int proveedorId, List<int> especialidadesIds)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -218,57 +242,31 @@ namespace Data.Repositories
             }
         }
 
-
-        //----------------------------------------------------------Función para listar----------------------------------------------------------
-        public async Task<List<Proveedor>> ListAll() //revisar para ver si debe usar el mapeo o el DTO
+        //----------------------------------------------------------eliminar proveedores por ID-------------------------------------------------
+        public async Task<(int codErr, string desErr)> EliminarProveedor(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedor", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    var response = new List<Proveedor>();
-                    await sql.OpenAsync();
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            response.Add(MapToProveedor(reader));
-                        }
-                    }
-                    return response;
-                }
-            }
-        }
-
-        //----------------------------------------------------------Listar por ID----------------------------------------------------------------
-        public async Task<Proveedor> ListarPorIdProveedor(int id) //revisar para ver si debe usar el mapeo o el DTO
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedorPorId", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_EliminarProveedor", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
 
-                    Proveedor response = null;
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
 
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (await reader.ReadAsync())
-                        {
-                            response = MapToProveedor(reader);
-                        }
-                    }
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
 
-                    return response;
+                    return (codError, desError);
                 }
             }
         }
-        
+
         //...........................................................MAPEO (recordar sacar lo de vaores nulos)....................................................
         private Proveedor MapToProveedor(SqlDataReader reader)
         {
@@ -287,8 +285,6 @@ namespace Data.Repositories
                 //eliminar mas adelante cuando usuario creacion este habilitado ya que el mapeo no acepta valores nulos y los metodos de insercion no contemplan insertar usuario_creacion
                 USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
-
-
             };
         }
     }
