@@ -46,6 +46,7 @@ namespace Data.Repositories
         }
 
         //---------------------------------------------------Listar especialidades simple (nombre, id) para listarlos y asignar a proveedores---------------------------------------------------
+        //preguntar al profe si es mejor utilizar DTO para listar o cual es la mejor practica
         public async Task<List<LstEspecialidadDTO>> LstEspecialidad()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -175,7 +176,7 @@ namespace Data.Repositories
             };
         }
 
-        //se utilizo dto en vez del modelo
+        //se utilizo dto en vez del modelo, preguntar al profesor que es mejor para hacer el mapeo dto o el modelo
         private LstEspecialidadDTO MapToEspecialidadSimp(SqlDataReader reader)
         {
             return new LstEspecialidadDTO()
