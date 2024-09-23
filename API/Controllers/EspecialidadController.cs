@@ -22,7 +22,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Listar especialidades---------------------------------------------------
-        [HttpGet]
+        [HttpGet("ListarEspecialidades")] // se parametrizo cambiar en el frontend
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
             var response = await _especialidadRepository.ListAll();

@@ -21,7 +21,7 @@ namespace Data.Repositories
         public string desError;
 
         //---------------------------------------------------Función para listar---------------------------------------------------
-        public async Task<List<Especialidad>> ListAll()
+        public async Task<List<EspecialidadDTO>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -29,14 +29,14 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    var response = new List<Especialidad>();
+                    var response = new List<EspecialidadDTO>();
                     await sql.OpenAsync();
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
-                            response.Add(MapToEspecialidad(reader));
+                            response.Add(MapToEspecialidadDTO(reader));
                         }
                     }
 
@@ -157,9 +157,9 @@ namespace Data.Repositories
 
 
         //---------------------------------------------------Mapeo de la especialidad (recordar sacar lo de vaores nulos)---------------------------------------------------
-        private Especialidad MapToEspecialidad(SqlDataReader reader)
+        private EspecialidadDTO MapToEspecialidadDTO(SqlDataReader reader)
         {
-            return new Especialidad()
+            return new EspecialidadDTO()
             {
                 //OJO el mapeo solo sirve para listar si son nulos si se quiere insertar un dato nulo eso se debe ver en otra situacion, lo que hara la fecha creacion en esta situcaion 
                 //seria poner la fecha actual en el listado para que no quede nulo y el listado si funcione

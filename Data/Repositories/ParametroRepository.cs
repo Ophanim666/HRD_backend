@@ -26,7 +26,7 @@ namespace Data.Repositories
         public string desError;
 
         //---------------------------------------------------------------Listar parametro-----------------------------------------------------------------
-        public async Task<List<Parametro>> ListAll()
+        public async Task<List<ParametroDTO>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -34,14 +34,14 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    var response = new List<Parametro>();
+                    var response = new List<ParametroDTO>();
                     await sql.OpenAsync();
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
-                            response.Add(MapToParametro(reader));
+                            response.Add(MapToParametroDTO(reader));
                         }
                     }
 
@@ -136,9 +136,9 @@ namespace Data.Repositories
         }
 
         //...........................................................MAPEO....................................................
-        private Parametro MapToParametro(SqlDataReader reader)
+        private ParametroDTO MapToParametroDTO(SqlDataReader reader)
         {
-            return new Parametro()
+            return new ParametroDTO()
             {
                 ID = reader.GetInt32(reader.GetOrdinal("ID")),
                 PARAMETRO = reader.GetString(reader.GetOrdinal("PARAMETRO")),
