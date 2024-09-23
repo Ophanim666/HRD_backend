@@ -6,6 +6,9 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//Importamos el dto
+using DTO.Parametro;
+
 
 namespace Data.Repositories
 {
@@ -18,55 +21,11 @@ namespace Data.Repositories
             _connectionString = connectionString;
         }
 
-        // Insertar TipoParametro con validación
-        public async Task<int> InsertarParametro(Parametro Parametro)
-        {
-            //if (await TipoParametroExists(tipoParametro.TIPO_PARAMETRO))
-            //{
-            //    throw new Exception("El tipo de parámetro ya existe.");
-            //}
+        //aqui ponemos los codErr y desErr para poder trabajarlos
+        public int codError;
+        public string desError;
 
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("usp_InsertarParametro", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.AddWithValue("@PARAMETRO", Parametro.PARAMETRO);
-                    cmd.Parameters.AddWithValue("@VALOR", Parametro.VALOR);
-                    cmd.Parameters.AddWithValue("@ID_TIPO_PARAMETRO", Parametro.ID_TIPO_PARAMETRO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", Parametro.USUARIO_CREACION);
-
-                    await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
-                }
-            }
-        }
-
-        // Actualizar Parametro
-        public async Task<int> ActualizarParametro(Parametro Parametro)
-        {
-            
-
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("usp_ActualizarParametro", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.AddWithValue("@ID", Parametro.ID);
-                    cmd.Parameters.AddWithValue("@PARAMETRO", Parametro.PARAMETRO);
-                    cmd.Parameters.AddWithValue("@VALOR", Parametro.VALOR);
-                    cmd.Parameters.AddWithValue("@ID_TIPO_PARAMETRO", Parametro.ID_TIPO_PARAMETRO);
-                    cmd.Parameters.AddWithValue("@ESTADO", Parametro.ESTADO);
-
-                    await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
-                }
-            }
-        }
-
-        // Función para listar
+        //---------------------------------------------------------------Listar parametro-----------------------------------------------------------------
         public async Task<List<Parametro>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -91,8 +50,68 @@ namespace Data.Repositories
             }
         }
 
-        // eliminar Parametro
-        public async Task<int> EliminarParametro(int id)
+        //---------------------------------------------------------------Insertar Parametro--------------------------------------------------------------- 
+        public async Task<(int codErr, string desErr)> InsertarParametro(ParametroInsertDTO value)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_InsertarParametro", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add(new SqlParameter("@PARAMETRO", value.PARAMETRO));
+                    cmd.Parameters.Add(new SqlParameter("@VALOR", value.VALOR));
+                    cmd.Parameters.Add(new SqlParameter("@ID_TIPO_PARAMETRO", value.ID_TIPO_PARAMETRO));
+                    //demomento mantenemos el usaurio creacion para insertar
+                    cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", value.USUARIO_CREACION));
+
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+                    await sql.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
+                }
+            }
+        }
+
+        //---------------------------------------------------------------Actualizar Parametro-------------------------------------------------------------
+        public async Task<(int codErr, string desErr)> ActualizarParametro(int id, ParametroUpdateDTO value)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ActualizarParametro", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add(new SqlParameter("@ID", id));
+                    cmd.Parameters.Add(new SqlParameter("@PARAMETRO", value.PARAMETRO));
+                    cmd.Parameters.Add(new SqlParameter("@VALOR", value.VALOR));
+                    cmd.Parameters.Add(new SqlParameter("@ID_TIPO_PARAMETRO", value.ID_TIPO_PARAMETRO));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
+
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+                    await sql.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
+                }
+            }
+        }
+
+        //---------------------------------------------------------------Eliminar Parametro---------------------------------------------------------------
+        public async Task<(int codErr, string desErr)> EliminarParametro(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -101,12 +120,22 @@ namespace Data.Repositories
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@ID", id);
 
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
-                    return await cmd.ExecuteNonQueryAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+
+                    return (codError, desError);
                 }
             }
         }
 
+        //...........................................................MAPEO....................................................
         private Parametro MapToParametro(SqlDataReader reader)
         {
             return new Parametro()
