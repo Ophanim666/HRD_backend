@@ -33,11 +33,36 @@ namespace API.Controllers
             {
                 objetoRequest.Estado.Ack = false;
                 objetoRequest.Estado.ErrNo = "001.01";
-                objetoRequest.Estado.ErrDes = "No hay tipo parametro registrados";
+                objetoRequest.Estado.ErrDes = "No hay especialidades registradas";
                 objetoRequest.Estado.ErrCon = "[Especialidadcontroller]";
             }
 
             var EspecialidadDTOs = _mapper.Map<List<EspecialidadDTO>>(response);
+
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = EspecialidadDTOs
+            };
+            return objetoRequest;
+        }
+
+        //---------------------------------------------------Listar especialidades simple (nombre, id) para listarlos y asignar a proveedores---------------------------------------------------
+        [HttpGet("ListadoDeespecialidadesSimple")]
+        public async Task<ActionResult<ObjetoRequest>> LstEspecialidad()
+        {
+            var response = await _especialidadRepository.ListAll();
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null /*|| response.Count == 0*/)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay especialidades registradas";
+                objetoRequest.Estado.ErrCon = "[Especialidadcontroller]";
+            }
+
+            var EspecialidadDTOs = _mapper.Map<List<LstEspecialidadDTO>>(response);
 
             objetoRequest.Body = new BodyRequest()
             {

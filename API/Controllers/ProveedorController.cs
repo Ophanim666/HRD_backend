@@ -4,6 +4,8 @@ using Data.Repositories;
 using System.Threading.Tasks;
 using DTO.Proveedor;
 using AutoMapper;
+using DTO;
+
 
 namespace API.Controllers
 {
@@ -19,20 +21,32 @@ namespace API.Controllers
             _proveedorRepository = proveedorRepository;
             _mapper = mapper;
         }
-        //listar proveedor
-        [HttpGet]
-        public async Task<ActionResult<List<ProveedorDTO>>> ListAll()
+
+        //----------------------------------------------------------------listar proveedor----------------------------------------------------------------
+        [HttpGet] //preguntar cual seria la mejor forma de parametrizar las rutas, ejemplo [Route("Lista")] o [HttpGet("Lista")]
+        public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
             var response = await _proveedorRepository.ListAll();
-            if (response == null || response.Count == 0)
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null /*|| response.Count == 0*/)
             {
-                return NotFound();
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay proveedor registrados";
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
             }
 
-            var proveedorDTO = _mapper.Map<List<ProveedorDTO>>(response);
-            return Ok(proveedorDTO);
+            var proveedorDTOs = _mapper.Map<List<ProveedorDTO>>(response);
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = proveedorDTOs
+            };
+            return objetoRequest;
         }
-        //Listar proveedor por ID ---------------------------------------ELIMINAR SI NO FUNCIONA-----------------------------------------
+
+        //-----------------------------------------------------------------Listar proveedor por ID--------------------------------------------------------
         [HttpGet("{id}")]
         public async Task<ActionResult<ProveedorDTO>> ListarPorIdProveedor(int id)
         {
@@ -45,113 +59,112 @@ namespace API.Controllers
             var proveedorDTO = _mapper.Map<ProveedorDTO>(response);
             return Ok(proveedorDTO);
         }
-        //insertar Proveedores
-        [HttpPost]
-        public async Task<IActionResult> InsertarTipoParametro([FromBody] ProveedorDTO proveedorDTO)
+
+        //----------------------------------------------------------------listar proveedores con especialidades---------------------------------------------------
+        [HttpGet("con-especialidades")]
+        public async Task<ActionResult<ObjetoRequest>> ListarProveedoresConEspecialidades()
         {
-            if (proveedorDTO == null)
+            var response = await _proveedorRepository.ListarProveedoresConEspecialidades();
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null || response.Count == 0)
             {
-                return BadRequest("Datos inválidos.");
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay proveedores con especialidades registrados";
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
+                return NotFound(objetoRequest);
             }
 
-            var proveedor = new Proveedor
+            objetoRequest.Body = new BodyRequest()
             {
-                NOMBRE = proveedorDTO.NOMBRE,
-                RAZON_SOCIAL = proveedorDTO.RAZON_SOCIAL,
-                RUT = proveedorDTO.RUT,
-                DV = proveedorDTO.DV,
-                NOMBRE_CONTACTO_PRINCIPAL = proveedorDTO.NOMBRE_CONTACTO_PRINCIPAL,
-                NUMERO_CONTACTO_PRINCIPAL = proveedorDTO.NUMERO_CONTACTO_PRINCIPAL,
-                NOMBRE_CONTACTO_SECUNDARIO = proveedorDTO.NOMBRE_CONTACTO_SECUNDARIO,
-                NUMERO_CONTACTO_SECUNDARIO = proveedorDTO.NUMERO_CONTACTO_SECUNDARIO,
-                ESTADO = proveedorDTO.ESTADO,
-                USUARIO_CREACION = proveedorDTO.USUARIO_CREACION,
-                FECHA_CREACION = proveedorDTO.FECHA_CREACION
+                Response = response
             };
 
-            try
-            {
-                var result = await _proveedorRepository.InsertarProveedor(proveedor);
-
-                if (result > 0)
-                {
-                    return Ok("Proveedor insertado correctamente.");
-                }
-                else
-                {
-                    return StatusCode(500, "Error al insertar el Proveedor.");
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(objetoRequest);
         }
-        //editar Proveedores
+
+        //----------------------------------------------------------------insertar Proveedores------------------------------------------------------------
+        [HttpPost("add")]
+        public async Task<ActionResult<ObjetoRequest>> InsertarProveedor([FromBody] ProveedorInsertDTO value)
+        {
+            var responseProveedor = await _proveedorRepository.InsertarProveedor(value);
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (responseProveedor.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = responseProveedor.codErr.ToString();
+                objetoRequest.Estado.ErrDes = responseProveedor.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
+                return BadRequest(objetoRequest);
+            }
+
+            var responseEspecialidades = await _proveedorRepository.InsertarProveedorXEspecialidad(responseProveedor.proveedorId.Value, value.ListaEspecialidades);
+
+            if (responseEspecialidades.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = responseEspecialidades.codErr.ToString();
+                objetoRequest.Estado.ErrDes = responseEspecialidades.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
+                return BadRequest(objetoRequest);
+            }
+            return Ok(objetoRequest);
+
+        }
+
+        //----------------------------------------------------------------Actualizar Proveedores--------------------------------------------------------------
         [HttpPut("{id}")]
-        public async Task<IActionResult> ActualizarProveedor(int id, [FromBody] ProveedorDTO proveedorDTO)
+        public async Task<ActionResult<ObjetoRequest>> ActualizarProveedor(int id, [FromBody] ProveedorUpdateDTO value)
         {
-            if (proveedorDTO == null)
+            var response = await _proveedorRepository.ActualizarProveedor(id, value);
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response.codErr != 0)
             {
-                return BadRequest("Datos inválidos.");
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
+                return BadRequest(objetoRequest);
             }
 
-            var proveedor = new Proveedor
+            var responseEspecialidades = await _proveedorRepository.ActualizarProveedorXEspecialidad(id, value.ListaEspecialidades);
+
+            if (responseEspecialidades.codErr != 0)
             {
-                ID = id,
-                NOMBRE = proveedorDTO.NOMBRE,
-                RAZON_SOCIAL = proveedorDTO.RAZON_SOCIAL,
-                RUT = proveedorDTO.RUT,
-                DV = proveedorDTO.DV,
-                NOMBRE_CONTACTO_PRINCIPAL = proveedorDTO.NOMBRE_CONTACTO_PRINCIPAL,
-                NUMERO_CONTACTO_PRINCIPAL = proveedorDTO.NUMERO_CONTACTO_PRINCIPAL,
-                NOMBRE_CONTACTO_SECUNDARIO = proveedorDTO.NOMBRE_CONTACTO_SECUNDARIO,
-                NUMERO_CONTACTO_SECUNDARIO = proveedorDTO.NUMERO_CONTACTO_SECUNDARIO,
-                ESTADO = proveedorDTO.ESTADO,
-                USUARIO_CREACION = proveedorDTO.USUARIO_CREACION,
-                FECHA_CREACION = proveedorDTO.FECHA_CREACION
-
-            };
-
-            try
-            {
-                var response = await _proveedorRepository.ActualizarProveedor(proveedor);
-
-                if (response > 0)
-                {
-                    return Ok("Proveedor actualizado correctamente.");
-                }
-                else
-                {
-                    return BadRequest("Error al actualizar el Proveedor.");
-                }
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = responseEspecialidades.codErr.ToString();
+                objetoRequest.Estado.ErrDes = responseEspecialidades.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
+                return BadRequest(objetoRequest);
             }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+
+            objetoRequest.Estado.Ack = true;
+            return Ok(objetoRequest);
         }
-        // Método para eliminar el Proveedor por ID
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> EliminarProveedor(int id)
-        {
-            try
-            {
-                var result = await _proveedorRepository.EliminarProveedor(id);
 
-                if (result != 0)
-                {
-                    return Ok("TipoParametro eliminado correctamente." + result);
-                }
-                else
-                {
-                    return NotFound("TipoParametro no encontrado.");
-                }
-            }
-            catch (Exception ex)
+        //----------------------------------------------------------------eliminar el Proveedor por ID----------------------------------------------------
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ObjetoRequest>> EliminarProveedor(int id)
+        {
+            var response = await _proveedorRepository.EliminarProveedor(id);
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
+
+            if (response.codErr != 0)
             {
-                return BadRequest(ex.Message);
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
             }
+            return objetoRequest;
         }
     }
 }

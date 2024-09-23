@@ -57,12 +57,10 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", value.TIPO_PARAMETRO);
-                    cmd.Parameters.AddWithValue("@ESTADO", value.ESTADO);
-                    //se deshabilitaron en la bd
-                    //cmd.Parameters.AddWithValue("@FECHA_CREACION", value.FECHA_CREACION);
-                    //cmd.Parameters.AddWithValue("@USUARIO_CREACION", value.USUARIO_CREACION);
-
+                    cmd.Parameters.Add(new SqlParameter("@TIPO_PARAMETRO", value.TIPO_PARAMETRO));
+                    cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", value.USUARIO_CREACION));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
+                    cmd.Parameters.Add(new SqlParameter("@FECHA_CREACION", value.FECHA_CREACION));
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
@@ -83,7 +81,6 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                // AQUI SE CAMBIO EL PROCEDIMIENTO ALMACENADO YA QUE ESTE ACTUALIZA Y NO DA ERROR SI EL TIPOPARAMETRO NO SE ALTERA
                 using (SqlCommand cmd = new SqlCommand("usp_ActualizarTipoParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -107,8 +104,8 @@ namespace Data.Repositories
             }
         }
 
-        //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
-        public async Task<(int codErr, string desErr)> EliminarTipoParametro(int id)
+        //---------------------------------------------------------------Función para listar---------------------------------------------------------------
+        public async Task<List<TipoParametro>> ListAll() //revisar pq no se listan de DTO pero se listan de TipoParametro (mapeo abajo)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -132,8 +129,8 @@ namespace Data.Repositories
             }
         }
 
-        //...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................
-        //preguntar al profesor por que este y no el TipoParametroDTO
+        //...........................................................MAPEO (recordar sacar lo de vaores nulos)....................................................
+
         private TipoParametro MapToTipoParametro(SqlDataReader reader)
         {
             return new TipoParametro()

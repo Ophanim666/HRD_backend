@@ -45,6 +45,32 @@ namespace Data.Repositories
             }
         }
 
+        //---------------------------------------------------Listar especialidades simple (nombre, id) para listarlos y asignar a proveedores---------------------------------------------------
+        //preguntar al profe si es mejor utilizar DTO para listar o cual es la mejor practica
+        public async Task<List<LstEspecialidadDTO>> LstEspecialidad()
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_LstEspecialidades", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var response = new List<LstEspecialidadDTO>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            response.Add(MapToEspecialidadSimp(reader));
+                        }
+                    }
+
+                    return response;
+                }
+            }
+        }
+
         //---------------------------------------------------Función para añadir---------------------------------------------------
         public async Task<(int codErr, string desErr)> AñadirEspecialidad(EspecialidadInsertDTO value)
         {
@@ -54,8 +80,8 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    cmd.Parameters.AddWithValue("@NOMBRE", value.NOMBRE);
-                    cmd.Parameters.AddWithValue("@ESTADO", value.ESTADO);
+                    cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
                     // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
                     //cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
                     //cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
@@ -83,7 +109,7 @@ namespace Data.Repositories
                 using (SqlCommand cmd = new SqlCommand("SP_EliminarEspecialidad", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
+                    cmd.Parameters.Add(new SqlParameter("@ID", id));
 
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
@@ -130,7 +156,7 @@ namespace Data.Repositories
 
 
 
-        //---------------------------------------------------Mapeo de la especialidad---------------------------------------------------
+        //---------------------------------------------------Mapeo de la especialidad (recordar sacar lo de vaores nulos)---------------------------------------------------
         private Especialidad MapToEspecialidad(SqlDataReader reader)
         {
             return new Especialidad()
@@ -147,6 +173,16 @@ namespace Data.Repositories
                 //implementacion de DateTime.Now como este valor no uede ser nulo se entregara la fecha actual como solucion a null
                 //FECHA_CREACION utiliza la fecha y hora actuales en caso de que el valor de la base de datos sea nulo, se asignara DateTime.Now cuando se detecte un valor nulo.
                 FECHA_CREACION = reader.IsDBNull(reader.GetOrdinal("FECHA_CREACION")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
+            };
+        }
+
+        //se utilizo dto en vez del modelo, preguntar al profesor que es mejor para hacer el mapeo dto o el modelo
+        private LstEspecialidadDTO MapToEspecialidadSimp(SqlDataReader reader)
+        {
+            return new LstEspecialidadDTO()
+            {
+                ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                NOMBRE = reader.IsDBNull(reader.GetOrdinal("NOMBRE")) ? null : reader.GetString(reader.GetOrdinal("NOMBRE")),
             };
         }
 

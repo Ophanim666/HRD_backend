@@ -9,7 +9,6 @@ namespace DTO.Proveedor
 {
     public class ProveedorInsertDTO
     {
-        //Revisar datos que hay que sacar y cuales se mantienen para insertar consultar procedimiento almacenado
         public int ID { get; set; }
         public string NOMBRE { get; set; }
         public string RAZON_SOCIAL { get; set; }
@@ -21,8 +20,7 @@ namespace DTO.Proveedor
         public int NUMERO_CONTACTO_SECUNDARIO { get; set; }
         public int ESTADO { get; set; }
 
-        //Eliminar si se requiere
-        public string USUARIO_CREACION { get; set; }
-        public DateTime FECHA_CREACION { get; set; }
+        //
+        public List<int> ListaEspecialidades { get; set; } // IDs de especialidades seleccionadas
     }
 }
