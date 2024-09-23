@@ -17,35 +17,36 @@ namespace Data.Repositories
         {
             _connectionString = connectionString;
         }
+        
         //aqui ponemos los codErr y desErr para poder trabajarlos
         public int codError;
-        public string desError; 
+        public string desError;
 
-        //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
-        public async Task<(int codErr, string desErr)> EliminarTipoParametro(int id)
+        //---------------------------------------------------------------Listar Tipo Parametror---------------------------------------------------------------
+        //preguntar al profesor por que este y no el TipoParametroDTO
+        public async Task<List<TipoParametro>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("usp_EliminarTipoParametro", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerTipoParametros", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
 
-                    //agregamos nuestro manejo de errores
-                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+                    var response = new List<TipoParametro>();
                     await sql.OpenAsync();
-                    await cmd.ExecuteNonQueryAsync();
 
-                    //lo que debemos retornar
-                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
-                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            response.Add(MapToTipoParametro(reader));
+                        }
+                    }
 
-                    return (codError, desError);
+                    return response;
                 }
             }
         }
-
 
         //---------------------------------------------------------------Insertar TipoParametro--------------------------------------------------------------- 
         public async Task<(int codErr, string desErr)> InsertarTipoParametro(TipoParametroInsertDTO value)
@@ -57,9 +58,11 @@ namespace Data.Repositories
                     cmd.CommandType = CommandType.StoredProcedure;
 
                     cmd.Parameters.AddWithValue("@TIPO_PARAMETRO", value.TIPO_PARAMETRO);
-                    cmd.Parameters.AddWithValue("@USUARIO_CREACION", value.USUARIO_CREACION);
                     cmd.Parameters.AddWithValue("@ESTADO", value.ESTADO);
-                    cmd.Parameters.AddWithValue("@FECHA_CREACION", value.FECHA_CREACION);
+                    //se deshabilitaron en la bd
+                    //cmd.Parameters.AddWithValue("@FECHA_CREACION", value.FECHA_CREACION);
+                    //cmd.Parameters.AddWithValue("@USUARIO_CREACION", value.USUARIO_CREACION);
+
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
@@ -104,33 +107,33 @@ namespace Data.Repositories
             }
         }
 
-        //---------------------------------------------------------------Función para listar---------------------------------------------------------------
-        public async Task<List<TipoParametro>> ListAll()
+        //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
+        public async Task<(int codErr, string desErr)> EliminarTipoParametro(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("usp_ObtenerTipoParametros", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_EliminarTipoParametro", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ID", id);
 
-                    var response = new List<TipoParametro>();
+                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
                     await sql.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
 
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            response.Add(MapToTipoParametro(reader));
-                        }
-                    }
+                    //lo que debemos retornar
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = (cmd.Parameters["@des_err"].Value).ToString();
 
-                    return response;
+                    return (codError, desError);
                 }
             }
         }
 
-//...........................................................MAPEO....................................................
-
+        //...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................
+        //preguntar al profesor por que este y no el TipoParametroDTO
         private TipoParametro MapToTipoParametro(SqlDataReader reader)
         {
             return new TipoParametro()
@@ -149,7 +152,7 @@ namespace Data.Repositories
                 ID = reader.GetInt32(reader.GetOrdinal("ID")),
                 TIPO_PARAMETRO = reader.GetString(reader.GetOrdinal("TIPO_PARAMETRO")),
                 ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
-                USUARIO_CREACION = reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
             };
         }
