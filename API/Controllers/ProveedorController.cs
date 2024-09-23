@@ -23,7 +23,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------listar proveedor----------------------------------------------------------------
-        [HttpGet]
+        [HttpGet] //preguntar cual seria la mejor forma de parametrizar las rutas, ejemplo [Route("Lista")] o [HttpGet("Lista")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
             var response = await _proveedorRepository.ListAll();

@@ -24,7 +24,7 @@ namespace Data.Repositories
         public int proveedorId;
 
         //----------------------------------------------------------Listar proveedores----------------------------------------------------------
-        public async Task<List<Proveedor>> ListAll() //revisar para ver si debe usar el mapeo o el DTO
+        public async Task<List<ProveedorDTO>> ListAll() //revisar para ver si debe usar el mapeo del modelo o de el DTO
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -32,14 +32,14 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    var response = new List<Proveedor>();
+                    var response = new List<ProveedorDTO>();
                     await sql.OpenAsync();
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
-                            response.Add(MapToProveedor(reader));
+                            response.Add(MapToProveedorDTOListar(reader));
                         }
                     }
                     return response;
@@ -271,6 +271,27 @@ namespace Data.Repositories
         private Proveedor MapToProveedor(SqlDataReader reader)
         {
             return new Proveedor()
+            {
+                ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                NOMBRE = reader.GetString(reader.GetOrdinal("NOMBRE")),
+                RAZON_SOCIAL = reader.GetString(reader.GetOrdinal("RAZON_SOCIAL")),
+                RUT = reader.GetString(reader.GetOrdinal("RUT")),
+                DV = reader.GetString(reader.GetOrdinal("DV")),
+                NOMBRE_CONTACTO_PRINCIPAL = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_PRINCIPAL")),
+                NUMERO_CONTACTO_PRINCIPAL = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_PRINCIPAL")),
+                NOMBRE_CONTACTO_SECUNDARIO = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_SECUNDARIO")),
+                NUMERO_CONTACTO_SECUNDARIO = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_SECUNDARIO")),
+                ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
+                //eliminar mas adelante cuando usuario creacion este habilitado ya que el mapeo no acepta valores nulos y los metodos de insercion no contemplan insertar usuario_creacion
+                USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
+            };
+        }
+
+        //cual mapeo usar?
+        private ProveedorDTO MapToProveedorDTOListar(SqlDataReader reader)
+        {
+            return new ProveedorDTO()
             {
                 ID = reader.GetInt32(reader.GetOrdinal("ID")),
                 NOMBRE = reader.GetString(reader.GetOrdinal("NOMBRE")),
