@@ -50,7 +50,7 @@ namespace API.Controllers
         [HttpGet("ListadoDeespecialidadesSimple")]
         public async Task<ActionResult<ObjetoRequest>> LstEspecialidad()
         {
-            var response = await _especialidadRepository.ListAll();
+            var response = await _especialidadRepository.LstEspecialidad();
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
 
