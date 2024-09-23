@@ -23,15 +23,14 @@ namespace API.Controllers
             _tipoParametroRepositorio = tipoParametroRepositorio;
             _mapper = mapper;
         }
-
         //---------------------------------------------------------------Listar tipoparametros---------------------------------------------------------------
         [HttpGet]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
-            var response = await _tipoParametroRepositorio.ListAll();        
+            var response = await _tipoParametroRepositorio.ListAll();
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
-            
+
             if (response == null /*|| response.Count == 0*/)
             {
                 objetoRequest.Estado.Ack = false;
@@ -51,20 +50,22 @@ namespace API.Controllers
         //---------------------------------------------------------------Insertar tipoparametros---------------------------------------------------------------
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarTipoParametro([FromBody] TipoParametroInsertDTO value)
-        {   
+        {
             var response = await _tipoParametroRepositorio.InsertarTipoParametro(value);
 
 
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
+            //Ya no es necesario ya que se soluciono en el procedimiento almacenado
+            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
             if (response.codErr != 0)
             {
                 objetoRequest.Estado.Ack = false;
                 objetoRequest.Estado.ErrNo = response.codErr.ToString();
                 objetoRequest.Estado.ErrDes = response.desErr.ToString();
-                objetoRequest.Estado.ErrCon = "[TipoParametroController]";  
+                objetoRequest.Estado.ErrCon = "[TipoParametroController]";
             }
-                return objetoRequest;
+            return objetoRequest;
 
         }
 
@@ -75,6 +76,7 @@ namespace API.Controllers
             var response = await _tipoParametroRepositorio.ActualizarTipoParametro(id, value);
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
+            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
 
             if (response.codErr != 0)
             {
@@ -93,6 +95,7 @@ namespace API.Controllers
             var response = await _tipoParametroRepositorio.EliminarTipoParametro(id);
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
+            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
 
             if (response.codErr != 0)
             {
