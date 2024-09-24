@@ -47,24 +47,24 @@ namespace Data.Repositories
             }
         }
 
-        //----------------------------------------------------------Listar proveedores por ID----------------------------------------------------------------
-        public async Task<Proveedor> ListarPorIdProveedor(int id) //revisar para ver si debe usar el mapeo o el DTO
+        //----------------------------------------------------------Buscar proveedor con sus especialidades por id----------------------------------------------------------------
+        public async Task<BuscarProveedorConEspecialidadDTO> ListarPorIdProveedorConEspecialidad(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedorPorId", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedorConEspecialidadPorId", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
+                    cmd.Parameters.AddWithValue("@IDproveedor", id);
 
-                    Proveedor response = null;
+                    BuscarProveedorConEspecialidadDTO response = null;
                     await sql.OpenAsync();
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
                         {
-                            response = MapToProveedor(reader);
+                            response = MapToBuscarProveedorConEspecialidadDTOListar(reader);
                         }
                     }
 
@@ -268,27 +268,7 @@ namespace Data.Repositories
         }
 
         //...........................................................MAPEO (recordar sacar lo de vaores nulos)....................................................
-        private Proveedor MapToProveedor(SqlDataReader reader)
-        {
-            return new Proveedor()
-            {
-                ID = reader.GetInt32(reader.GetOrdinal("ID")),
-                NOMBRE = reader.GetString(reader.GetOrdinal("NOMBRE")),
-                RAZON_SOCIAL = reader.GetString(reader.GetOrdinal("RAZON_SOCIAL")),
-                RUT = reader.GetString(reader.GetOrdinal("RUT")),
-                DV = reader.GetString(reader.GetOrdinal("DV")),
-                NOMBRE_CONTACTO_PRINCIPAL = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_PRINCIPAL")),
-                NUMERO_CONTACTO_PRINCIPAL = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_PRINCIPAL")),
-                NOMBRE_CONTACTO_SECUNDARIO = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_SECUNDARIO")),
-                NUMERO_CONTACTO_SECUNDARIO = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_SECUNDARIO")),
-                ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
-                //eliminar mas adelante cuando usuario creacion este habilitado ya que el mapeo no acepta valores nulos y los metodos de insercion no contemplan insertar usuario_creacion
-                USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
-                FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
-            };
-        }
 
-        //cual mapeo usar?
         private ProveedorDTO MapToProveedorDTOListar(SqlDataReader reader)
         {
             return new ProveedorDTO()
@@ -306,6 +286,17 @@ namespace Data.Repositories
                 //eliminar mas adelante cuando usuario creacion este habilitado ya que el mapeo no acepta valores nulos y los metodos de insercion no contemplan insertar usuario_creacion
                 USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
+            };
+        }
+
+        //mapeo buscar proveedor con sus especialidades
+        private BuscarProveedorConEspecialidadDTO MapToBuscarProveedorConEspecialidadDTOListar(SqlDataReader reader)
+        {
+            return new BuscarProveedorConEspecialidadDTO()
+            {
+                IDproveedor = reader.GetInt32(reader.GetOrdinal("proveedorID")), // Cambiado para coincidir con el SP
+                IDespecialidad = reader.GetInt32(reader.GetOrdinal("especialidadID")), // Cambiado para coincidir con el SP
+                EspecialidadNombre = reader.GetString(reader.GetOrdinal("NombreEspecialidad")) // Cambiado para coincidir con el SP
             };
         }
     }

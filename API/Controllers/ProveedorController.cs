@@ -48,15 +48,16 @@ namespace API.Controllers
 
         //-----------------------------------------------------------------Listar proveedor por ID--------------------------------------------------------
         [HttpGet("{id}")]
-        public async Task<ActionResult<ProveedorDTO>> ListarPorIdProveedor(int id)
+        //[Route("BuscarProveedorConEspecialidad")]
+        public async Task<ActionResult<BuscarProveedorConEspecialidadDTO>> ListarPorIdProveedorConEspecialidad(int id)
         {
-            var response = await _proveedorRepository.ListarPorIdProveedor(id);
+            var response = await _proveedorRepository.ListarPorIdProveedorConEspecialidad(id);
             if (response == null)
             {
                 return NotFound();
             }
 
-            var proveedorDTO = _mapper.Map<ProveedorDTO>(response);
+            var proveedorDTO = _mapper.Map<BuscarProveedorConEspecialidadDTO>(response);
             return Ok(proveedorDTO);
         }
 
