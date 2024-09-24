@@ -47,8 +47,7 @@ namespace API.Controllers
         }
 
         //-----------------------------------------------------------------Listar proveedor por ID--------------------------------------------------------
-        [HttpGet("{id}")]
-        //[Route("BuscarProveedorConEspecialidad")]
+        [HttpGet("BuscarProveedorConEspecialidad/{id}")]
         public async Task<ActionResult<BuscarProveedorConEspecialidadDTO>> ListarPorIdProveedorConEspecialidad(int id)
         {
             var response = await _proveedorRepository.ListarPorIdProveedorConEspecialidad(id);
