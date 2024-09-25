@@ -46,25 +46,11 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-        //-----------------------------------------------------------------Listar proveedor por ID--------------------------------------------------------
-        [HttpGet("BuscarProveedorConEspecialidad/{id}")]
-        public async Task<ActionResult<BuscarProveedorConEspecialidadDTO>> ListarPorIdProveedorConEspecialidad(int id)
-        {
-            var response = await _proveedorRepository.ListarPorIdProveedorConEspecialidad(id);
-            if (response == null)
-            {
-                return NotFound();
-            }
-
-            var proveedorDTO = _mapper.Map<BuscarProveedorConEspecialidadDTO>(response);
-            return Ok(proveedorDTO);
-        }
-
         //----------------------------------------------------------------listar proveedores con especialidades---------------------------------------------------
-        [HttpGet("con-especialidades")]
-        public async Task<ActionResult<ObjetoRequest>> ListarProveedoresConEspecialidades()
+        [HttpGet("con-especialidades/{id}")]
+        public async Task<ActionResult<ObjetoRequest>> ListarProveedoresConEspecialidades(int id)
         {
-            var response = await _proveedorRepository.ListarProveedoresConEspecialidades();
+            var response = await _proveedorRepository.ListarProveedoresConEspecialidades(id);
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
 

@@ -47,40 +47,16 @@ namespace Data.Repositories
             }
         }
 
-        //----------------------------------------------------------Buscar proveedor con sus especialidades por id----------------------------------------------------------------
-        public async Task<BuscarProveedorConEspecialidadDTO> ListarPorIdProveedorConEspecialidad(int id)
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedorConEspecialidadPorId", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@IDproveedor", id);
-
-                    BuscarProveedorConEspecialidadDTO response = null;
-                    await sql.OpenAsync();
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        if (await reader.ReadAsync())
-                        {
-                            response = MapToBuscarProveedorConEspecialidadDTOListar(reader);
-                        }
-                    }
-
-                    return response;
-                }
-            }
-        }
 
         //----------------------------------------------------------Listar proveedores con sus especialidades---------------------------------------------------------- 
-        public async Task<List<ProveedorConEspecialidadDTO>> ListarProveedoresConEspecialidades()
+        public async Task<List<ProveedorConEspecialidadDTO>> ListarProveedoresConEspecialidades(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
                 using (SqlCommand cmd = new SqlCommand("usp_ListarProveedoresConEspecialidades", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@IDproveedor", id);
 
                     var response = new List<ProveedorConEspecialidadDTO>();
                     await sql.OpenAsync();
@@ -286,17 +262,6 @@ namespace Data.Repositories
                 //eliminar mas adelante cuando usuario creacion este habilitado ya que el mapeo no acepta valores nulos y los metodos de insercion no contemplan insertar usuario_creacion
                 USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
-            };
-        }
-
-        //mapeo buscar proveedor con sus especialidades
-        private BuscarProveedorConEspecialidadDTO MapToBuscarProveedorConEspecialidadDTOListar(SqlDataReader reader)
-        {
-            return new BuscarProveedorConEspecialidadDTO()
-            {
-                IDproveedor = reader.GetInt32(reader.GetOrdinal("proveedorID")), // Cambiado para coincidir con el SP
-                IDespecialidad = reader.GetInt32(reader.GetOrdinal("especialidadID")), // Cambiado para coincidir con el SP
-                EspecialidadNombre = reader.GetString(reader.GetOrdinal("NombreEspecialidad")) // Cambiado para coincidir con el SP
             };
         }
     }
