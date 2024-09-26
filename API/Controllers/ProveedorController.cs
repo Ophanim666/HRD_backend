@@ -23,7 +23,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------listar proveedor----------------------------------------------------------------
-        [HttpGet] //preguntar cual seria la mejor forma de parametrizar las rutas, ejemplo [Route("Lista")] o [HttpGet("Lista")]
+        [HttpGet] 
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
             var response = await _proveedorRepository.ListAll();
@@ -45,6 +45,35 @@ namespace API.Controllers
             };
             return objetoRequest;
         }
+
+        //---------------------------------------------------------------listadoTesting...............................................................................NEW
+        [HttpGet("Listado")]
+        public async Task<ActionResult<ObjetoRequest>> ListAllProveedoresConEspecialidades()
+        {
+            var response = await _proveedorRepository.ListAllProveedoresConEspecialidades();
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null || response.Count == 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay proveedores registrados con especialidades";
+                objetoRequest.Estado.ErrCon = "[ProveedorController]";
+            }
+            else
+            {
+                objetoRequest.Estado.Ack = true;
+            }
+
+            var proveedorDTOs = _mapper.Map<List<ListarProveedoresXEspecialidadesDTO>>(response);
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = proveedorDTOs
+            };
+            return objetoRequest;
+        }
+
 
         //----------------------------------------------------------------listar proveedores con especialidades Por ID---------------------------------------------------
         [HttpGet("con-especialidades/{id}")]
@@ -96,7 +125,6 @@ namespace API.Controllers
             return Ok(objetoRequest);
         }
 
-
         //----------------------------------------------------------------insertar Proveedores------------------------------------------------------------
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarProveedor([FromBody] ProveedorInsertDTO value)
@@ -129,7 +157,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------Actualizar Proveedores--------------------------------------------------------------
-        [HttpPut("{id}")]
+        [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarProveedor(int id, [FromBody] ProveedorUpdateDTO value)
         {
             var response = await _proveedorRepository.ActualizarProveedor(id, value);
@@ -161,7 +189,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------eliminar el Proveedor por ID----------------------------------------------------
-        [HttpDelete("{id}")]
+        [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarProveedor(int id)
         {
             var response = await _proveedorRepository.EliminarProveedor(id);
