@@ -18,6 +18,9 @@ namespace API
 
             //Automapeo para tareas
             CreateMap<Tarea, TareaDTO>().ReverseMap();
+            CreateMap<Tarea, TareaDTO>().ReverseMap();
+            CreateMap<Tarea, TareaInsertDTO>().ReverseMap();
+            CreateMap<Tarea, TareaUpdateDTO>().ReverseMap();
 
             //Automapeo para especialidad
             CreateMap<Especialidad, EspecialidadDTO>().ReverseMap();
