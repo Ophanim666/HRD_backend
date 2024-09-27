@@ -24,7 +24,7 @@ namespace Data.Repositories
 
         //---------------------------------------------------------------Listar Tipo Parametror---------------------------------------------------------------
         //preguntar al profesor por que este y no el TipoParametroDTO
-        public async Task<List<TipoParametro>> ListAll()
+        public async Task<List<TipoParametroDTO>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -32,7 +32,7 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    var response = new List<TipoParametro>();
+                    var response = new List<TipoParametroDTO>();
                     await sql.OpenAsync();
 
                     using (var reader = await cmd.ExecuteReaderAsync())
@@ -130,9 +130,9 @@ namespace Data.Repositories
 
         //...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................
         //preguntar al profesor por que este y no el TipoParametroDTO
-        private TipoParametro MapToTipoParametro(SqlDataReader reader)
+        private TipoParametroDTO MapToTipoParametro(SqlDataReader reader)
         {
-            return new TipoParametro()
+            return new TipoParametroDTO()
             {
                 ////OJO el mapeo solo sirve para listar si son nulos si se quiere insertar un dato nulo eso se debe ver en otra situacion 
                 //ID = reader.GetInt32(reader.GetOrdinal("ID")),

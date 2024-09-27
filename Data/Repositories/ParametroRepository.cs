@@ -25,7 +25,7 @@ namespace Data.Repositories
         public int codError;
         public string desError;
 
-        //---------------------------------------------------------------Listar parametro-----------------------------------------------------------------
+        //---------------------------------------------------------------Listar parametro----------------------------------------------------------------- NO FUNCIONANDO
         public async Task<List<ParametroDTO>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -50,7 +50,7 @@ namespace Data.Repositories
             }
         }
 
-        //---------------------------------------------------------------Insertar Parametro--------------------------------------------------------------- 
+        //---------------------------------------------------------------Insertar Parametro--------------------------------------------------------------- FUNCIONANDO
         public async Task<(int codErr, string desErr)> InsertarParametro(ParametroInsertDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -62,8 +62,9 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@PARAMETRO", value.PARAMETRO));
                     cmd.Parameters.Add(new SqlParameter("@VALOR", value.VALOR));
                     cmd.Parameters.Add(new SqlParameter("@ID_TIPO_PARAMETRO", value.ID_TIPO_PARAMETRO));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
                     //demomento mantenemos el usaurio creacion para insertar
-                    cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", value.USUARIO_CREACION));
+                    //cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", value.USUARIO_CREACION));
 
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
@@ -80,7 +81,7 @@ namespace Data.Repositories
             }
         }
 
-        //---------------------------------------------------------------Actualizar Parametro-------------------------------------------------------------
+        //---------------------------------------------------------------Actualizar Parametro------------------------------------------------------------- FUNCIONANDO
         public async Task<(int codErr, string desErr)> ActualizarParametro(int id, ParametroUpdateDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -110,7 +111,7 @@ namespace Data.Repositories
             }
         }
 
-        //---------------------------------------------------------------Eliminar Parametro---------------------------------------------------------------
+        //---------------------------------------------------------------Eliminar Parametro--------------------------------------------------------------- FUNCIONANDO
         public async Task<(int codErr, string desErr)> EliminarParametro(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
