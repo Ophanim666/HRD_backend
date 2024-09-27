@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 //Importamos el dto
 using DTO.Parametro;
+using DTO.Proveedor;
 
 
 namespace Data.Repositories
@@ -25,7 +26,7 @@ namespace Data.Repositories
         public int codError;
         public string desError;
 
-        //---------------------------------------------------------------Listar parametro----------------------------------------------------------------- NO FUNCIONANDO
+        //---------------------------------------------------------------Listar parametro----------------------------------------------------------------- FUNCIONANDO LISDATO PERO NO SE PUEDE USAR MAPEO POR EL TEMA DE QUE ID_TIPO_PARAMETRO ES UND FK REVISAR
         public async Task<List<ParametroDTO>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -41,10 +42,19 @@ namespace Data.Repositories
                     {
                         while (await reader.ReadAsync())
                         {
-                            response.Add(MapToParametroDTO(reader));
+                            var Parametro = new ParametroDTO
+                            {
+                                ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                                PARAMETRO = reader.GetString(reader.GetOrdinal("PARAMETRO")),
+                                VALOR = reader.GetString(reader.GetOrdinal("VALOR")),
+                                ID_TIPO_PARAMETRO = reader.GetInt32(reader.GetOrdinal("ID_TIPO_PARAMETRO")),
+                                ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
+                                USUARIO_CREACION = reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                                FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION")),
+                            };
+                            response.Add(Parametro);
                         }
                     }
-
                     return response;
                 }
             }
@@ -136,7 +146,7 @@ namespace Data.Repositories
             }
         }
 
-        //...........................................................MAPEO....................................................
+        //...........................................................MAPEO.................................................... NO SE ESTA UTILIZANDO PERO BUSCAR SOLUCION O MANTENER METODO ACTUAL PARA LISTAR
         private ParametroDTO MapToParametroDTO(SqlDataReader reader)
         {
             return new ParametroDTO()
@@ -146,10 +156,11 @@ namespace Data.Repositories
                 VALOR = reader.GetString(reader.GetOrdinal("VALOR")),
                 ID_TIPO_PARAMETRO = reader.GetInt32(reader.GetOrdinal("ID_TIPO_PARAMETRO")),
                 ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
-                USUARIO_CREACION = reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
             };
         }
+
 
 
     }

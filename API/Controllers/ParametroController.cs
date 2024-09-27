@@ -21,28 +21,31 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Listar Parametro---------------------------------------------------------------
-        [HttpGet]
+        [HttpGet("Listar")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
             var response = await _parametroRepositorio.ListAll();
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
 
-            if (response == null /*|| response.Count == 0*/)
+            if (response == null || response.Count == 0)
             {
                 objetoRequest.Estado.Ack = false;
                 objetoRequest.Estado.ErrNo = "001.01";
-                objetoRequest.Estado.ErrDes = "No hay parametro registrados";
+                objetoRequest.Estado.ErrDes = "No hay parámetros registrados";
                 objetoRequest.Estado.ErrCon = "[ParametroController]";
             }
-
-            var tipoParametroDTOs = _mapper.Map<List<TipoParametroDTO>>(response);
-            objetoRequest.Body = new BodyRequest()
+            else
             {
-                Response = tipoParametroDTOs
-            };
+                objetoRequest.Body = new BodyRequest()
+                {
+                    Response = response // Aquí se asigna la lista de ParametroDTO
+                };
+            }
             return objetoRequest;
         }
+
+
 
         //---------------------------------------------------------------Insertar parametro---------------------------------------------------------------
         [HttpPost("add")]
@@ -63,7 +66,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Actualizar parametro---------------------------------------------------------------
-        [HttpPut("{id}")]
+        [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarParametro(int id, [FromBody] ParametroUpdateDTO value)
         {
             var response = await _parametroRepositorio.ActualizarParametro(id, value);
@@ -82,7 +85,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Eliminar Parametro---------------------------------------------------------------
-        [HttpDelete("{id}")]
+        [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarParametro(int id)
         {
             var response = await _parametroRepositorio.EliminarParametro(id);
