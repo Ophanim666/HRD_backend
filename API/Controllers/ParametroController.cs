@@ -45,8 +45,6 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-
-
         //---------------------------------------------------------------Insertar parametro---------------------------------------------------------------
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarParametro([FromBody] ParametroInsertDTO value)
