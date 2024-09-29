@@ -1,70 +1,133 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Data.Repositorios;
 using Models.Entidades;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using Data.Repositories;
+using System.Threading.Tasks;
+using DTO.Especialidad;
+using AutoMapper;
+using DTO;
+using DTO.Tarea;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class TareaController : ControllerBase
     {
         private readonly TareaRepository _tareaRepository;
+        private readonly IMapper _mapper;
 
-        public TareaController(TareaRepository tareaRepository)
+        public TareaController(TareaRepository tareaRepository, IMapper mapper)
         {
             _tareaRepository = tareaRepository;
+            _mapper = mapper;
         }
 
-        // GET: api/tarea
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Tarea>>> GetTareas()
+        //---------------------------------------------------Listar especialidades---------------------------------------------------
+        [HttpGet("ListarTareas")] // se parametrizo cambiar en el frontend
+        public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
-            var tareas = await _tareaRepository.ListAll();
-            return Ok(tareas);
+            var response = await _tareaRepository.ListAll();
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null /*|| response.Count == 0*/)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay tareas registradas";
+                objetoRequest.Estado.ErrCon = "[Tareacontroller]";
+            }
+
+            var TareaDTOs = _mapper.Map<List<TareaDTO>>(response);
+
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = TareaDTOs
+            };
+            return objetoRequest;
         }
 
-        // POST: api/tarea
-        [HttpPost]
-        public async Task<ActionResult> InsertTarea([FromBody] Tarea tarea)
+        //---------------------------------------------------Listar especialidades simple (nombre, id) para listarlos y asignar a proveedores---------------------------------------------------
+        [HttpGet("ListadoDeTareaSimple")]
+        public async Task<ActionResult<ObjetoRequest>> LstTarea()
         {
-            if (tarea == null)
+            var response = await _tareaRepository.LstTarea();
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null /*|| response.Count == 0*/)
             {
-                return BadRequest("Tarea no puede ser nula.");
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay Tareas registradas";
+                objetoRequest.Estado.ErrCon = "[Tareacontroller]";
             }
 
-            await _tareaRepository.Insert(tarea);
-            return Ok("Tarea insertada exitosamente.");
-        }
-        // PUT: api/tarea
-        [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateTarea([FromBody] Tarea tarea)
+            var TareaDTOs = _mapper.Map<List<LstTareaDTO>>(response);
 
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = TareaDTOs
+            };
+            return objetoRequest;
+        }
+
+        //---------------------------------------------------Añadir especialidades---------------------------------------------------
+        [HttpPost("add")]
+        public async Task<ActionResult<ObjetoRequest>> AñadirTarea([FromBody] TareaInsertDTO value)
         {
-            if (tarea == null)
-            {
-                return BadRequest("Tarea no puede ser nula.");
-            }
+            var response = await _tareaRepository.AñadirTarea(value);
 
-            try
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response.codErr != 0)
             {
-                await _tareaRepository.Update(tarea);
-                return Ok("Tarea actualizada exitosamente.");
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[Tareacontroller]";
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error al actualizar la tarea: {ex.Message}");
-            }
+            return objetoRequest;
         }
 
-        // DELETE: api/tarea/{id}
+        //---------------------------------------------------Eliminar especialidades---------------------------------------------------
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteTarea(int id)
+        public async Task<ActionResult<ObjetoRequest>> EliminarTarea(int id)
         {
-            await _tareaRepository.Delete(id);
-            return Ok("Tarea eliminada exitosamente.");
+            var response = await _tareaRepository.EliminarTarea(id);
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+
+            if (response.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[TareaController]";
+            }
+            return objetoRequest;
+        }
+
+
+        //---------------------------------------------------SP para actualizar especialidad---------------------------------------------------
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ObjetoRequest>> ActualizarTarea(int id, [FromBody] TareaUpdateDTO value)
+        {
+            var response = await _tareaRepository.ActualizarTarea(id, value);
+
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[Tareacontroller]";
+            }
+            return objetoRequest;
         }
     }
 }
