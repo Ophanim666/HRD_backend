@@ -14,10 +14,11 @@ namespace DTO.Proveedor
         public string RAZON_SOCIAL { get; set; }
         public string RUT { get; set; }
         public string DV { get; set; }
-        public string NOMBRE_CONTACTO_PRINCIPAL { get; set; }
-        public int NUMERO_CONTACTO_PRINCIPAL { get; set; }
-        public string NOMBRE_CONTACTO_SECUNDARIO { get; set; }
-        public int NUMERO_CONTACTO_SECUNDARIO { get; set; }
+        //eliminar cuando sea necesario
+        //public string NOMBRE_CONTACTO_PRINCIPAL { get; set; }
+        //public int NUMERO_CONTACTO_PRINCIPAL { get; set; }
+        //public string NOMBRE_CONTACTO_SECUNDARIO { get; set; }
+        //public int NUMERO_CONTACTO_SECUNDARIO { get; set; }
         public int ESTADO { get; set; }
 
         //

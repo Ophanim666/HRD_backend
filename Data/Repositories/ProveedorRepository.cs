@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 //Importamos el dto
 using DTO.Proveedor;
+using DTO.Especialidad;
 
 namespace Data.Repositories
 {
@@ -47,40 +48,89 @@ namespace Data.Repositories
             }
         }
 
-        //----------------------------------------------------------Listar proveedores por ID----------------------------------------------------------------
-        public async Task<Proveedor> ListarPorIdProveedor(int id) //revisar para ver si debe usar el mapeo o el DTO
+        //---------------------------------------------------------------listadoTesting...............................................................................NEW
+        public async Task<List<ListarProveedoresXEspecialidadesDTO>> ListAllProveedoresConEspecialidades()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedorPorId", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ListarProveedoresConEspecialidadesTESTING", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
 
-                    Proveedor response = null;
+                    var response = new List<ListarProveedoresXEspecialidadesDTO>();
                     await sql.OpenAsync();
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        if (await reader.ReadAsync())
+                        while (await reader.ReadAsync())
                         {
-                            response = MapToProveedor(reader);
+                            // Obtener el ID del proveedor y su información
+                            int idProveedor = reader.GetInt32(reader.GetOrdinal("IDproveedor"));
+                            string nombreProveedor = reader.GetString(reader.GetOrdinal("NombreProveedor"));
+                            string razonSocial = reader.GetString(reader.GetOrdinal("RazonSocial"));
+                            string rut = reader.GetString(reader.GetOrdinal("Rut"));
+                            string dv = reader.GetString(reader.GetOrdinal("Dv"));
+                            //eliminar si se requiere
+                            //string nombreContactoPri = reader.GetString(reader.GetOrdinal("NombreContactoPri"));
+                            //int numeroContactoPri = reader.GetInt32(reader.GetOrdinal("NumeroContactoPri"));
+                            //string nombreContactoSec = reader.GetString(reader.GetOrdinal("NombreContactoSec"));
+                            //int numeroContactoSec = reader.GetInt32(reader.GetOrdinal("NumeroContactoSec"));
+                            int estado = reader.GetInt32(reader.GetOrdinal("Estado"));
+
+                            // Obtener el ID y nombre de la especialidad
+                            int idEspecialidad = reader.GetInt32(reader.GetOrdinal("IDespecialidad"));
+                            string nombreEspecialidad = reader.GetString(reader.GetOrdinal("NombreEspecialidad"));
+
+                            // Buscar si el proveedor ya está en la lista
+                            var proveedor = response.FirstOrDefault(p => p.IDproveedor == idProveedor);
+
+                            if (proveedor == null)
+                            {
+                                // Si el proveedor no existe, lo agregamos con la primera especialidad
+                                proveedor = new ListarProveedoresXEspecialidadesDTO
+                                {
+                                    IDproveedor = idProveedor,
+                                    NombreProveedor = nombreProveedor,
+                                    RazonSocial = razonSocial,
+                                    Rut = rut,
+                                    Dv = dv,
+                                    //eliminar si se requiere
+                                    //NombreContactoPri = nombreContactoPri,
+                                    //NumeroContactoPri = numeroContactoPri,
+                                    //NombreContactoSec = nombreContactoSec,
+                                    //NumeroContactoSec = numeroContactoSec,
+                                    Estado = estado,
+
+                                    // Inicializar listas de especialidades
+                                    IDespecialidad = new List<int> { idEspecialidad },
+                                    NombreEspecialidad = new List<string> { nombreEspecialidad }
+                                };
+
+                                // Añadir el proveedor a la lista de respuesta
+                                response.Add(proveedor);
+                            }
+                            else
+                            {
+                                // Si el proveedor ya existe, solo agregamos la especialidad a las listas
+                                proveedor.IDespecialidad.Add(idEspecialidad);
+                                proveedor.NombreEspecialidad.Add(nombreEspecialidad);
+                            }
                         }
                     }
-
                     return response;
                 }
             }
         }
 
-        //----------------------------------------------------------Listar proveedores con sus especialidades---------------------------------------------------------- 
-        public async Task<List<ProveedorConEspecialidadDTO>> ListarProveedoresConEspecialidades()
+        //----------------------------------------------------------Listar proveedores con sus especialidades por id de proveedor---------------------------------------------------------- 
+        public async Task<List<ProveedorConEspecialidadDTO>> ListarProveedoresConEspecialidades(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("usp_ListarProveedoresConEspecialidades", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_ListarProveedoresConEspecialidadesPorID", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@IDproveedor", id);
 
                     var response = new List<ProveedorConEspecialidadDTO>();
                     await sql.OpenAsync();
@@ -89,14 +139,95 @@ namespace Data.Repositories
                     {
                         while (await reader.ReadAsync())
                         {
-                            var proveedorConEspecialidad = new ProveedorConEspecialidadDTO
+                            // Obtener el ID y el nombre del proveedor
+                            //SE SUPONE QUE SE DEBE HACER UNA VARIABLE PARA GAURDAR ESTO PERO NO SE PUEDE GAURDAR UNA VARIABLE DENTRO DE OTRA VARIABLE PARA SER ENTREGADA
+                            var proveedorID = reader.GetInt32(reader.GetOrdinal("ID proveedor"));
+                            var proveedorNombre = reader.GetString(reader.GetOrdinal("Nombre Proveedor"));
+                            var especialidadID = reader.GetInt32(reader.GetOrdinal("ID especialidad"));
+                            var especialidadNombre = reader.GetString(reader.GetOrdinal("Nombre Especialidad"));
+
+
+                            // FUNCIONA PERO HAY QUE DESHACERCE DE ESTA METODOLOGIA 
+
+                            // Busca si ya existe un proveedor en la lista
+                            var proveedor = response.FirstOrDefault(p => p.IDproveedor == proveedorID);
+
+                            if (proveedor == null)
                             {
-                                IDproveedor = reader.GetInt32(reader.GetOrdinal("ID proveedor")),
-                                ProveedorNombre = reader.GetString(reader.GetOrdinal("Nombre Proveedor")),
-                                IDespecialidad = reader.GetInt32(reader.GetOrdinal("ID especialidad")),
-                                EspecialidadNombre = reader.GetString(reader.GetOrdinal("Nombre Especialidad"))
-                            };
-                            response.Add(proveedorConEspecialidad);
+                                // Si no existe, añade un nuevo proveedor
+                                proveedor = new ProveedorConEspecialidadDTO
+                                {
+                                    IDproveedor = proveedorID,
+                                    ProveedorNombre = proveedorNombre,
+                                };
+
+                                // Añadir la especialidad inicial
+                                proveedor.IDespecialidades.Add(especialidadID);
+                                proveedor.EspecialidadNombres.Add(especialidadNombre);
+
+                                // Agregar a la lista de respuesta
+                                response.Add(proveedor);
+                            }
+                            else
+                            {
+                                // Si ya existe, añade la especialidad a las listas
+                                proveedor.IDespecialidades.Add(especialidadID);
+                                proveedor.EspecialidadNombres.Add(especialidadNombre);
+                            }
+                        }
+                    }
+                    return response;
+                }
+            }
+        }
+
+        //----------------------------------------------------------Listar proveedores con sus especialidades por GENERAL PARA LISTAR Y COMPROBAR------------------
+        public async Task<List<ProveedorEspecialidadGeneralDTO>> ObtenerProveedoresEspecialidadesGeneral()
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedorConEspecialidad", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var response = new List<ProveedorEspecialidadGeneralDTO>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            // Obtener el ID y el nombre del proveedor
+                            int proveedorID = reader.GetInt32(reader.GetOrdinal("ID proveedor"));
+                            string proveedorNombre = reader.GetString(reader.GetOrdinal("Nombre Proveedor"));
+                            int especialidadID = reader.GetInt32(reader.GetOrdinal("ID especialidad"));
+                            string especialidadNombre = reader.GetString(reader.GetOrdinal("Nombre Especialidad"));
+
+                            // Buscar si ya existe un proveedor en la lista
+                            var proveedor = response.FirstOrDefault(p => p.IDproveedor == proveedorID);
+
+                            if (proveedor == null)
+                            {
+                                // Si no existe, añadir un nuevo proveedor con sus listas de especialidades
+                                proveedor = new ProveedorEspecialidadGeneralDTO
+                                {
+                                    IDproveedor = proveedorID,
+                                    ProveedorNombre = proveedorNombre,
+                                };
+
+                                // Añadir la especialidad inicial
+                                proveedor.IDespecialidades.Add(especialidadID);
+                                proveedor.EspecialidadNombres.Add(especialidadNombre);
+
+                                // Agregar a la lista de respuesta
+                                response.Add(proveedor);
+                            }
+                            else
+                            {
+                                // Si ya existe, solo añadir la especialidad a las listas
+                                proveedor.IDespecialidades.Add(especialidadID);
+                                proveedor.EspecialidadNombres.Add(especialidadNombre);
+                            }
                         }
                     }
                     return response;
@@ -118,10 +249,11 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.RAZON_SOCIAL));
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.RUT));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.DV));
-                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_PRINCIPAL", value.NOMBRE_CONTACTO_PRINCIPAL));
-                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_PRINCIPAL", value.NUMERO_CONTACTO_PRINCIPAL));
-                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_SECUNDARIO", value.NOMBRE_CONTACTO_SECUNDARIO));
-                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
+                    //eliminar si se requiere
+                    //cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_PRINCIPAL", value.NOMBRE_CONTACTO_PRINCIPAL));
+                    //cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_PRINCIPAL", value.NUMERO_CONTACTO_PRINCIPAL));
+                    //cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_SECUNDARIO", value.NOMBRE_CONTACTO_SECUNDARIO));
+                    //cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
 
                     //agregamos nuestro manejo de errores
@@ -191,10 +323,11 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.RAZON_SOCIAL));
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.RUT));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.DV));
-                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_PRINCIPAL", value.NOMBRE_CONTACTO_PRINCIPAL));
-                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_PRINCIPAL", value.NUMERO_CONTACTO_PRINCIPAL));
-                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_SECUNDARIO", value.NOMBRE_CONTACTO_SECUNDARIO));
-                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
+                    //eliminar cuando sea requerido
+                    //cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_PRINCIPAL", value.NOMBRE_CONTACTO_PRINCIPAL));
+                    //cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_PRINCIPAL", value.NUMERO_CONTACTO_PRINCIPAL));
+                    //cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_SECUNDARIO", value.NOMBRE_CONTACTO_SECUNDARIO));
+                    //cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
 
                     // Manejo de errores
@@ -268,27 +401,7 @@ namespace Data.Repositories
         }
 
         //...........................................................MAPEO (recordar sacar lo de vaores nulos)....................................................
-        private Proveedor MapToProveedor(SqlDataReader reader)
-        {
-            return new Proveedor()
-            {
-                ID = reader.GetInt32(reader.GetOrdinal("ID")),
-                NOMBRE = reader.GetString(reader.GetOrdinal("NOMBRE")),
-                RAZON_SOCIAL = reader.GetString(reader.GetOrdinal("RAZON_SOCIAL")),
-                RUT = reader.GetString(reader.GetOrdinal("RUT")),
-                DV = reader.GetString(reader.GetOrdinal("DV")),
-                NOMBRE_CONTACTO_PRINCIPAL = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_PRINCIPAL")),
-                NUMERO_CONTACTO_PRINCIPAL = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_PRINCIPAL")),
-                NOMBRE_CONTACTO_SECUNDARIO = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_SECUNDARIO")),
-                NUMERO_CONTACTO_SECUNDARIO = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_SECUNDARIO")),
-                ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
-                //eliminar mas adelante cuando usuario creacion este habilitado ya que el mapeo no acepta valores nulos y los metodos de insercion no contemplan insertar usuario_creacion
-                USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
-                FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
-            };
-        }
 
-        //cual mapeo usar?
         private ProveedorDTO MapToProveedorDTOListar(SqlDataReader reader)
         {
             return new ProveedorDTO()
@@ -298,10 +411,10 @@ namespace Data.Repositories
                 RAZON_SOCIAL = reader.GetString(reader.GetOrdinal("RAZON_SOCIAL")),
                 RUT = reader.GetString(reader.GetOrdinal("RUT")),
                 DV = reader.GetString(reader.GetOrdinal("DV")),
-                NOMBRE_CONTACTO_PRINCIPAL = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_PRINCIPAL")),
-                NUMERO_CONTACTO_PRINCIPAL = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_PRINCIPAL")),
-                NOMBRE_CONTACTO_SECUNDARIO = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_SECUNDARIO")),
-                NUMERO_CONTACTO_SECUNDARIO = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_SECUNDARIO")),
+                //NOMBRE_CONTACTO_PRINCIPAL = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_PRINCIPAL")),
+                //NUMERO_CONTACTO_PRINCIPAL = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_PRINCIPAL")),
+                //NOMBRE_CONTACTO_SECUNDARIO = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_SECUNDARIO")),
+                //NUMERO_CONTACTO_SECUNDARIO = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_SECUNDARIO")),
                 ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
                 //eliminar mas adelante cuando usuario creacion este habilitado ya que el mapeo no acepta valores nulos y los metodos de insercion no contemplan insertar usuario_creacion
                 USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
