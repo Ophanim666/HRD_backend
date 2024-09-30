@@ -26,7 +26,7 @@ namespace Data.Repositories
         public int codError;
         public string desError;
 
-        //---------------------------------------------------------------Listar parametro----------------------------------------------------------------- FUNCIONANDO LISDATO PERO NO SE PUEDE USAR MAPEO POR EL TEMA DE QUE ID_TIPO_PARAMETRO ES UND FK REVISAR
+        //---------------------------------------------------------------Listar parametro----------------------------------------------------------------- FUNCIONANDO LISDATO PERO NO SE PUEDE USAR MAPEO POR EL TEMA DE QUE ID_TIPO_PARAMETRO ES UND FK REVISARr p
         public async Task<List<ParametroDTO>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
