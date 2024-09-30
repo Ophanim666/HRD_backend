@@ -9,10 +9,10 @@ namespace DTO.Tarea
     public class TareaDTO
     {
         public int ID { get; set; }
-        public string Nombre { get; set; }
-        public int Estado { get; set; }
-        public string Usuario_Creacion { get; set; }
-        public DateTime Fecha_Creacion { get; set; }
+        public string NOMBRE { get; set; }
+        public int ESTADO { get; set; }
+        public string USUARIO_CREACION { get; set; }
+        public DateTime FECHA_CREACION { get; set; }
 
     }
 }
