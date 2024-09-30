@@ -47,6 +47,30 @@ namespace API.Controllers
             return objetoRequest;
         }
 
+        //---------------------------------------------------------------ejecucion Lsttipoparametros---------------------------------------------------------------
+        [HttpGet("LstTipopParametros")]
+        public async Task<ActionResult<ObjetoRequest>> LstTipoParametro()
+        {
+            var response = await _tipoParametroRepositorio.LstTipoParametro();
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response == null /*|| response.Count == 0*/)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No hay tipo parametro registrados";
+                objetoRequest.Estado.ErrCon = "[TipoParametroController]";
+            }
+
+            var tipoParametroDTOs = _mapper.Map<List<LstTipoParametroDTO>>(response);
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = tipoParametroDTOs
+            };
+            return objetoRequest;
+        }
+
         //---------------------------------------------------------------Insertar tipoparametros---------------------------------------------------------------
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarTipoParametro([FromBody] TipoParametroInsertDTO value)
