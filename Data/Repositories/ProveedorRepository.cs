@@ -70,10 +70,11 @@ namespace Data.Repositories
                             string razonSocial = reader.GetString(reader.GetOrdinal("RazonSocial"));
                             string rut = reader.GetString(reader.GetOrdinal("Rut"));
                             string dv = reader.GetString(reader.GetOrdinal("Dv"));
-                            string nombreContactoPri = reader.GetString(reader.GetOrdinal("NombreContactoPri"));
-                            int numeroContactoPri = reader.GetInt32(reader.GetOrdinal("NumeroContactoPri"));
-                            string nombreContactoSec = reader.GetString(reader.GetOrdinal("NombreContactoSec"));
-                            int numeroContactoSec = reader.GetInt32(reader.GetOrdinal("NumeroContactoSec"));
+                            //eliminar si se requiere
+                            //string nombreContactoPri = reader.GetString(reader.GetOrdinal("NombreContactoPri"));
+                            //int numeroContactoPri = reader.GetInt32(reader.GetOrdinal("NumeroContactoPri"));
+                            //string nombreContactoSec = reader.GetString(reader.GetOrdinal("NombreContactoSec"));
+                            //int numeroContactoSec = reader.GetInt32(reader.GetOrdinal("NumeroContactoSec"));
                             int estado = reader.GetInt32(reader.GetOrdinal("Estado"));
 
                             // Obtener el ID y nombre de la especialidad
@@ -93,10 +94,11 @@ namespace Data.Repositories
                                     RazonSocial = razonSocial,
                                     Rut = rut,
                                     Dv = dv,
-                                    NombreContactoPri = nombreContactoPri,
-                                    NumeroContactoPri = numeroContactoPri,
-                                    NombreContactoSec = nombreContactoSec,
-                                    NumeroContactoSec = numeroContactoSec,
+                                    //eliminar si se requiere
+                                    //NombreContactoPri = nombreContactoPri,
+                                    //NumeroContactoPri = numeroContactoPri,
+                                    //NombreContactoSec = nombreContactoSec,
+                                    //NumeroContactoSec = numeroContactoSec,
                                     Estado = estado,
 
                                     // Inicializar listas de especialidades
@@ -247,10 +249,11 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.RAZON_SOCIAL));
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.RUT));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.DV));
-                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_PRINCIPAL", value.NOMBRE_CONTACTO_PRINCIPAL));
-                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_PRINCIPAL", value.NUMERO_CONTACTO_PRINCIPAL));
-                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_SECUNDARIO", value.NOMBRE_CONTACTO_SECUNDARIO));
-                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
+                    //eliminar si se requiere
+                    //cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_PRINCIPAL", value.NOMBRE_CONTACTO_PRINCIPAL));
+                    //cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_PRINCIPAL", value.NUMERO_CONTACTO_PRINCIPAL));
+                    //cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_SECUNDARIO", value.NOMBRE_CONTACTO_SECUNDARIO));
+                    //cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
 
                     //agregamos nuestro manejo de errores
@@ -320,10 +323,11 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.RAZON_SOCIAL));
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.RUT));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.DV));
-                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_PRINCIPAL", value.NOMBRE_CONTACTO_PRINCIPAL));
-                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_PRINCIPAL", value.NUMERO_CONTACTO_PRINCIPAL));
-                    cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_SECUNDARIO", value.NOMBRE_CONTACTO_SECUNDARIO));
-                    cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
+                    //eliminar cuando sea requerido
+                    //cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_PRINCIPAL", value.NOMBRE_CONTACTO_PRINCIPAL));
+                    //cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_PRINCIPAL", value.NUMERO_CONTACTO_PRINCIPAL));
+                    //cmd.Parameters.Add(new SqlParameter("@NOMBRE_CONTACTO_SECUNDARIO", value.NOMBRE_CONTACTO_SECUNDARIO));
+                    //cmd.Parameters.Add(new SqlParameter("@NUMERO_CONTACTO_SECUNDARIO", value.NUMERO_CONTACTO_SECUNDARIO));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
 
                     // Manejo de errores
@@ -407,10 +411,10 @@ namespace Data.Repositories
                 RAZON_SOCIAL = reader.GetString(reader.GetOrdinal("RAZON_SOCIAL")),
                 RUT = reader.GetString(reader.GetOrdinal("RUT")),
                 DV = reader.GetString(reader.GetOrdinal("DV")),
-                NOMBRE_CONTACTO_PRINCIPAL = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_PRINCIPAL")),
-                NUMERO_CONTACTO_PRINCIPAL = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_PRINCIPAL")),
-                NOMBRE_CONTACTO_SECUNDARIO = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_SECUNDARIO")),
-                NUMERO_CONTACTO_SECUNDARIO = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_SECUNDARIO")),
+                //NOMBRE_CONTACTO_PRINCIPAL = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_PRINCIPAL")),
+                //NUMERO_CONTACTO_PRINCIPAL = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_PRINCIPAL")),
+                //NOMBRE_CONTACTO_SECUNDARIO = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_SECUNDARIO")),
+                //NUMERO_CONTACTO_SECUNDARIO = reader.GetInt32(reader.GetOrdinal("NUMERO_CONTACTO_SECUNDARIO")),
                 ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
                 //eliminar mas adelante cuando usuario creacion este habilitado ya que el mapeo no acepta valores nulos y los metodos de insercion no contemplan insertar usuario_creacion
                 USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
