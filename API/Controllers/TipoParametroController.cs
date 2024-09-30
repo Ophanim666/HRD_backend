@@ -48,7 +48,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------ejecucion Lsttipoparametros---------------------------------------------------------------
-        [HttpGet("LstTipopParametros")]
+        [HttpGet("LstTipoParametros")]
         public async Task<ActionResult<ObjetoRequest>> LstTipoParametro()
         {
             var response = await _tipoParametroRepositorio.LstTipoParametro();
