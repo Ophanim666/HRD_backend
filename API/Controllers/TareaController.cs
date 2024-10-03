@@ -22,7 +22,7 @@ namespace API.Controllers
             _mapper = mapper;
         }
 
-        //---------------------------------------------------Listar especialidades---------------------------------------------------
+        //---------------------------------------------------Listar Tarea---------------------------------------------------
         [HttpGet("ListarTareas")] // se parametrizo cambiar en el frontend
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -47,7 +47,7 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-        //---------------------------------------------------Listar especialidades simple (nombre, id) para listarlos y asignar a proveedores---------------------------------------------------
+        //---------------------------------------------------Listar Tarea simple (nombre, id) ---------------------------------------------------
         [HttpGet("ListadoDeTareaSimple")]
         public async Task<ActionResult<ObjetoRequest>> LstTarea()
         {
@@ -72,7 +72,7 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-        //---------------------------------------------------Añadir especialidades---------------------------------------------------
+        //---------------------------------------------------Añadir Tarea---------------------------------------------------
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> AñadirTarea([FromBody] TareaInsertDTO value)
         {
@@ -91,7 +91,7 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-        //---------------------------------------------------Eliminar especialidades---------------------------------------------------
+        //---------------------------------------------------Eliminar Tarea---------------------------------------------------
         [HttpDelete("{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarTarea(int id)
         {
@@ -111,7 +111,7 @@ namespace API.Controllers
         }
 
 
-        //---------------------------------------------------SP para actualizar especialidad---------------------------------------------------
+        //---------------------------------------------------SP para actualizar Tarea---------------------------------------------------
         [HttpPut("{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarTarea(int id, [FromBody] TareaUpdateDTO value)
         {
