@@ -76,6 +76,8 @@ namespace Data.Repositories
                             //string nombreContactoSec = reader.GetString(reader.GetOrdinal("NombreContactoSec"));
                             //int numeroContactoSec = reader.GetInt32(reader.GetOrdinal("NumeroContactoSec"));
                             int estado = reader.GetInt32(reader.GetOrdinal("Estado"));
+                            //agregar fecha
+                            DateTime fechaCreacion = reader.GetDateTime(reader.GetOrdinal("FechaCreacion"));
 
                             // Obtener el ID y nombre de la especialidad
                             int idEspecialidad = reader.GetInt32(reader.GetOrdinal("IDespecialidad"));
@@ -100,6 +102,7 @@ namespace Data.Repositories
                                     //NombreContactoSec = nombreContactoSec,
                                     //NumeroContactoSec = numeroContactoSec,
                                     Estado = estado,
+                                    FechaCreacion = fechaCreacion,
 
                                     // Inicializar listas de especialidades
                                     IDespecialidad = new List<int> { idEspecialidad },
