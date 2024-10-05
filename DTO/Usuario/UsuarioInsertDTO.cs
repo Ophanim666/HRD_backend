@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace DTO.Usuario
 {
-    public class UsuarioDTO
+    public class UsuarioInsertDTO
     {
-        public int Id { get; set; }
         public string Primer_nombre { get; set; }
         public string Segundo_nombre { get; set; }
         public string Primer_apellido { get; set; }
@@ -16,12 +15,9 @@ namespace DTO.Usuario
         public string Rut { get; set; }
         public string Dv { get; set; }
         public string Email { get; set; }
+        public string Password { get; set; } //debe de se hashed
         public int Es_administrador { get; set; }
         public int Rol_id { get; set; }
         public int Estado { get; set; }
-        public string Usuario_creacion { get; set; }
-        public DateTime Fecha_creacion { get; set; }
-        
     }
 }
-
