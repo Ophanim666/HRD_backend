@@ -63,7 +63,7 @@ namespace Data.Repositorios
                     cmd.Parameters.Add(new SqlParameter("@PRIMER_NOMBRE", value.Primer_nombre));
                     cmd.Parameters.Add(new SqlParameter("@SEGUNDO_NOMBRE", value.Segundo_nombre));
                     cmd.Parameters.Add(new SqlParameter("@PRIMER_APELLIDO", value.Primer_apellido));
-                    cmd.Parameters.Add(new SqlParameter("@SERGUNDO_APELLIDO", value.Segundo_apellido));
+                    cmd.Parameters.Add(new SqlParameter("@SEGUNDO_APELLIDO", value.Segundo_apellido));
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.Rut));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.Dv));
                     cmd.Parameters.Add(new SqlParameter("@EMAIL", value.Email));
@@ -125,7 +125,7 @@ namespace Data.Repositorios
             }
         }
 
-        //----------------------------------------------------------eliminar Usuario por ID-------------------------------------------------
+        //----------------------------------------------------------Eliminar Usuario por ID-------------------------------------------------
         public async Task<(int codErr, string desErr)> EliminarUsuario(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -167,7 +167,7 @@ namespace Data.Repositorios
                 Estado = reader.GetInt32(reader.GetOrdinal("Estado")),
                 //
                 Usuario_creacion = reader.IsDBNull(reader.GetOrdinal("Usuario_creacion")) ? null : reader.GetString(reader.GetOrdinal("Usuario_creacion")),
-                Fecha_creacion = reader.GetDateTime(reader.GetOrdinal("Fecha_creacion")),
+                Fecha_creacion = reader.GetDateTime(reader.GetOrdinal("Fecha_creacion"))
             };
         }
     }
