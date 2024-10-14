@@ -167,7 +167,7 @@ namespace Data.Repositorios
                 Estado = reader.GetInt32(reader.GetOrdinal("Estado")),
                 //
                 Usuario_creacion = reader.IsDBNull(reader.GetOrdinal("Usuario_creacion")) ? null : reader.GetString(reader.GetOrdinal("Usuario_creacion")),
-                Fecha_creacion = reader.GetDateTime(reader.GetOrdinal("Fecha_creacion"))
+                Fecha_creacion = reader.IsDBNull(reader.GetOrdinal("Fecha_creacion")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("Fecha_creacion"))
             };
         }
     }
