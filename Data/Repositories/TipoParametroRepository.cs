@@ -23,8 +23,7 @@ namespace Data.Repositories
         public string desError;
 
         //---------------------------------------------------------------Listar Tipo Parametror---------------------------------------------------------------
-        //preguntar al profesor por que este y no el TipoParametroDTO
-        public async Task<List<TipoParametro>> ListAll()
+        public async Task<List<TipoParametroDTO>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -32,7 +31,7 @@ namespace Data.Repositories
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    var response = new List<TipoParametro>();
+                    var response = new List<TipoParametroDTO>();
                     await sql.OpenAsync();
 
                     using (var reader = await cmd.ExecuteReaderAsync())
@@ -40,6 +39,31 @@ namespace Data.Repositories
                         while (await reader.ReadAsync())
                         {
                             response.Add(MapToTipoParametro(reader));
+                        }
+                    }
+
+                    return response;
+                }
+            }
+        }
+
+        //---------------------------------------------------------------para ejecuciion de Lst Tipo Parametro en parametros---------------------------------------------------------------
+        public async Task<List<LstTipoParametroDTO>> LstTipoParametro()
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_LstTipoParametro", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    var response = new List<LstTipoParametroDTO>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            response.Add(MapToLstTipoParametro(reader));
                         }
                     }
 
@@ -130,9 +154,9 @@ namespace Data.Repositories
 
         //...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................
         //preguntar al profesor por que este y no el TipoParametroDTO
-        private TipoParametro MapToTipoParametro(SqlDataReader reader)
+        private TipoParametroDTO MapToTipoParametro(SqlDataReader reader)
         {
-            return new TipoParametro()
+            return new TipoParametroDTO()
             {
                 ////OJO el mapeo solo sirve para listar si son nulos si se quiere insertar un dato nulo eso se debe ver en otra situacion 
                 //ID = reader.GetInt32(reader.GetOrdinal("ID")),
@@ -144,12 +168,21 @@ namespace Data.Repositories
                 ////aqui pondra la fecha actual ya que datetime no puede qudar nulo
                 //FECHA_CREACION = reader.IsDBNull(reader.GetOrdinal("FECHA_CREACION")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
 
-                //En caso de errores se veia asi antes de la aceptacion de los valores nulos
                 ID = reader.GetInt32(reader.GetOrdinal("ID")),
                 TIPO_PARAMETRO = reader.GetString(reader.GetOrdinal("TIPO_PARAMETRO")),
                 ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
                 USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
+            };
+        }
+
+        //mapeo lsttipoparametro
+        private LstTipoParametroDTO MapToLstTipoParametro(SqlDataReader reader)
+        {
+            return new LstTipoParametroDTO()
+            {
+                ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                TIPO_PARAMETRO = reader.GetString(reader.GetOrdinal("TIPO_PARAMETRO")),
             };
         }
     }

@@ -33,6 +33,7 @@ namespace API
             CreateMap<TipoParametro, TipoParametroDTO>().ReverseMap();
             CreateMap<TipoParametro, TipoParametroInsertDTO>().ReverseMap();
             CreateMap<TipoParametro, TipoParametroUpdateDTO>().ReverseMap();
+            CreateMap<TipoParametro, LstTipoParametroDTO>().ReverseMap();
 
             //Automapeo de parametro
             CreateMap<Parametro, ParametroDTO>().ReverseMap();

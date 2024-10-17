@@ -139,7 +139,7 @@ namespace API.Controllers
                 objetoRequest.Estado.ErrNo = responseProveedor.codErr.ToString();
                 objetoRequest.Estado.ErrDes = responseProveedor.desErr.ToString();
                 objetoRequest.Estado.ErrCon = "[ProveedorController]";
-                return BadRequest(objetoRequest);
+                return objetoRequest;
             }
 
             var responseEspecialidades = await _proveedorRepository.InsertarProveedorXEspecialidad(responseProveedor.proveedorId.Value, value.ListaEspecialidades);
@@ -150,7 +150,7 @@ namespace API.Controllers
                 objetoRequest.Estado.ErrNo = responseEspecialidades.codErr.ToString();
                 objetoRequest.Estado.ErrDes = responseEspecialidades.desErr.ToString();
                 objetoRequest.Estado.ErrCon = "[ProveedorController]";
-                return BadRequest(objetoRequest);
+                return objetoRequest;
             }
             return Ok(objetoRequest);
 
@@ -170,7 +170,7 @@ namespace API.Controllers
                 objetoRequest.Estado.ErrNo = response.codErr.ToString();
                 objetoRequest.Estado.ErrDes = response.desErr.ToString();
                 objetoRequest.Estado.ErrCon = "[ProveedorController]";
-                return BadRequest(objetoRequest);
+                return objetoRequest;
             }
 
             var responseEspecialidades = await _proveedorRepository.ActualizarProveedorXEspecialidad(id, value.ListaEspecialidades);
@@ -181,7 +181,7 @@ namespace API.Controllers
                 objetoRequest.Estado.ErrNo = responseEspecialidades.codErr.ToString();
                 objetoRequest.Estado.ErrDes = responseEspecialidades.desErr.ToString();
                 objetoRequest.Estado.ErrCon = "[ProveedorController]";
-                return BadRequest(objetoRequest);
+                return objetoRequest;
             }
 
             objetoRequest.Estado.Ack = true;
@@ -209,4 +209,3 @@ namespace API.Controllers
     }
 }
 
-//realizada la fusion de main a esta rama
