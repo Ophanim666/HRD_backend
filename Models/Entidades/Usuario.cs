@@ -17,7 +17,7 @@ namespace Models.Entidades
         public string Dv { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public int Es_administrador { get; set; } //recordar hacerle un hash
+        public int Es_administrador { get; set; } 
         public int Rol_id { get; set; }
         public string Usuario_creacion { get; set; }
         public DateTime Fecha_creacion { get; set; }
