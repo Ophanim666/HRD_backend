@@ -13,6 +13,6 @@ namespace DTO.Parametro
         public string VALOR { get; set; }
         public int ID_TIPO_PARAMETRO { get; set; }
         public int ESTADO { get; set; }
-        public string USUARIO_CREACION { get; set; }
+        //public string USUARIO_CREACION { get; set; }
     }
 }

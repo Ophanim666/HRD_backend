@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 //Importamos el dto
 using DTO.Parametro;
+using DTO.Proveedor;
 
 
 namespace Data.Repositories
@@ -25,7 +26,7 @@ namespace Data.Repositories
         public int codError;
         public string desError;
 
-        //---------------------------------------------------------------Listar parametro-----------------------------------------------------------------
+        //---------------------------------------------------------------Listar parametro----------------------------------------------------------------- FUNCIONANDO LISDATO PERO NO SE PUEDE USAR MAPEO POR EL TEMA DE QUE ID_TIPO_PARAMETRO ES UND FK REVISARr p
         public async Task<List<ParametroDTO>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -41,16 +42,25 @@ namespace Data.Repositories
                     {
                         while (await reader.ReadAsync())
                         {
-                            response.Add(MapToParametroDTO(reader));
+                            var Parametro = new ParametroDTO
+                            {
+                                ID = reader.GetInt32(reader.GetOrdinal("ID")),
+                                PARAMETRO = reader.GetString(reader.GetOrdinal("PARAMETRO")),
+                                VALOR = reader.GetString(reader.GetOrdinal("VALOR")),
+                                ID_TIPO_PARAMETRO = reader.GetInt32(reader.GetOrdinal("ID_TIPO_PARAMETRO")),
+                                ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
+                                USUARIO_CREACION = reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                                FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION")),
+                            };
+                            response.Add(Parametro);
                         }
                     }
-
                     return response;
                 }
             }
         }
 
-        //---------------------------------------------------------------Insertar Parametro--------------------------------------------------------------- 
+        //---------------------------------------------------------------Insertar Parametro--------------------------------------------------------------- FUNCIONANDO
         public async Task<(int codErr, string desErr)> InsertarParametro(ParametroInsertDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -62,8 +72,9 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@PARAMETRO", value.PARAMETRO));
                     cmd.Parameters.Add(new SqlParameter("@VALOR", value.VALOR));
                     cmd.Parameters.Add(new SqlParameter("@ID_TIPO_PARAMETRO", value.ID_TIPO_PARAMETRO));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
                     //demomento mantenemos el usaurio creacion para insertar
-                    cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", value.USUARIO_CREACION));
+                    //cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", value.USUARIO_CREACION));
 
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
@@ -80,7 +91,7 @@ namespace Data.Repositories
             }
         }
 
-        //---------------------------------------------------------------Actualizar Parametro-------------------------------------------------------------
+        //---------------------------------------------------------------Actualizar Parametro------------------------------------------------------------- FUNCIONANDO
         public async Task<(int codErr, string desErr)> ActualizarParametro(int id, ParametroUpdateDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -110,7 +121,7 @@ namespace Data.Repositories
             }
         }
 
-        //---------------------------------------------------------------Eliminar Parametro---------------------------------------------------------------
+        //---------------------------------------------------------------Eliminar Parametro--------------------------------------------------------------- FUNCIONANDO
         public async Task<(int codErr, string desErr)> EliminarParametro(int id)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -135,7 +146,7 @@ namespace Data.Repositories
             }
         }
 
-        //...........................................................MAPEO....................................................
+        //...........................................................MAPEO.................................................... NO SE ESTA UTILIZANDO PERO BUSCAR SOLUCION O MANTENER METODO ACTUAL PARA LISTAR
         private ParametroDTO MapToParametroDTO(SqlDataReader reader)
         {
             return new ParametroDTO()
@@ -145,11 +156,14 @@ namespace Data.Repositories
                 VALOR = reader.GetString(reader.GetOrdinal("VALOR")),
                 ID_TIPO_PARAMETRO = reader.GetInt32(reader.GetOrdinal("ID_TIPO_PARAMETRO")),
                 ESTADO = reader.GetInt32(reader.GetOrdinal("ESTADO")),
-                USUARIO_CREACION = reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
+                USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
             };
         }
 
 
+
     }
 }
+
+// se aplicaron cambios de main
