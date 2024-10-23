@@ -25,7 +25,7 @@ namespace API.Controllers
             _usuarioRepository = usuarioRepository;
             _mapper = mapper;
         }
-        //---------------------------------------------------------------Listar Parametro---------------------------------------------------------------
+        //---------------------------------------------------------------Listar Usuarios---------------------------------------------------------------
         [HttpGet("ListarUsuarios")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -67,7 +67,7 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-        //----------------------------------------------------------------Actualizar Proveedores--------------------------------------------------------------
+        //----------------------------------------------------------------Actualizar Usuarios--------------------------------------------------------------
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarUsuario(int id, [FromBody] UsuarioUpdateDTO value)
         {

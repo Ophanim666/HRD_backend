@@ -27,7 +27,7 @@ namespace Data.Repositorios
         public string desError;
 
 
-        //Funciion listar
+        //---------------------------------------------------Función para listar---------------------------------------------------
         public async Task<List<UsuarioDTO>> ListAll()
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
