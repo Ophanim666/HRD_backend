@@ -9,14 +9,18 @@ namespace Models.Entidades
     public class Usuario
     {
         public int Id { get; set; }
+        public string Primer_nombre { get; set; }
+        public string segundo_nombre { get; set; }
+        public string Primer_apellido { get; set; }
+        public string Segundo_apellido { get; set; }
         public string Rut { get; set; }
-        public string Primer_Nombre { get; set; }
-        public string Segundo_Nombre { get; set; }
-        public string Primer_Apellido { get; set; }
-        public string Segundo_Apellido { get; set; }
-        public DateTime Fecha_de_nacimiento { get; set; }
-        public string Rol { get; set; }
-        public string Especialidad { get; set; }
+        public string Dv { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public int Es_administrador { get; set; } 
+        public int Rol_id { get; set; }
+        public string Usuario_creacion { get; set; }
+        public DateTime Fecha_creacion { get; set; }
     }
 }
 
