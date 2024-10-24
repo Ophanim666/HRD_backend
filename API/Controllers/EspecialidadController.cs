@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DTO.Especialidad;
 using AutoMapper;
 using DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -23,6 +24,7 @@ namespace API.Controllers
 
         //---------------------------------------------------Listar especialidades---------------------------------------------------
         [HttpGet("ListarEspecialidades")] // se parametrizo cambiar en el frontend
+        [Authorize]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
             var response = await _especialidadRepository.ListAll();
@@ -48,6 +50,7 @@ namespace API.Controllers
 
         //---------------------------------------------------Listar especialidades simple (nombre, id) para listarlos y asignar a proveedores---------------------------------------------------
         [HttpGet("ListadoDeespecialidadesSimple")]
+        [Authorize]
         public async Task<ActionResult<ObjetoRequest>> LstEspecialidad()
         {
             var response = await _especialidadRepository.LstEspecialidad();
@@ -73,6 +76,7 @@ namespace API.Controllers
 
         //---------------------------------------------------Añadir especialidades---------------------------------------------------
         [HttpPost("add")]
+        [Authorize]
         public async Task<ActionResult<ObjetoRequest>> AñadirEspecialidad([FromBody] EspecialidadInsertDTO value)
         {
             var response = await _especialidadRepository.AñadirEspecialidad(value);
@@ -92,6 +96,7 @@ namespace API.Controllers
 
         //---------------------------------------------------Eliminar especialidades---------------------------------------------------
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<ActionResult<ObjetoRequest>> EliminarEspecialidad(int id)
         {
             var response = await _especialidadRepository.EliminarEspecialidad(id);
@@ -112,6 +117,7 @@ namespace API.Controllers
 
         //---------------------------------------------------SP para actualizar especialidad---------------------------------------------------
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<ActionResult<ObjetoRequest>> ActualizarEspecialidad(int id, [FromBody] EspecialidadUpdateDTO value)
         {
             var response = await _especialidadRepository.ActualizarEspecialidad(id, value);

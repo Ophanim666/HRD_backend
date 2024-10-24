@@ -10,6 +10,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//
+using BCrypt.Net;
 
 namespace Data.Repositorios
 {
@@ -149,6 +151,57 @@ namespace Data.Repositorios
                 }
             }
         }
+
+        //----------------------------------------------------------LogInUsuarios------------------------------------------------
+        // Para hashear una contraseña:
+        public string HashPasswordBCrypt(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+        //Para verificar una contraseña (compara el hash guardado con la contraseña que el usuario ingresó)
+        public bool VerifyPasswordBCrypt(string password, string hashedPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+        }
+
+        public async Task<UsuarioTokenDTO> ObtenerUsuarioPorEmail(string email, string password)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerUsuarioPorEmailYPassword", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@Email", email));
+                    cmd.Parameters.Add(new SqlParameter("@Password", password)); // Aquí puedes verificar el hash más adelante
+
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            return new UsuarioTokenDTO
+                            {
+                                Email = reader["Email"].ToString(),
+                                Rol_id = Convert.ToInt32(reader["Rol_id"]),
+                                Primer_nombre = reader["Primer_nombre"].ToString()
+                            };
+                        }
+                        else
+                        {
+                            // Si no se encuentra el usuario
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
 
         //...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................
         private UsuarioDTO MapToUsuarioDTO(SqlDataReader reader)

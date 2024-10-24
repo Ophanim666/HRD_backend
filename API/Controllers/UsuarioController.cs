@@ -19,11 +19,16 @@ namespace API.Controllers
     {
         private readonly UsuarioRepository _usuarioRepository;
         private readonly IMapper _mapper;
+        //
+        private readonly TokenService _tokenService;
 
-        public UsuariosController(UsuarioRepository usuarioRepository, IMapper mapper)
+
+        public UsuariosController(UsuarioRepository usuarioRepository, IMapper mapper, TokenService tokenService)
         {
             _usuarioRepository = usuarioRepository;
             _mapper = mapper;
+            //
+            _tokenService = tokenService;
         }
         //---------------------------------------------------------------Listar Usuarios---------------------------------------------------------------
         [HttpGet("ListarUsuarios")]
@@ -105,6 +110,23 @@ namespace API.Controllers
             }
             return objetoRequest;
         }
+
+        //----------------------------------------------------------------eliminar el USuario por ID----------------------------------------------------
+        // Endpoint para iniciar sesión y obtener un token JWT
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] UsuarioLoginDTO loginDTO)
+        {
+            var usuario = await _usuarioRepository.ObtenerUsuarioPorEmail(loginDTO.Email, loginDTO.Password);
+
+            if (usuario == null)
+            {
+                return Unauthorized("Credenciales inválidas.");
+            }
+
+            var token = _tokenService.GenerateJwtToken(usuario);
+            return Ok(new { Token = token });
+        }
+
 
     }
 }
