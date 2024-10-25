@@ -20,16 +20,16 @@ public class TokenService
 
     public string GenerateJwtToken(UsuarioTokenDTO usuario)
     {
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier, usuario.Email),
-            new Claim(ClaimTypes.Role, usuario.Rol_id.ToString())
-            // Puedes agregar más claims si es necesario
-        };
+        var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, usuario.Email),
+        new Claim(ClaimTypes.Role, usuario.Rol_id.ToString()),
+        new Claim("es_administrador", usuario.EsAdministrador ? "True" : "False") // Agregar claim de administrador
+    };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var expiry = DateTime.UtcNow.AddMinutes(60); // Tiempo de expiración del token
+        var expiry = DateTime.UtcNow.AddMinutes(60);
 
         var token = new JwtSecurityToken(
             issuer: _issuer,
@@ -40,4 +40,6 @@ public class TokenService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+
+
 }

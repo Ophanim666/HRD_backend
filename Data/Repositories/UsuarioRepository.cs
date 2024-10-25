@@ -184,7 +184,7 @@ namespace Data.Repositorios
                             {
                                 Email = reader["Email"].ToString(),
                                 Rol_id = Convert.ToInt32(reader["Rol_id"]),
-                                Primer_nombre = reader["Primer_nombre"].ToString()
+                                EsAdministrador = Convert.ToInt32(reader["es_administrador"]) == 1 // Convertir int a bool
                             };
                         }
                         else
@@ -196,11 +196,6 @@ namespace Data.Repositorios
                 }
             }
         }
-
-
-
-
-
 
 
         //...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................

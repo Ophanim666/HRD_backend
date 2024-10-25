@@ -10,6 +10,7 @@ using DTO;
 using DTO.Parametro;
 using Data.Repositories;
 using DTO.Proveedor;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -31,6 +32,7 @@ namespace API.Controllers
             _tokenService = tokenService;
         }
         //---------------------------------------------------------------Listar Usuarios---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")] //es para que solo los admins puedan ejecutar estas funciones
         [HttpGet("ListarUsuarios")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -94,6 +96,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------eliminar el USuario por ID----------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")] // Solo los administradores pueden eliminar usuarios
         [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarUsuario(int id)
         {
@@ -110,6 +113,7 @@ namespace API.Controllers
             }
             return objetoRequest;
         }
+
 
         //----------------------------------------------------------------eliminar el USuario por ID----------------------------------------------------
         // Endpoint para iniciar sesión y obtener un token JWT

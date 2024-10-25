@@ -62,6 +62,13 @@ builder.Services.AddAuthentication(options =>
 });
 // ---------------------------------------------
 
+// Agregar políticas de autorización
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy =>
+        policy.RequireClaim("es_administrador", "True")); // El claim debe ser "True" para que sea considerado administrador
+});
+
 // Configurar el TokenService
 builder.Services.AddSingleton<TokenService>(provider => new TokenService(
     builder.Configuration["JwtSettings:SecretKey"],

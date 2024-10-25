@@ -10,7 +10,6 @@ namespace DTO.Usuario
     {
         public string Email { get; set; }
         public int Rol_id { get; set; }
-        public string Primer_nombre { get; set; }
+        public bool EsAdministrador { get; set; } // Agregar esta propiedad
     }
-
 }
