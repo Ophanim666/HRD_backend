@@ -1,11 +1,7 @@
-﻿using Models.Entidades;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 //Importamos el dto
 using DTO.Proveedor;
-using DTO.Especialidad;
 
 namespace Data.Repositories
 {
