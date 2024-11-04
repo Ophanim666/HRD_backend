@@ -3,6 +3,7 @@ using Data.Repositories;
 using DTO;
 using DTO.Parametro;
 using DTO.TipoParametro;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Entidades;
 
@@ -21,6 +22,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Listar Parametro---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("Listar")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -46,6 +48,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Insertar parametro---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarParametro([FromBody] ParametroInsertDTO value)
         {
@@ -64,6 +67,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Actualizar parametro---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarParametro(int id, [FromBody] ParametroUpdateDTO value)
         {
@@ -83,6 +87,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Eliminar Parametro---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarParametro(int id)
         {
@@ -104,5 +109,3 @@ namespace API.Controllers
         }
     }
 }
-
-//realizada la fusion de main a esta rama

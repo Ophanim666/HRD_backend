@@ -5,6 +5,7 @@ using AutoMapper;
 using DTO.Usuario;
 using Data.Repositorios;
 using Microsoft.AspNetCore.Authorization;
+using DTO;
 
 namespace API.Controllers
 {
@@ -27,29 +28,37 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------Log in----------------------------------------------------
-        // Endpoint para iniciar sesión y obtener un token JWT
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UsuarioLoginDTO loginDTO)
         {
-            var usuario = await _usuarioRepository.ObtenerUsuarioPorEmail(loginDTO.Email, loginDTO.Password);
+            var (usuario, codErr, desErr) = await _usuarioRepository.ObtenerUsuarioPorEmail(loginDTO.Email, loginDTO.Password);
+
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            // Verificar el código de error
+            if (codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = codErr.ToString();
+                objetoRequest.Estado.ErrDes = desErr;
+                objetoRequest.Estado.ErrCon = "[LoginController]";
+                return BadRequest(objetoRequest);
+            }
 
             if (usuario == null)
             {
-                return Unauthorized("Credenciales inválidas.");
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "10001";
+                objetoRequest.Estado.ErrDes = "Credenciales inválidas.";
+                objetoRequest.Estado.ErrCon = "[LoginController]";
+                return Unauthorized(objetoRequest);
             }
 
+            // Generar el token JWT
             var token = _tokenService.GenerateJwtToken(usuario);
             return Ok(new { Token = token });
         }
 
-        //funcion de cerrar cesion, no hace nada solo retorna un mensaje xd
-        [HttpPost("logout")]
-        [Authorize]  // Esto asegura que solo usuarios autenticados puedan cerrar sesión
-        public IActionResult Logout()
-        {
-            // En este caso, no necesitamos hacer nada más en el servidor.
-            // El frontend simplemente eliminará el token JWT que tiene almacenado.
-            return Ok("Sesión cerrada correctamente.");
-        }
     }
 }

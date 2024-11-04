@@ -164,38 +164,46 @@ namespace Data.Repositorios
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
 
-        public async Task<UsuarioTokenDTO> ObtenerUsuarioPorEmail(string email, string password)
+public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> ObtenerUsuarioPorEmail(string email, string password)
+{
+    using (SqlConnection sql = new SqlConnection(_connectionString))
+    {
+        using (SqlCommand cmd = new SqlCommand("usp_ObtenerUsuarioPorEmailYPassword", sql))
         {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add(new SqlParameter("@Email", email));
+            cmd.Parameters.Add(new SqlParameter("@Password", password)); // Aquí puedes agregar el hash más adelante
+
+            // Agregar los parámetros de salida para manejo de errores
+            cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int) { Direction = ParameterDirection.Output });
+            cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 200) { Direction = ParameterDirection.Output });
+
+            await sql.OpenAsync();
+
+            UsuarioTokenDTO usuario = null;
+
+            using (var reader = await cmd.ExecuteReaderAsync())
             {
-                using (SqlCommand cmd = new SqlCommand("usp_ObtenerUsuarioPorEmailYPassword", sql))
+                if (await reader.ReadAsync())
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.Add(new SqlParameter("@Email", email));
-                    cmd.Parameters.Add(new SqlParameter("@Password", password)); // Aquí puedes verificar el hash más adelante
-
-                    await sql.OpenAsync();
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
+                    usuario = new UsuarioTokenDTO
                     {
-                        if (await reader.ReadAsync())
-                        {
-                            return new UsuarioTokenDTO
-                            {
-                                Email = reader["Email"].ToString(),
-                                Rol_id = Convert.ToInt32(reader["Rol_id"]),
-                                EsAdministrador = Convert.ToInt32(reader["es_administrador"]) == 1 // Convertir int a bool
-                            };
-                        }
-                        else
-                        {
-                            // Si no se encuentra el usuario
-                            return null;
-                        }
-                    }
+                        Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
+                        Rol_id = reader["Rol_id"] != DBNull.Value ? Convert.ToInt32(reader["Rol_id"]) : 0,
+                        EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) == 1 : false
+                    };
                 }
             }
+
+            // Obtener los valores de los parámetros de salida
+            int codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+            string desError = cmd.Parameters["@des_err"].Value.ToString();
+
+            return (usuario, codError, desError);
         }
+    }
+}
+
 
 
         //...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................

@@ -50,6 +50,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Insertar Usuarios---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarUsuario([FromBody] UsuarioInsertDTO value)
         {
@@ -68,6 +69,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------Actualizar Usuarios--------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarUsuario(int id, [FromBody] UsuarioUpdateDTO value)
         {
