@@ -10,7 +10,7 @@ namespace DTO.Proveedor
     {
         public int ID { get; set; }
         public string NOMBRE { get; set; }
-        public string RAZON_SOCIAL { get; set; }
+        public string razonSocial { get; set; }
         public string RUT { get; set; }
         public string DV { get; set; }
         // se docuemtno 

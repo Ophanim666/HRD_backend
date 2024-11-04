@@ -245,7 +245,7 @@ namespace Data.Repositories
 
                     //añadimos valores a los parametros
                     cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
-                    cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.RAZON_SOCIAL));
+                    cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.razonSocial));
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.RUT));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.DV));
                     //eliminar si se requiere
@@ -319,7 +319,7 @@ namespace Data.Repositories
                     // Agregar parámetros
                     cmd.Parameters.Add(new SqlParameter("@ID", id));
                     cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
-                    cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.RAZON_SOCIAL));
+                    cmd.Parameters.Add(new SqlParameter("@RAZON_SOCIAL", value.razonSocial));
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.RUT));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.DV));
                     //eliminar cuando sea requerido
@@ -407,7 +407,7 @@ namespace Data.Repositories
             {
                 ID = reader.GetInt32(reader.GetOrdinal("ID")),
                 NOMBRE = reader.GetString(reader.GetOrdinal("NOMBRE")),
-                RAZON_SOCIAL = reader.GetString(reader.GetOrdinal("RAZON_SOCIAL")),
+                razonSocial = reader.GetString(reader.GetOrdinal("RAZON_SOCIAL")),
                 RUT = reader.GetString(reader.GetOrdinal("RUT")),
                 DV = reader.GetString(reader.GetOrdinal("DV")),
                 //NOMBRE_CONTACTO_PRINCIPAL = reader.GetString(reader.GetOrdinal("NOMBRE_CONTACTO_PRINCIPAL")),
