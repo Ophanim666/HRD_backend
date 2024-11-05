@@ -28,11 +28,16 @@ builder.Services.AddScoped<ParametroRepository>(provider => new ParametroReposit
 
 
 
+
 //ProveedorRepository
 builder.Services.AddScoped<ProveedorRepository>(provider => new ProveedorRepository(connectionString));
 
 // Registrar TareaRepository
 builder.Services.AddScoped<TareaRepository>(provider => new TareaRepository(connectionString));
+
+//Obra
+builder.Services.AddScoped<ObraRepository>(provider => new ObraRepository(connectionString));
+
 
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
