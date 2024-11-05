@@ -61,6 +61,8 @@ namespace Data.Repositorios
                 using (SqlCommand cmd = new SqlCommand("usp_InsertarUsuario", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+                    // Hashear la contraseña antes de enviarla a la base de datos
+                    string hashedPassword = HashPasswordBCrypt(value.Password);
 
                     cmd.Parameters.Add(new SqlParameter("@PRIMER_NOMBRE", value.Primer_nombre));
                     cmd.Parameters.Add(new SqlParameter("@SEGUNDO_NOMBRE", value.Segundo_nombre));
@@ -69,7 +71,7 @@ namespace Data.Repositorios
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.Rut));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.Dv));
                     cmd.Parameters.Add(new SqlParameter("@EMAIL", value.Email));
-                    cmd.Parameters.Add(new SqlParameter("@PASSWORD", value.Password)); // Recordar hacerle un hash a las contraseñas mas adelante //
+                    cmd.Parameters.Add(new SqlParameter("@PASSWORD", hashedPassword)); // Recordar hacerle un hash a las contraseñas mas adelante //
                     cmd.Parameters.Add(new SqlParameter("@ES_ADMINISTRADOR", value.Es_administrador));
                     cmd.Parameters.Add(new SqlParameter("@ROL_ID", value.Rol_id));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.Estado));
@@ -96,6 +98,8 @@ namespace Data.Repositorios
                 using (SqlCommand cmd = new SqlCommand("usp_ActualizarUsuario", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+                    // Hashear la contraseña antes de enviarla a la base de datos
+                    string hashedPassword = HashPasswordBCrypt(value.Password);
 
                     // Agregar parámetros
                     cmd.Parameters.Add(new SqlParameter("@ID", id));
@@ -106,7 +110,7 @@ namespace Data.Repositorios
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.Rut));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.Dv));
                     cmd.Parameters.Add(new SqlParameter("@EMAIL", value.Email));
-                    cmd.Parameters.Add(new SqlParameter("@PASSWORD", value.Password));
+                    cmd.Parameters.Add(new SqlParameter("@PASSWORD", hashedPassword));
                     cmd.Parameters.Add(new SqlParameter("@ES_ADMINISTRADOR", value.Es_administrador));
                     cmd.Parameters.Add(new SqlParameter("@ROL_ID", value.Rol_id));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.Estado));
@@ -164,45 +168,45 @@ namespace Data.Repositorios
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
 
-public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> ObtenerUsuarioPorEmail(string email, string password)
-{
-    using (SqlConnection sql = new SqlConnection(_connectionString))
-    {
-        using (SqlCommand cmd = new SqlCommand("usp_ObtenerUsuarioPorEmailYPassword", sql))
+        public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> ObtenerUsuarioPorEmail(string email, string password)
         {
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.Add(new SqlParameter("@Email", email));
-            cmd.Parameters.Add(new SqlParameter("@Password", password)); // Aquí puedes agregar el hash más adelante
-
-            // Agregar los parámetros de salida para manejo de errores
-            cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int) { Direction = ParameterDirection.Output });
-            cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 200) { Direction = ParameterDirection.Output });
-
-            await sql.OpenAsync();
-
-            UsuarioTokenDTO usuario = null;
-
-            using (var reader = await cmd.ExecuteReaderAsync())
+            using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                if (await reader.ReadAsync())
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerUsuarioPorEmailYPassword", sql))
                 {
-                    usuario = new UsuarioTokenDTO
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@Email", email));
+                    cmd.Parameters.Add(new SqlParameter("@Password", password)); // Aquí puedes agregar el hash más adelante
+
+                    // Agregar los parámetros de salida para manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 200) { Direction = ParameterDirection.Output });
+
+                    await sql.OpenAsync();
+
+                    UsuarioTokenDTO usuario = null;
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
                     {
-                        Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
-                        Rol_id = reader["Rol_id"] != DBNull.Value ? Convert.ToInt32(reader["Rol_id"]) : 0,
-                        EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) == 1 : false
-                    };
+                        if (await reader.ReadAsync())
+                        {
+                            usuario = new UsuarioTokenDTO
+                            {
+                                Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
+                                Rol_id = reader["Rol_id"] != DBNull.Value ? Convert.ToInt32(reader["Rol_id"]) : 0,
+                                EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) == 1 : false
+                            };
+                        }
+                    }
+
+                    // Obtener los valores de los parámetros de salida
+                    int codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    string desError = cmd.Parameters["@des_err"].Value.ToString();
+
+                    return (usuario, codError, desError);
                 }
             }
-
-            // Obtener los valores de los parámetros de salida
-            int codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
-            string desError = cmd.Parameters["@des_err"].Value.ToString();
-
-            return (usuario, codError, desError);
         }
-    }
-}
 
 
 
