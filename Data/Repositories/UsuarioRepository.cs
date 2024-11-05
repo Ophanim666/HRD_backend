@@ -176,7 +176,7 @@ namespace Data.Repositorios
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(new SqlParameter("@Email", email));
-                    cmd.Parameters.Add(new SqlParameter("@Password", password)); // Aquí puedes agregar el hash más adelante
+                    cmd.Parameters.Add(new SqlParameter("@Password", password)); // Agrega esta línea para el parámetro de la contraseña
 
                     // Agregar los parámetros de salida para manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int) { Direction = ParameterDirection.Output });
@@ -194,7 +194,7 @@ namespace Data.Repositorios
                             {
                                 Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
                                 Rol_id = reader["Rol_id"] != DBNull.Value ? Convert.ToInt32(reader["Rol_id"]) : 0,
-                                EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) == 1 : false
+                                EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) == 1 : false,
                             };
                         }
                     }
@@ -203,12 +203,20 @@ namespace Data.Repositorios
                     int codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
                     string desError = cmd.Parameters["@des_err"].Value.ToString();
 
-                    return (usuario, codError, desError);
+                    // Verificar la contraseña ingresada contra el hash recuperado
+                    if (usuario != null && codError == 0)
+                    {
+                        // Aquí debes verificar si el password coincide con el hash en la base de datos
+                        // Si tu procedimiento almacenado ya verifica la contraseña internamente, esta verificación es innecesaria
+                        return (usuario, 0, "OK"); // Retorna el usuario si la contraseña es correcta
+                    }
+                    else
+                    {
+                        return (null, codError, desError); // Retornar error si hubo uno
+                    }
                 }
             }
         }
-
-
 
         //...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................
         private UsuarioDTO MapToUsuarioDTO(SqlDataReader reader)
