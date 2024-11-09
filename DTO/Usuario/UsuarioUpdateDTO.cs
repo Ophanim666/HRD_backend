@@ -15,7 +15,7 @@ namespace DTO.Usuario
         public string Rut { get; set; }
         public string Dv { get; set; }
         public string Email { get; set; }
-        public bool Es_administrador { get; set; }
+        public int Es_administrador { get; set; }
         public int Rol_id { get; set; }
         public int Estado { get; set; }
     }
