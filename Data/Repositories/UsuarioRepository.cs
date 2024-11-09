@@ -190,8 +190,7 @@ namespace Data.Repositorios
                             usuario = new UsuarioTokenDTO
                             {
                                 Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
-                                Rol_id = reader["Rol_id"] != DBNull.Value ? Convert.ToInt32(reader["Rol_id"]) : 0,
-                                EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) == 1 : false,
+                                EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) : 0,
                             };
                         }
                     }

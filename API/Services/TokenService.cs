@@ -23,8 +23,7 @@ public class TokenService
         var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, usuario.Email),
-        new Claim(ClaimTypes.Role, usuario.Rol_id.ToString()),
-        new Claim("es_administrador", usuario.EsAdministrador ? "True" : "False") // Agregar claim de administrador
+        new Claim("es_administrador", usuario.EsAdministrador == 1 ? "True" : "False") // Se compara con 1
     };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
@@ -40,6 +39,5 @@ public class TokenService
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
-
 
 }

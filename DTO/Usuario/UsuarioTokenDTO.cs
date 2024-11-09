@@ -9,7 +9,6 @@ namespace DTO.Usuario
     public class UsuarioTokenDTO
     {
         public string Email { get; set; }
-        public int Rol_id { get; set; }
-        public bool EsAdministrador { get; set; } 
+        public int EsAdministrador { get; set; } 
     }
 }
