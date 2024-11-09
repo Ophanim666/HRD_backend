@@ -25,7 +25,7 @@ namespace API.Controllers
             _tokenService = tokenService;
         }
         //---------------------------------------------------------------Listar Usuarios---------------------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")] //es para que solo los admins puedan ejecutar estas funciones
+        //[Authorize(Policy = "AdminPolicy")] //es para que solo los admins puedan ejecutar estas funciones
         [HttpGet("ListarUsuarios")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -69,7 +69,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------Actualizar Usuarios--------------------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarUsuario(int id, [FromBody] UsuarioUpdateDTO value)
         {
@@ -91,7 +91,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------eliminar el USuario por ID----------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")] // Solo los administradores pueden eliminar usuarios
+        //[Authorize(Policy = "AdminPolicy")] // Solo los administradores pueden eliminar usuarios
         [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarUsuario(int id)
         {

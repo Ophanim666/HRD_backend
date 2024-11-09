@@ -24,7 +24,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------listar proveedor----------------------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpGet] 
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -49,7 +49,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------listadoTesting...............................................................................NEW
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpGet("Listado")]
         public async Task<ActionResult<ObjetoRequest>> ListAllProveedoresConEspecialidades()
         {
@@ -79,7 +79,7 @@ namespace API.Controllers
 
 
         //----------------------------------------------------------------listar proveedores con especialidades Por ID---------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpGet("con-especialidades/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ListarProveedoresConEspecialidades(int id)
         {
@@ -105,7 +105,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------Listar proveedores con sus especialidades por GENERAL PARA LISTAR Y COMPROBAR------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpGet("ObtenerProveedorConEspecialidadGeneral")] //preguntar cual seria la mejor forma de parametrizar las rutas, ejemplo [Route("Lista")] o [HttpGet("Lista")]
         public async Task<ActionResult<ObjetoRequest>> ObtenerProveedoresEspecialidadesGeneral()
         {
@@ -131,7 +131,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------insertar Proveedores------------------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarProveedor([FromBody] ProveedorInsertDTO value)
         {
@@ -163,7 +163,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------Actualizar Proveedores--------------------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarProveedor(int id, [FromBody] ProveedorUpdateDTO value)
         {
@@ -196,7 +196,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------eliminar el Proveedor por ID----------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarProveedor(int id)
         {

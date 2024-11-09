@@ -22,7 +22,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Listar Parametro---------------------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpGet("Listar")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -48,7 +48,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Insertar parametro---------------------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarParametro([FromBody] ParametroInsertDTO value)
         {
@@ -67,7 +67,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Actualizar parametro---------------------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarParametro(int id, [FromBody] ParametroUpdateDTO value)
         {
@@ -87,7 +87,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Eliminar Parametro---------------------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        //[Authorize(Policy = "AdminPolicy")]
         [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarParametro(int id)
         {
