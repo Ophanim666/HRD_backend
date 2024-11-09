@@ -6,6 +6,7 @@ using DTO.TipoParametro;
 using DTO.Parametro;
 using DTO.Usuario;
 using DTO.Proveedor;
+using DTO.Acta;
 using Models.Entidades;
 
 namespace API
@@ -37,6 +38,9 @@ namespace API
 
             //Automapeo de parametro
             CreateMap<Parametro, ParametroDTO>().ReverseMap();
+
+            //Automapeo de Acta
+            CreateMap<Parametro, ActaDTO>().ReverseMap();
 
             //Automapeo de provveodr
             CreateMap<Proveedor, ProveedorDTO>().ReverseMap();

@@ -25,7 +25,8 @@ builder.Services.AddScoped<EspecialidadRepository>(provider => new EspecialidadR
 builder.Services.AddScoped<TipoParametroRepository>(provider => new TipoParametroRepository(connectionString));
 //Parametro
 builder.Services.AddScoped<ParametroRepository>(provider => new ParametroRepository(connectionString));
-
+//Acta
+builder.Services.AddScoped<ActaRepository>(provider => new ActaRepository(connectionString));
 
 
 //ProveedorRepository
