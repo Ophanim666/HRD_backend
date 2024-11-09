@@ -98,8 +98,6 @@ namespace Data.Repositorios
                 using (SqlCommand cmd = new SqlCommand("usp_ActualizarUsuario", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    // Hashear la contraseña antes de enviarla a la base de datos
-                    string hashedPassword = HashPasswordBCrypt(value.Password);
 
                     // Agregar parámetros
                     cmd.Parameters.Add(new SqlParameter("@ID", id));
@@ -110,7 +108,6 @@ namespace Data.Repositorios
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.Rut));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.Dv));
                     cmd.Parameters.Add(new SqlParameter("@EMAIL", value.Email));
-                    cmd.Parameters.Add(new SqlParameter("@PASSWORD", hashedPassword));
                     cmd.Parameters.Add(new SqlParameter("@ES_ADMINISTRADOR", value.Es_administrador));
                     cmd.Parameters.Add(new SqlParameter("@ROL_ID", value.Rol_id));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.Estado));

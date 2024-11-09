@@ -15,7 +15,6 @@ namespace DTO.Usuario
         public string Rut { get; set; }
         public string Dv { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; } //debe de se hashed
         public bool Es_administrador { get; set; }
         public int Rol_id { get; set; }
         public int Estado { get; set; }
