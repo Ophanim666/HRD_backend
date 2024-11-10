@@ -10,6 +10,10 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//
+using BCrypt.Net;
+using System.Diagnostics;
+
 
 namespace Data.Repositorios
 {
@@ -59,6 +63,8 @@ namespace Data.Repositorios
                 using (SqlCommand cmd = new SqlCommand("usp_InsertarUsuario", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+                    // Hashear la contraseña antes de enviarla a la base de datos
+                    string hashedPassword = HashPasswordBCrypt(value.Password);
 
                     cmd.Parameters.Add(new SqlParameter("@PRIMER_NOMBRE", value.Primer_nombre));
                     cmd.Parameters.Add(new SqlParameter("@SEGUNDO_NOMBRE", value.Segundo_nombre));
@@ -67,7 +73,7 @@ namespace Data.Repositorios
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.Rut));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.Dv));
                     cmd.Parameters.Add(new SqlParameter("@EMAIL", value.Email));
-                    cmd.Parameters.Add(new SqlParameter("@PASSWORD", value.Password)); // Recordar hacerle un hash a las contraseñas mas adelante //
+                    cmd.Parameters.Add(new SqlParameter("@PASSWORD", hashedPassword)); // Recordar hacerle un hash a las contraseñas mas adelante //
                     cmd.Parameters.Add(new SqlParameter("@ES_ADMINISTRADOR", value.Es_administrador));
                     cmd.Parameters.Add(new SqlParameter("@ROL_ID", value.Rol_id));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.Estado));
@@ -104,7 +110,6 @@ namespace Data.Repositorios
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.Rut));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.Dv));
                     cmd.Parameters.Add(new SqlParameter("@EMAIL", value.Email));
-                    cmd.Parameters.Add(new SqlParameter("@PASSWORD", value.Password));
                     cmd.Parameters.Add(new SqlParameter("@ES_ADMINISTRADOR", value.Es_administrador));
                     cmd.Parameters.Add(new SqlParameter("@ROL_ID", value.Rol_id));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.Estado));
@@ -146,6 +151,78 @@ namespace Data.Repositorios
                     desError = (cmd.Parameters["@des_err"].Value).ToString();
 
                     return (codError, desError);
+                }
+            }
+        }
+
+        //----------------------------------------------------------LogInUsuarios------------------------------------------------
+        // Para hashear una contraseña:
+        public string HashPasswordBCrypt(string password)
+        {
+            return BCrypt.Net.BCrypt.HashPassword(password);
+        }
+        //Para verificar una contraseña(compara el hash guardado con la contraseña que el usuario ingresó)
+        public bool VerifyPasswordBCrypt(string password, string hashedPassword)
+        {
+            
+            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+        }
+
+
+
+        public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> ObtenerUsuarioPorEmail(string email, string password)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerUsuarioPorEmailYPassword", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@Email", email));
+
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 200) { Direction = ParameterDirection.Output });
+
+                    await sql.OpenAsync();
+
+                    UsuarioTokenDTO usuario = null;
+                    string passwordHash = null;
+
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            
+                            usuario = new UsuarioTokenDTO
+                            {
+                                Email = reader["Email"].ToString(),
+
+                                EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) : 0,
+                            };
+
+                            passwordHash = reader["password"].ToString().Trim(); // Obtén el hash de la BD
+                        }
+
+                    }
+
+                    int codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    string desError = cmd.Parameters["@des_err"].Value.ToString();
+
+
+                    Debug.WriteLine("Password Hash desde la base de datos: " + passwordHash + "contraseña en texto " + password);
+                    Debug.WriteLine(codError);
+                    Debug.WriteLine(VerifyPasswordBCrypt(password, passwordHash));
+
+                    
+                    // Utiliza VerifyPasswordBCrypt para comparar
+                    if (usuario != null && codError == 0 && VerifyPasswordBCrypt(password, passwordHash))
+                    {
+                        return (usuario, 0, "OK");
+                    }
+                    else
+                    {
+                        return (null, codError, "Credenciales inválidas o usuario no encontrado");
+                    }
                 }
             }
         }
