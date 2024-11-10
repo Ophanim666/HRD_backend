@@ -76,6 +76,13 @@ builder.Services.AddSingleton<TokenService>(provider => new TokenService(
     builder.Configuration["JwtSettings:Audience"]
 ));
 
+//ProveedorRepository
+builder.Services.AddScoped<ProveedorRepository>(provider => new ProveedorRepository(connectionString));
+
+
+//Obra
+builder.Services.AddScoped<ObraRepository>(provider => new ObraRepository(connectionString));
+
 
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
