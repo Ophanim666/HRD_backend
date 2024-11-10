@@ -12,6 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 //
 using BCrypt.Net;
+using System.Diagnostics;
+
 
 namespace Data.Repositorios
 {
@@ -159,11 +161,14 @@ namespace Data.Repositorios
         {
             return BCrypt.Net.BCrypt.HashPassword(password);
         }
-        //Para verificar una contraseña (compara el hash guardado con la contraseña que el usuario ingresó)
+        //Para verificar una contraseña(compara el hash guardado con la contraseña que el usuario ingresó)
         public bool VerifyPasswordBCrypt(string password, string hashedPassword)
         {
+            
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
+
+
 
         public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> ObtenerUsuarioPorEmail(string email, string password)
         {
@@ -173,42 +178,50 @@ namespace Data.Repositorios
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(new SqlParameter("@Email", email));
-                    cmd.Parameters.Add(new SqlParameter("@Password", password)); // Agrega esta línea para el parámetro de la contraseña
 
-                    // Agregar los parámetros de salida para manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int) { Direction = ParameterDirection.Output });
                     cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 200) { Direction = ParameterDirection.Output });
 
                     await sql.OpenAsync();
 
                     UsuarioTokenDTO usuario = null;
+                    string passwordHash = null;
+
 
                     using (var reader = await cmd.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
                         {
+                            
                             usuario = new UsuarioTokenDTO
                             {
-                                Email = reader["Email"] != DBNull.Value ? reader["Email"].ToString() : string.Empty,
+                                Email = reader["Email"].ToString(),
+
                                 EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) : 0,
                             };
+
+                            passwordHash = reader["password"].ToString().Trim(); // Obtén el hash de la BD
                         }
+
                     }
 
-                    // Obtener los valores de los parámetros de salida
                     int codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
                     string desError = cmd.Parameters["@des_err"].Value.ToString();
 
-                    // Verificar la contraseña ingresada contra el hash recuperado
-                    if (usuario != null && codError == 0)
+
+                    Debug.WriteLine("Password Hash desde la base de datos: " + passwordHash + "contraseña en texto " + password);
+                    Debug.WriteLine(codError);
+                    Debug.WriteLine(VerifyPasswordBCrypt(password, passwordHash));
+
+                    
+                    // Utiliza VerifyPasswordBCrypt para comparar
+                    if (usuario != null && codError == 0 && VerifyPasswordBCrypt(password, passwordHash))
                     {
-                        // Aquí debes verificar si el password coincide con el hash en la base de datos
-                        // Si tu procedimiento almacenado ya verifica la contraseña internamente, esta verificación es innecesaria
-                        return (usuario, 0, "OK"); // Retorna el usuario si la contraseña es correcta
+                        return (usuario, 0, "OK");
                     }
                     else
                     {
-                        return (null, codError, desError); // Retornar error si hubo uno
+                        return (null, codError, "Credenciales inválidas o usuario no encontrado");
                     }
                 }
             }
