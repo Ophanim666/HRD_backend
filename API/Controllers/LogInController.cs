@@ -11,7 +11,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LogInConreoller : ControllerBase
+    public class LogInController : ControllerBase
     {
         private readonly UsuarioRepository _usuarioRepository;
         private readonly IMapper _mapper;
@@ -19,7 +19,7 @@ namespace API.Controllers
         private readonly TokenService _tokenService;
 
         //hay que aplicar esta logica a las demas clases construidas en repository
-        public LogInConreoller(UsuarioRepository usuarioRepository, IMapper mapper, TokenService tokenService)
+        public LogInController(UsuarioRepository usuarioRepository, IMapper mapper, TokenService tokenService)
         {
             _usuarioRepository = usuarioRepository;
             _mapper = mapper;
