@@ -168,7 +168,7 @@ namespace Data.Repositorios
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
 
-
+        //-----------------------------------------------------LogIn Admin----------------------------------------------------------
         public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> ObtenerUsuarioPorEmail(string email, string password)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -216,6 +216,69 @@ namespace Data.Repositorios
                     if (usuario.EsAdministrador == 0)
                     {
                         return (null, 10004, "Acceso denegado: El usuario no es administrador.");
+                    }
+
+                    // Verificación de la contraseña usando BCrypt
+                    if (VerifyPasswordBCrypt(password, passwordHash))
+                    {
+                        return (usuario, 0, "OK"); // Usuario válido y contraseña correcta
+                    }
+                    else
+                    {
+                        return (null, 10001, "Credenciales inválidas."); // Contraseña incorrecta
+                    }
+                }
+            }
+        }
+
+        //-----------------------------------------------------LogIn Usuarios----------------------------------------------------------
+        public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> ObtenerUsuarioNoAdminPorEmail(string email, string password)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerUsuarioPorEmailYPassword", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@Email", email));
+
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 200) { Direction = ParameterDirection.Output });
+
+                    await sql.OpenAsync();
+
+                    UsuarioTokenDTO usuario = null;
+                    string passwordHash = null;
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            // Crear el objeto usuario
+                            usuario = new UsuarioTokenDTO
+                            {
+                                Email = reader["Email"].ToString(),
+                                EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) : 0,
+                            };
+
+                            // Obtener el hash de la contraseña desde la base de datos
+                            passwordHash = reader["password"] != DBNull.Value ? reader["password"].ToString().Trim() : null;
+                        }
+                    }
+
+                    // Obtener los parámetros de salida
+                    int codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    string desError = cmd.Parameters["@des_err"].Value.ToString();
+
+                    // Validaciones adicionales
+                    if (usuario == null)
+                    {
+                        return (null, codError, desError);  // Usuario no encontrado o error en el procedimiento almacenado
+                    }
+
+                    // Bloquear el acceso si el usuario es administrador (EsAdministrador == 1)
+                    if (usuario.EsAdministrador == 1)
+                    {
+                        return (null, 10005, "Acceso denegado: El usuario es administrador.");
                     }
 
                     // Verificación de la contraseña usando BCrypt

@@ -28,6 +28,8 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------Log in----------------------------------------------------
+
+        //admin
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UsuarioLoginDTO loginDTO)
         {
@@ -60,5 +62,37 @@ namespace API.Controllers
             return Ok(new { Token = token });
         }
 
+        //Usuario
+        [HttpPost("loginUsuario")]
+        public async Task<IActionResult> LoginUsuarioNoAdmin([FromBody] UsuarioLoginDTO loginDTO)
+        {
+            var (usuario, codErr, desErr) = await _usuarioRepository.ObtenerUsuarioNoAdminPorEmail(loginDTO.Email, loginDTO.Password);
+
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            // Verificar el código de error
+            if (codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = codErr.ToString();
+                objetoRequest.Estado.ErrDes = desErr;
+                objetoRequest.Estado.ErrCon = "[LoginUsuarioNoAdminController]";
+                return BadRequest(objetoRequest);
+            }
+
+            if (usuario == null)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "10001";
+                objetoRequest.Estado.ErrDes = "Credenciales inválidas.";
+                objetoRequest.Estado.ErrCon = "[LoginUsuarioNoAdminController]";
+                return Unauthorized(objetoRequest);
+            }
+
+            // Generar el token JWT
+            var token = _tokenService.GenerateJwtToken(usuario);
+            return Ok(new { Token = token });
+        }
     }
 }
