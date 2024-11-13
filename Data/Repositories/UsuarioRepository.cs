@@ -36,9 +36,10 @@ namespace Data.Repositorios
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                // Lo llama por procedimiento almacenado
                 using (SqlCommand cmd = new SqlCommand("usp_ObtenerUsuarios", sql))
                 {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
                     var response = new List<UsuarioDTO>();
                     await sql.OpenAsync();
 
@@ -247,7 +248,7 @@ namespace Data.Repositorios
                 Email = reader.GetString(reader.GetOrdinal("Email")),
                 Rol_id = reader.GetInt32(reader.GetOrdinal("Rol_id")),
                 Estado = reader.GetInt32(reader.GetOrdinal("Estado")),
-                //
+                Es_administrador = reader.GetInt32(reader.GetOrdinal("Es_administrador")), 
                 Usuario_creacion = reader.IsDBNull(reader.GetOrdinal("Usuario_creacion")) ? null : reader.GetString(reader.GetOrdinal("Usuario_creacion")),
                 Fecha_creacion = reader.IsDBNull(reader.GetOrdinal("Fecha_creacion")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("Fecha_creacion"))
             };
