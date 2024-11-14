@@ -46,8 +46,8 @@ namespace Data.Repositories
                                 PROVEEDOR_ID = reader.GetInt32(reader.GetOrdinal("PROVEEDOR_ID")),
                                 ESPECIALIDAD_ID = reader.GetInt32(reader.GetOrdinal("ESPECIALIDAD_ID")),
                                 ESTADO_ID = reader.GetInt32(reader.GetOrdinal("ESTADO_ID")),
-                                FECHA_APROBACION = reader.GetDateTime(reader.GetOrdinal("FECHA_APROBACION")),
-                                OBSERVACION = reader.GetString(reader.GetOrdinal("OBSERVACION")),
+                                FECHA_APROBACION = reader.IsDBNull(reader.GetOrdinal("FECHA_APROBACION")) ? (DateTime?) null : reader.GetDateTime(reader.GetOrdinal("FECHA_APROBACION")),
+                                OBSERVACION = reader.IsDBNull(reader.GetOrdinal("OBSERVACION")) ? null : reader.GetString(reader.GetOrdinal("OBSERVACION")),
                                 REVISOR_ID = reader.GetInt32(reader.GetOrdinal("REVISOR_ID")),
                                 USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION")),
@@ -72,9 +72,11 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@OBRA_ID", value.OBRA_ID));
                     cmd.Parameters.Add(new SqlParameter("@PROVEEDOR_ID", value.PROVEEDOR_ID));
                     cmd.Parameters.Add(new SqlParameter("@ESPECIALIDAD_ID", value.ESPECIALIDAD_ID));
-                    cmd.Parameters.Add(new SqlParameter("@ESTADO_ID", value.ESTADO_ID));
-                    cmd.Parameters.Add(new SqlParameter("@FECHA_APROBACION", value.FECHA_APROBACION));
-                    cmd.Parameters.Add(new SqlParameter("@OBSERVACION", value.OBSERVACION));
+                    //cmd.Parameters.Add(new SqlParameter("@ESTADO_ID", value.ESTADO_ID));
+                    //cmd.Parameters.Add(new SqlParameter("@FECHA_APROBACION", value.FECHA_APROBACION));
+                    // Asigna DBNull.Value si FECHA_APROBACION es null
+                    cmd.Parameters.Add(new SqlParameter("@FECHA_APROBACION", value.FECHA_APROBACION ?? (object)DBNull.Value));
+                    cmd.Parameters.Add(new SqlParameter("@OBSERVACION", value.OBSERVACION ?? (object)DBNull.Value));
                     cmd.Parameters.Add(new SqlParameter("@REVISOR_ID", value.REVISOR_ID));
                     //demomento mantenemos el usaurio creacion para insertar
                     //cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", value.USUARIO_CREACION));
@@ -107,9 +109,11 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@OBRA_ID", value.OBRA_ID));
                     cmd.Parameters.Add(new SqlParameter("@PROVEEDOR_ID", value.PROVEEDOR_ID));
                     cmd.Parameters.Add(new SqlParameter("@ESPECIALIDAD_ID", value.ESPECIALIDAD_ID));
-                    cmd.Parameters.Add(new SqlParameter("@ESTADO_ID", value.ESTADO_ID));
-                    cmd.Parameters.Add(new SqlParameter("@FECHA_APROBACION", value.FECHA_APROBACION));
-                    cmd.Parameters.Add(new SqlParameter("@OBSERVACION", value.OBSERVACION));
+                    //cmd.Parameters.Add(new SqlParameter("@ESTADO_ID", value.ESTADO_ID));
+                    //cmd.Parameters.Add(new SqlParameter("@FECHA_APROBACION", value.FECHA_APROBACION));
+                    cmd.Parameters.Add(new SqlParameter("@FECHA_APROBACION", value.FECHA_APROBACION ?? (object)DBNull.Value));
+
+                    cmd.Parameters.Add(new SqlParameter("@OBSERVACION", value.OBSERVACION ?? (object)DBNull.Value));
                     cmd.Parameters.Add(new SqlParameter("@REVISOR_ID", value.REVISOR_ID));
 
                     //agregamos nuestro manejo de errores
@@ -162,8 +166,8 @@ namespace Data.Repositories
                 PROVEEDOR_ID = reader.GetInt32(reader.GetOrdinal("PROVEEDOR_ID")),
                 ESPECIALIDAD_ID = reader.GetInt32(reader.GetOrdinal("ESPECIALIDAD_ID")),
                 ESTADO_ID = reader.GetInt32(reader.GetOrdinal("ESTADO_ID")),
-                FECHA_APROBACION = reader.GetDateTime(reader.GetOrdinal("FECHA_APROBACION")),
-                OBSERVACION = reader.GetString(reader.GetOrdinal("OBSERVACION")),
+                FECHA_APROBACION = reader.IsDBNull(reader.GetOrdinal("FECHA_APROBACION")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("FECHA_APROBACION")),
+                OBSERVACION = reader.IsDBNull(reader.GetOrdinal("OBSERVACION")) ? null : reader.GetString(reader.GetOrdinal("OBSERVACION")),
                 REVISOR_ID = reader.GetInt32(reader.GetOrdinal("REVISOR_ID")),
                 USUARIO_CREACION = reader.IsDBNull(reader.GetOrdinal("USUARIO_CREACION")) ? null : reader.GetString(reader.GetOrdinal("USUARIO_CREACION")),
                 FECHA_CREACION = reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))

@@ -13,7 +13,7 @@ namespace Models.Entidades
         public int PROVEEDOR_ID { get; set; }
         public int ESPECIALIDAD_ID { get; set; }
         public int ESTADO_ID { get; set; }
-        public DateTime FECHA_APROBACION { get; set; }
+        public DateTime? FECHA_APROBACION { get; set; }
         public string OBSERVACION { get; set; }
         public int REVISOR_ID { get; set; }
         public string USUARIO_CREACION { get; set; }
