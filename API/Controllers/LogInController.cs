@@ -66,7 +66,7 @@ namespace API.Controllers
         [HttpPost("loginUsuario")]
         public async Task<IActionResult> LoginUsuarioNoAdmin([FromBody] UsuarioLoginDTO loginDTO)
         {
-            var (usuario, codErr, desErr) = await _usuarioRepository.ObtenerUsuarioNoAdminPorEmail(loginDTO.Email, loginDTO.Password);
+            var (usuario, codErr, desErr) = await _usuarioRepository.LoginEstandar(loginDTO.Email, loginDTO.Password);
 
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();

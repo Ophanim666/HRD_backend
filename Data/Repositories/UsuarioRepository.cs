@@ -232,7 +232,7 @@ namespace Data.Repositorios
         }
 
         //-----------------------------------------------------LogIn Usuarios----------------------------------------------------------
-        public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> ObtenerUsuarioNoAdminPorEmail(string email, string password)
+        public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> LoginEstandar(string email, string password)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -275,12 +275,6 @@ namespace Data.Repositorios
                         return (null, codError, desError);  // Usuario no encontrado o error en el procedimiento almacenado
                     }
 
-                    // Bloquear el acceso si el usuario es administrador (EsAdministrador == 1)
-                    if (usuario.EsAdministrador == 1)
-                    {
-                        return (null, 10005, "Acceso denegado: El usuario es administrador.");
-                    }
-
                     // Verificación de la contraseña usando BCrypt
                     if (VerifyPasswordBCrypt(password, passwordHash))
                     {
@@ -293,6 +287,7 @@ namespace Data.Repositorios
                 }
             }
         }
+
 
 
         //...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................
