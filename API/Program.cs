@@ -35,6 +35,8 @@ builder.Services.AddScoped<ActaRepository>(provider => new ActaRepository(connec
 builder.Services.AddScoped<ProveedorRepository>(provider => new ProveedorRepository(connectionString));
 // Registrar TareaRepository
 builder.Services.AddScoped<TareaRepository>(provider => new TareaRepository(connectionString));
+// Registrar GrupoTareaRepository
+builder.Services.AddScoped<GrupoTareasRepository>(provider => new GrupoTareasRepository(connectionString));
 
 // ---------------------------------------------
 // Configuración de JWT
