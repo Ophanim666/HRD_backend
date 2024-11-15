@@ -30,37 +30,32 @@ namespace API.Controllers
         //----------------------------------------------------------------Log in----------------------------------------------------
 
         //admin
+        // Modificado para incluir el email del usuario logueado
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UsuarioLoginDTO loginDTO)
         {
+            // Validar que la contraseña no sea nula ni vacía
+            if (string.IsNullOrEmpty(loginDTO.Password))
+            {
+                return BadRequest(new { codErr = "10003", desErr = "La contraseña es obligatoria." });
+            }
+
             var (usuario, codErr, desErr) = await _usuarioRepository.ObtenerUsuarioPorEmail(loginDTO.Email, loginDTO.Password);
 
-            ObjetoRequest objetoRequest = new ObjetoRequest();
-            objetoRequest.Estado = new EstadoRequest();
-
-            // Verificar el código de error
             if (codErr != 0)
             {
-                objetoRequest.Estado.Ack = false;
-                objetoRequest.Estado.ErrNo = codErr.ToString();
-                objetoRequest.Estado.ErrDes = desErr;
-                objetoRequest.Estado.ErrCon = "[LoginController]";
-                return BadRequest(objetoRequest);
+                return BadRequest(new { codErr, desErr });
             }
 
             if (usuario == null)
             {
-                objetoRequest.Estado.Ack = false;
-                objetoRequest.Estado.ErrNo = "10001";
-                objetoRequest.Estado.ErrDes = "Credenciales inválidas.";
-                objetoRequest.Estado.ErrCon = "[LoginController]";
-                return Unauthorized(objetoRequest);
+                return Unauthorized(new { codErr = "10001", desErr = "Credenciales inválidas." });
             }
 
-            // Generar el token JWT
             var token = _tokenService.GenerateJwtToken(usuario);
             return Ok(new { Token = token });
         }
+
 
         //Usuario
         [HttpPost("loginUsuario")]

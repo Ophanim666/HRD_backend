@@ -4,6 +4,12 @@ using DTO.Usuario;
 using Data.Repositorios;
 using DTO;
 using Microsoft.AspNetCore.Authorization;
+// Importar dependencias necesarias
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
+
+
 
 namespace API.Controllers
 {
@@ -49,13 +55,24 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-        //---------------------------------------------------------------Insertar Usuarios---------------------------------------------------------------
+        //---------------------------------------------------------------Insertar Usuarios--------------------------------------------------------------- Aqui se hicieorn cambios para obtener el usuario creacion
         //[Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarUsuario([FromBody] UsuarioInsertDTO value)
         {
-            var response = await _usuarioRepository.InsertarUsuario(value);
+            // Obtener el Email del usuario logueado desde el JWT
+            var usuarioCreacion = HttpContext.User?.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;  // Extrae el 'Email' o 'ID' del usuario logueado
 
+            if (usuarioCreacion == null)
+            {
+                return Unauthorized(new { message = "Usuario no autenticado" });
+            }
+
+            // Llamar al repositorio para insertar el usuario, pasando el 'usuarioCreacion'
+            var response = await _usuarioRepository.InsertarUsuario(value, usuarioCreacion);
+
+            // Preparar la respuesta de la API
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
             if (response.codErr != 0)
@@ -65,6 +82,11 @@ namespace API.Controllers
                 objetoRequest.Estado.ErrDes = response.desErr.ToString();
                 objetoRequest.Estado.ErrCon = "[UsuarioController]";
             }
+            else
+            {
+                objetoRequest.Estado.Ack = true;
+            }
+
             return objetoRequest;
         }
 

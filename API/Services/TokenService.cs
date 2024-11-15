@@ -40,4 +40,25 @@ public class TokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
+
+    // Esto es solo un ejemplo de cómo podrías obtener los datos del token
+    public string GetUserEmailFromToken(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        try
+        {
+            var jwtToken = handler.ReadJwtToken(token);  // Usar ReadJwtToken para JWT
+            var emailClaim = jwtToken?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            return emailClaim;
+        }
+        catch (Exception ex)
+        {
+            // Si hay un error al leer el token, puedes manejarlo de alguna manera
+            // Ejemplo: Registrar el error o lanzar una excepción personalizada
+            throw new InvalidOperationException("Token inválido o malformado.", ex);
+        }
+    }
+
+
+
 }
