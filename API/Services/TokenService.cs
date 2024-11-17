@@ -41,7 +41,7 @@ public class TokenService
     }
 
 
-    // Esto es solo un ejemplo de cómo podrías obtener los datos del token
+    // Obtener los datos del token
     public string GetUserEmailFromToken(string token)
     {
         var handler = new JwtSecurityTokenHandler();

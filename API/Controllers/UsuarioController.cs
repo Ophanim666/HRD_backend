@@ -89,6 +89,7 @@ namespace API.Controllers
 
             return objetoRequest;
         }
+        // en si casi toda la logica se hace en el controller y el insert qeu vemos aqui a demas de el tokenservice 
 
         //----------------------------------------------------------------Actualizar Usuarios--------------------------------------------------------------
         //[Authorize(Policy = "AdminPolicy")]
