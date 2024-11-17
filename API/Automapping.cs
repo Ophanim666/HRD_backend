@@ -9,6 +9,7 @@ using DTO.Proveedor;
 using DTO.Obra;
 using DTO.Acta;
 using Models.Entidades;
+using DTO.GrupoTareas;
 
 namespace API
 {
@@ -51,6 +52,9 @@ namespace API
 
             //Automapeo de provveodr
             CreateMap<Proveedor, ProveedorDTO>().ReverseMap();
+
+            //Automapeo de grupo tareas
+            CreateMap<GrupoTareas, GrupoTareasDTO>().ReverseMap();
 
         }
     }
