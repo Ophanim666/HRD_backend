@@ -290,7 +290,7 @@ namespace Data.Repositories
             }
         }
 
-        //----------------------------------------------------------Actualizar grupo tarea----------------------------------------------------
+        //----------------------------------------------------------Actualizar grupo tarea----------------------------------------------------//aqui se actualiza el estado de grupo de tarea si esta realizado o rechazado y esos datos vendran de la tabla de parametro
         public async Task<(int codErr, string desErr)> ActualizarGrupoTarea(int id, GrupoTareasUpdateDTO value)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -321,7 +321,7 @@ namespace Data.Repositories
             }
         }
 
-        //----------------------------------------------------------Actualizar grupo tarea x tareas----------------------------------------------------
+        //----------------------------------------------------------Actualizar grupo tarea x tareas----------------------------------------------------//aqui se pondra el estado para el si o el no por tarea
         public async Task<(int codErr, string desErr)> ActualizarTareasXGrupoTarea(int grupoTareaId, List<int> tareasIds)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
