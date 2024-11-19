@@ -22,6 +22,7 @@ public class TokenService
     {
         var claims = new List<Claim>
     {
+        new Claim("user_id", usuario.Id.ToString()), //esta calim es la supuesata calim que nos debe ayudar a poner el id del usaurio qeu ingresa para busacar donde estan los grupo de tarea que le corresponde
         new Claim(ClaimTypes.NameIdentifier, usuario.Email),
         new Claim("es_administrador", usuario.EsAdministrador == 1 ? "True" : "False") // Se compara con 1
     };
@@ -59,6 +60,27 @@ public class TokenService
         }
     }
 
+    // Nueva función para obtener el Id del usuario desde el token
+    public int? GetUserIdFromToken(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        try
+        {
+            var jwtToken = handler.ReadJwtToken(token);
+            var userIdClaim = jwtToken?.Claims.FirstOrDefault(c => c.Type == "user_id")?.Value;
 
+            // Verificar si el user_id es un valor válido y convertirlo
+            if (int.TryParse(userIdClaim, out var userId))
+            {
+                return userId;
+            }
+            return null;
+        }
+        catch (Exception ex)
+        {
+            // Manejar el error de forma apropiada
+            throw new InvalidOperationException("Token inválido o malformado.", ex);
+        }
+    }
 
 }

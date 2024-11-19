@@ -9,8 +9,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 
-
-
 namespace API.Controllers
 {
     [Route("api/[controller]")]
@@ -160,8 +158,6 @@ namespace API.Controllers
 
         //    return Ok("Sesión cerrada correctamente.");
         //}
-
-
 
     }
 }

@@ -3,6 +3,7 @@ using Data.Repositories;
 using DTO.Acta;
 using DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -12,10 +13,13 @@ namespace API.Controllers
     {
         private readonly ActaRepository _actaRepositorio;
         private readonly IMapper _mapper;
-        public ActaController(ActaRepository actaRepositorio, IMapper mapper)
+        //
+        private readonly TokenService _tokenService;
+        public ActaController(ActaRepository actaRepositorio, IMapper mapper, TokenService tokenService)
         {
             _actaRepositorio = actaRepositorio;
             _mapper = mapper;
+            _tokenService = tokenService;
         }
 
         //---------------------------------------------------------------Listar Acta---------------------------------------------------------------
@@ -100,5 +104,36 @@ namespace API.Controllers
 
 
         }
+
+        //funcion acta con usuario
+        [HttpGet("user-actas/{id}")]
+        public async Task<ActionResult<ObjetoRequest>> ObtenerActasPorUsuario(int id)
+        {
+            // Llamar al repositorio para obtener las actas del usuario usando el ID
+            var actas = await _actaRepositorio.ObtenerActasPorUsuario(id);
+
+            // Crear el objeto de respuesta que sigue el formato que mencionaste
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (actas == null || !actas.Any())
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No se encontraron actas para el usuario";
+                objetoRequest.Estado.ErrCon = "[ActaController]";
+                return NotFound(objetoRequest);
+            }
+
+            // Agregar las actas al cuerpo de la respuesta
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = actas
+            };
+
+            // Retornar las actas en formato de respuesta exitosa
+            return Ok(objetoRequest);
+        }
+
     }
 }
