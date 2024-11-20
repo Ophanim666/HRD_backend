@@ -114,7 +114,7 @@ namespace API.Controllers
                 .FirstOrDefault(c => c.Type == "user_id")?.Value;
 
             // Agregar un WriteLine para depuración
-            Console.WriteLine($"ID del usuario autenticado: {usuarioId}");
+            //debug.WriteLine($"ID del usuario autenticado: {usuarioId}");
 
             // Validar si el usuario ID fue obtenido correctamente
             if (string.IsNullOrEmpty(usuarioId) || !int.TryParse(usuarioId, out int id))

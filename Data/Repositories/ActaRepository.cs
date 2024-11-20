@@ -160,7 +160,7 @@ namespace Data.Repositories
         //funcion acta usuario:
         public async Task<List<ActaUsuarioDTO>> ObtenerActasPorUsuario(int id)
         {
-            Debug.WriteLine($"Repositorio - ID del usuario recibido: {id}");
+            //Debug.WriteLine($"Repositorio - ID del usuario recibido: {id}");
 
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {

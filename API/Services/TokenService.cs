@@ -28,10 +28,11 @@ public class TokenService
         new Claim("es_administrador", usuario.EsAdministrador == 1 ? "True" : "False") // Se compara con 1
 
     };
-        Debug.WriteLine("Generando token:");
-        Debug.WriteLine("Usuario ID: " + usuario.Id);
-        Debug.WriteLine("Usuario Email: " + usuario.Email);
-        Debug.WriteLine("Usuario EsAdministrador: " + usuario.EsAdministrador);
+        //este debug es par verificar que lleguen los datos correctos de las claims
+        //Debug.WriteLine("Generando token:");
+        //Debug.WriteLine("Usuario ID: " + usuario.Id);
+        //Debug.WriteLine("Usuario Email: " + usuario.Email);
+        //Debug.WriteLine("Usuario EsAdministrador: " + usuario.EsAdministrador);
 
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
