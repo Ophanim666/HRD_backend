@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection.PortableExecutable;
+using System.Diagnostics;
 
 namespace Data.Repositories
 {
@@ -159,9 +160,10 @@ namespace Data.Repositories
         //funcion acta usuario:
         public async Task<List<ActaUsuarioDTO>> ObtenerActasPorUsuario(int id)
         {
+            Debug.WriteLine($"Repositorio - ID del usuario recibido: {id}");
+
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                // Cambié el nombre del procedimiento almacenado a 'usp_ObtenerActasPorEncargado'
                 using (SqlCommand cmd = new SqlCommand("usp_ObtenerActasPorEncargado", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -176,7 +178,6 @@ namespace Data.Repositories
                         {
                             var acta = new ActaUsuarioDTO
                             {
-                                // Mapeo de las columnas que devuelve el procedimiento almacenado
                                 Grupo = reader.GetInt32(reader.GetOrdinal("grupo")),
                                 Acta = reader.GetInt32(reader.GetOrdinal("acta")),
                                 Rol = reader.GetInt32(reader.GetOrdinal("rol")),
@@ -186,10 +187,12 @@ namespace Data.Repositories
                             response.Add(acta);
                         }
                     }
+
                     return response;
                 }
             }
         }
+
 
 
 

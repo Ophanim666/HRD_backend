@@ -12,5 +12,6 @@ namespace DTO.Usuario
         public int EsAdministrador { get; set; }
         // este id llega nulo si no funciona comentar per es necesario para insertar el usuario en acta
         public int Id { get; set; }
+        public string Primer_nombre { get; set; }
     }
 }

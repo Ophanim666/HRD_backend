@@ -29,7 +29,7 @@ namespace API.Controllers
             _tokenService = tokenService;
         }
         //---------------------------------------------------------------Listar Usuarios---------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")] //es para que solo los admins puedan ejecutar estas funciones
+        [Authorize] //es para que solo los admins puedan ejecutar estas funciones
         [HttpGet("ListarUsuarios")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -68,7 +68,7 @@ namespace API.Controllers
             }
 
             // Llamar al repositorio para insertar el usuario, pasando el 'usuarioCreacion'
-            var response = await _usuarioRepository.InsertarUsuario(value, usuarioCreacion);
+            var response = await _usuarioRepository.InsertarUsuario(value, usuarioCreacion); // este podriamos implementarlo
 
             // Preparar la respuesta de la API
             ObjetoRequest objetoRequest = new ObjetoRequest();

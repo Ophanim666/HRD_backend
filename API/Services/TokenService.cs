@@ -1,6 +1,7 @@
 ﻿using DTO.Usuario;
 using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -25,7 +26,13 @@ public class TokenService
         new Claim("user_id", usuario.Id.ToString()), //esta calim es la supuesata calim que nos debe ayudar a poner el id del usaurio qeu ingresa para busacar donde estan los grupo de tarea que le corresponde
         new Claim(ClaimTypes.NameIdentifier, usuario.Email),
         new Claim("es_administrador", usuario.EsAdministrador == 1 ? "True" : "False") // Se compara con 1
+
     };
+        Debug.WriteLine("Generando token:");
+        Debug.WriteLine("Usuario ID: " + usuario.Id);
+        Debug.WriteLine("Usuario Email: " + usuario.Email);
+        Debug.WriteLine("Usuario EsAdministrador: " + usuario.EsAdministrador);
+
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -84,3 +91,4 @@ public class TokenService
     }
 
 }
+

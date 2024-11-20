@@ -106,15 +106,30 @@ namespace API.Controllers
         }
 
         //funcion acta con usuario
-        [HttpGet("user-actas/{id}")]
-        public async Task<ActionResult<ObjetoRequest>> ObtenerActasPorUsuario(int id)
+        [HttpGet("user-actas")]
+        public async Task<ActionResult<ObjetoRequest>> ObtenerActasPorUsuario()
         {
+            // Obtener el ID del usuario logueado desde el JWT
+            var usuarioId = HttpContext.User?.Claims
+                .FirstOrDefault(c => c.Type == "user_id")?.Value;
+
+            // Agregar un WriteLine para depuración
+            Console.WriteLine($"ID del usuario autenticado: {usuarioId}");
+
+            // Validar si el usuario ID fue obtenido correctamente
+            if (string.IsNullOrEmpty(usuarioId) || !int.TryParse(usuarioId, out int id))
+            {
+                return Unauthorized(new { message = "Usuario no autenticado o ID inválido" });
+            }
+
             // Llamar al repositorio para obtener las actas del usuario usando el ID
             var actas = await _actaRepositorio.ObtenerActasPorUsuario(id);
 
-            // Crear el objeto de respuesta que sigue el formato que mencionaste
-            ObjetoRequest objetoRequest = new ObjetoRequest();
-            objetoRequest.Estado = new EstadoRequest();
+            // Crear el objeto de respuesta que sigue el formato definido
+            ObjetoRequest objetoRequest = new ObjetoRequest
+            {
+                Estado = new EstadoRequest()
+            };
 
             if (actas == null || !actas.Any())
             {
@@ -134,6 +149,7 @@ namespace API.Controllers
             // Retornar las actas en formato de respuesta exitosa
             return Ok(objetoRequest);
         }
+
 
     }
 }
