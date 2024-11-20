@@ -195,6 +195,7 @@ namespace Data.Repositorios
                             // Crear el objeto usuario
                             usuario = new UsuarioTokenDTO
                             {
+                                //aqui es importante declarar los datos entrantes para que en token service se pueda obtener y hacer una claim del dato entrante 
                                 Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
                                 Email = reader["Email"].ToString(),
                                 EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) : 0,
