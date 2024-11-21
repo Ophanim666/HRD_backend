@@ -212,6 +212,31 @@ namespace API.Controllers
             return objetoRequest;
         }
 
+        //-------------------------------------------------------------------------------------
+
+        //cambiar estodo de firma o rechazado en tabla GRUPO_TAREAS
+        [HttpPut("ActualizarEstadoFirma/{id}")]
+        public async Task<ActionResult<ObjetoRequest>> ActualizarEstadoGrupoTarea(int id, [FromBody] EstadoTareaDTO value)
+        {
+            var response = await _grupoTareasRepository.ActualizarEstadoGrupoTarea(id, value);
+
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr;
+                objetoRequest.Estado.ErrCon = "[GrupoTareaController]";
+                return BadRequest(objetoRequest);
+            }
+
+            objetoRequest.Estado.Ack = true;
+            return Ok(objetoRequest);
+        }
+
+
         //cambiar estado grupo tareas por tarea:
         [HttpPut("ActualizarEstadoTarea/{grupoTareaId}/{tareaId}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarEstadoTareaEnGrupo(int grupoTareaId, int tareaId, [FromBody] GrupoTareasXTareaUpdateDTO value)
