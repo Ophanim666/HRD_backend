@@ -8,7 +8,7 @@ namespace DTO.GrupoTareas
 {
     public class EstadoTareaDTO
     {
-        public int Estado { get; set; }  // 1 = Firmado, 0 = Rechazado, null = Sin firmar
+        public int? Estado { get; set; }  // 1 = Firmado, 0 = Rechazado, null = Sin firmar
     }
 
 }

@@ -8,6 +8,6 @@ namespace DTO.GrupoTareasXTareaDTO
 {
     public class GrupoTareasXTareaUpdateDTO
     {
-        public int estado { get; set; }
+        public int? estado { get; set; }
     }
 }

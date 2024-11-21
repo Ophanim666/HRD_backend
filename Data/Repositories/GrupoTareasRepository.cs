@@ -387,7 +387,7 @@ namespace Data.Repositories
 
                     // Agregar parámetros
                     cmd.Parameters.Add(new SqlParameter("@ID", id));
-                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.Estado));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.Estado.HasValue ? (object)value.Estado.Value : DBNull.Value));
                     // Manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
