@@ -4,6 +4,7 @@ using DTO.Proveedor;
 using DTO;
 using Microsoft.AspNetCore.Mvc;
 using DTO.GrupoTareas;
+using DTO.GrupoTareasXTareaDTO;
 
 namespace API.Controllers
 {
@@ -210,5 +211,28 @@ namespace API.Controllers
             }
             return objetoRequest;
         }
+
+        //cambiar estado grupo tareas por tarea:
+        [HttpPut("ActualizarEstadoTarea/{grupoTareaId}/{tareaId}")]
+        public async Task<ActionResult<ObjetoRequest>> ActualizarEstadoTareaEnGrupo(int grupoTareaId, int tareaId, [FromBody] GrupoTareasXTareaUpdateDTO value)
+        {
+            var response = await _grupoTareasRepository.ActualizarEstadoTareaEnGrupo(grupoTareaId, tareaId, value.estado);
+
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr;
+                objetoRequest.Estado.ErrCon = "[TareaController]";
+                return BadRequest(objetoRequest);
+            }
+
+            objetoRequest.Estado.Ack = true;
+            return Ok(objetoRequest);
+        }
+
     }
 }
