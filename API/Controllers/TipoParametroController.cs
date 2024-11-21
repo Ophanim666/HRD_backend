@@ -50,7 +50,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------ejecucion Lsttipoparametros---------------------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize]
         [HttpGet("LstTipoParametros")]
         public async Task<ActionResult<ObjetoRequest>> LstTipoParametro()
         {

@@ -50,7 +50,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Listar Tarea simple (nombre, id) ---------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
+        [Authorize]
         [HttpGet("ListadoDeTareaSimple")]
         public async Task<ActionResult<ObjetoRequest>> LstTarea()
         {
