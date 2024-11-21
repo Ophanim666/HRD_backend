@@ -23,6 +23,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Listar Acta---------------------------------------------------------------
+        [Authorize]
         [HttpGet("Listar")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -48,6 +49,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Insertar acta---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarActa([FromBody] ActaInsertDTO value)
         {
@@ -66,6 +68,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Actualizar acta---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarActa(int id, [FromBody] ActaUpdateDTO value)
         {
@@ -85,6 +88,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Eliminar Acta---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarActa(int id)
         {
@@ -106,6 +110,7 @@ namespace API.Controllers
         }
 
         //funcion acta con usuario
+        [Authorize]
         [HttpGet("user-actas")]
         public async Task<ActionResult<ObjetoRequest>> ObtenerActasPorUsuario()
         {

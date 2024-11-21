@@ -5,6 +5,7 @@ using DTO;
 using Microsoft.AspNetCore.Mvc;
 using DTO.GrupoTareas;
 using DTO.GrupoTareasXTareaDTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -21,7 +22,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------listar grupo tarea----------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize]
         [HttpGet("ListarGrupoTareas")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -46,7 +47,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------listadoTesting...............................................................................NEW
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("Listado")]
         public async Task<ActionResult<ObjetoRequest>> ListAllGListAllGrupoTareaxTareas()
         {
@@ -128,7 +129,7 @@ namespace API.Controllers
         //}
 
         //----------------------------------------------------------------insertar Grupo Tareas------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarGrupoTarea([FromBody] GrupoTareasInsertDTO value)
         {
@@ -160,7 +161,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------Actualizar GRupo TAreas--------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarGrupoTarea(int id, [FromBody] GrupoTareasUpdateDTO value)
         {
@@ -193,7 +194,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------eliminar el grupo tarea por ID----------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarGrupoTarea(int id)
         {
@@ -215,6 +216,7 @@ namespace API.Controllers
         //-------------------------------------------------------------------------------------
 
         //cambiar estodo de firma o rechazado en tabla GRUPO_TAREAS
+        [Authorize]
         [HttpPut("ActualizarEstadoFirma/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarEstadoGrupoTarea(int id, [FromBody] EstadoTareaDTO value)
         {
@@ -238,6 +240,7 @@ namespace API.Controllers
 
 
         //cambiar estado grupo tareas por tarea:
+        [Authorize]
         [HttpPut("ActualizarEstadoTarea/{grupoTareaId}/{tareaId}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarEstadoTareaEnGrupo(int grupoTareaId, int tareaId, [FromBody] GrupoTareasXTareaUpdateDTO value)
         {

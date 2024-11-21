@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DTO.Obra;
 using AutoMapper;
 using DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -22,6 +23,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Listar obras---------------------------------------------------
+        [Authorize]
         [HttpGet("ObtenerObras")] // se parametrizo cambiar en el frontend
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -72,6 +74,7 @@ namespace API.Controllers
         //}
 
         //---------------------------------------------------Añadir obras---------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> AñadirObra([FromBody] ObraInsertDTO value)
         {
@@ -91,6 +94,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Eliminar obras---------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarObra(int id)
         {
@@ -109,6 +113,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Actualizar obras---------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarObra(int id, [FromBody] ObraUpdateDTO value)
         {

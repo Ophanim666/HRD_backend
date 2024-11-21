@@ -24,7 +24,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Listar Tarea---------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize]
         [HttpGet("ListarTareas")] // se parametrizo cambiar en el frontend
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -50,7 +50,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Listar Tarea simple (nombre, id) ---------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("ListadoDeTareaSimple")]
         public async Task<ActionResult<ObjetoRequest>> LstTarea()
         {
@@ -76,7 +76,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Añadir Tarea---------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> AñadirTarea([FromBody] TareaInsertDTO value)
         {
@@ -96,7 +96,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Eliminar Tarea---------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarTarea(int id)
         {
@@ -117,7 +117,7 @@ namespace API.Controllers
 
 
         //---------------------------------------------------SP para actualizar Tarea---------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarTarea(int id, [FromBody] TareaUpdateDTO value)
         {
