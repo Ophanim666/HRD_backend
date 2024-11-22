@@ -4,6 +4,10 @@ using DTO.Usuario;
 using Data.Repositorios;
 using DTO;
 using Microsoft.AspNetCore.Authorization;
+// Importar dependencias necesarias
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -25,7 +29,7 @@ namespace API.Controllers
             _tokenService = tokenService;
         }
         //---------------------------------------------------------------Listar Usuarios---------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")] //es para que solo los admins puedan ejecutar estas funciones
+        [Authorize(Policy = "AdminPolicy")] //es para que solo los admins puedan ejecutar estas funciones
         [HttpGet("ListarUsuarios")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -49,13 +53,24 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-        //---------------------------------------------------------------Insertar Usuarios---------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        //---------------------------------------------------------------Insertar Usuarios--------------------------------------------------------------- Aqui se hicieorn cambios para obtener el usuario creacion
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarUsuario([FromBody] UsuarioInsertDTO value)
         {
-            var response = await _usuarioRepository.InsertarUsuario(value);
+            // Obtener el Email del usuario logueado desde el JWT
+            var usuarioCreacion = HttpContext.User?.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;  // Extrae el 'Email' o 'ID' del usuario logueado
 
+            if (usuarioCreacion == null)
+            {
+                return Unauthorized(new { message = "Usuario no autenticado" });
+            }
+
+            // Llamar al repositorio para insertar el usuario, pasando el 'usuarioCreacion'
+            var response = await _usuarioRepository.InsertarUsuario(value, usuarioCreacion); // este podriamos implementarlo
+
+            // Preparar la respuesta de la API
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
             if (response.codErr != 0)
@@ -65,11 +80,17 @@ namespace API.Controllers
                 objetoRequest.Estado.ErrDes = response.desErr.ToString();
                 objetoRequest.Estado.ErrCon = "[UsuarioController]";
             }
+            else
+            {
+                objetoRequest.Estado.Ack = true;
+            }
+
             return objetoRequest;
         }
+        // en si casi toda la logica se hace en el controller y el insert qeu vemos aqui a demas de el tokenservice 
 
         //----------------------------------------------------------------Actualizar Usuarios--------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarUsuario(int id, [FromBody] UsuarioUpdateDTO value)
         {
@@ -91,7 +112,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------eliminar el USuario por ID----------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")] // Solo los administradores pueden eliminar usuarios
+        [Authorize(Policy = "AdminPolicy")] // Solo los administradores pueden eliminar usuarios
         [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarUsuario(int id)
         {
@@ -137,8 +158,6 @@ namespace API.Controllers
 
         //    return Ok("Sesión cerrada correctamente.");
         //}
-
-
 
     }
 }

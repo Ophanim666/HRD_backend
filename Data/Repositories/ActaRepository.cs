@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection.PortableExecutable;
+using System.Diagnostics;
 
 namespace Data.Repositories
 {
@@ -155,6 +156,81 @@ namespace Data.Repositories
                 }
             }
         }
+
+        //funcion acta usuario:
+        public async Task<List<ActaUsuarioDTO>> ObtenerActasPorUsuario(int id)
+        {
+            //Debug.WriteLine($"Repositorio - ID del usuario recibido: {id}");
+
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerActasPorEncargado", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@usuario_entrante_id", id);
+
+                    var response = new List<ActaUsuarioDTO>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var acta = new ActaUsuarioDTO
+                            {
+                                Grupo = reader.GetInt32(reader.GetOrdinal("grupo")),
+                                Acta = reader.GetInt32(reader.GetOrdinal("acta")),
+                                Rol = reader.GetInt32(reader.GetOrdinal("rol")),
+                                Encargado = reader.GetInt32(reader.GetOrdinal("encargado")),
+                                Tarea = reader.GetInt32(reader.GetOrdinal("tarea"))
+                            };
+                            response.Add(acta);
+                        }
+                    }
+
+                    return response;
+                }
+            }
+        }
+
+        //funcion acta por revisor:
+        public async Task<List<ActaUsuarioDTO>> ObtenerActasPorRevisor(int id)
+        {
+            //Debug.WriteLine($"Repositorio - ID del usuario recibido: {id}");
+
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerActasPorRevisor", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@usuario_entrante_id", id);
+
+                    var response = new List<ActaUsuarioDTO>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var acta = new ActaUsuarioDTO
+                            {
+                                Grupo = reader.GetInt32(reader.GetOrdinal("grupo")),
+                                Acta = reader.GetInt32(reader.GetOrdinal("acta")),
+                                Rol = reader.GetInt32(reader.GetOrdinal("rol")),
+                                Encargado = reader.GetInt32(reader.GetOrdinal("encargado")),
+                                Tarea = reader.GetInt32(reader.GetOrdinal("tarea"))
+                            };
+                            response.Add(acta);
+                        }
+                    }
+
+                    return response;
+                }
+            }
+        }
+
+
+
 
         //...........................................................MAPEO.................................................... NO SE ESTA UTILIZANDO PERO BUSCAR SOLUCION O MANTENER METODO ACTUAL PARA LISTAR
         private ActaDTO MapToActaDTO(SqlDataReader reader)

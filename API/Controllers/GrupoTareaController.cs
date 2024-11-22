@@ -4,6 +4,8 @@ using DTO.Proveedor;
 using DTO;
 using Microsoft.AspNetCore.Mvc;
 using DTO.GrupoTareas;
+using DTO.GrupoTareasXTareaDTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -20,7 +22,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------listar grupo tarea----------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize]
         [HttpGet("ListarGrupoTareas")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -45,7 +47,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------listadoTesting...............................................................................NEW
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("Listado")]
         public async Task<ActionResult<ObjetoRequest>> ListAllGListAllGrupoTareaxTareas()
         {
@@ -127,7 +129,7 @@ namespace API.Controllers
         //}
 
         //----------------------------------------------------------------insertar Grupo Tareas------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarGrupoTarea([FromBody] GrupoTareasInsertDTO value)
         {
@@ -159,7 +161,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------Actualizar GRupo TAreas--------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarGrupoTarea(int id, [FromBody] GrupoTareasUpdateDTO value)
         {
@@ -192,7 +194,7 @@ namespace API.Controllers
         }
 
         //----------------------------------------------------------------eliminar el grupo tarea por ID----------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarGrupoTarea(int id)
         {
@@ -210,5 +212,55 @@ namespace API.Controllers
             }
             return objetoRequest;
         }
+
+        //-------------------------------------------------------------------------------------
+
+        //cambiar estodo de firma o rechazado en tabla GRUPO_TAREAS
+        [Authorize]
+        [HttpPut("ActualizarEstadoFirma/{id}")]
+        public async Task<ActionResult<ObjetoRequest>> ActualizarEstadoGrupoTarea(int id, [FromBody] EstadoTareaDTO value)
+        {
+            var response = await _grupoTareasRepository.ActualizarEstadoGrupoTarea(id, value);
+
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr;
+                objetoRequest.Estado.ErrCon = "[GrupoTareaController]";
+                return BadRequest(objetoRequest);
+            }
+
+            objetoRequest.Estado.Ack = true;
+            return Ok(objetoRequest);
+        }
+
+
+        //cambiar estado grupo tareas por tarea:
+        [Authorize]
+        [HttpPut("ActualizarEstadoTarea/{grupoTareaId}/{tareaId}")]
+        public async Task<ActionResult<ObjetoRequest>> ActualizarEstadoTareaEnGrupo(int grupoTareaId, int tareaId, [FromBody] GrupoTareasXTareaUpdateDTO value)
+        {
+            var response = await _grupoTareasRepository.ActualizarEstadoTareaEnGrupo(grupoTareaId, tareaId, value.estado);
+
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr;
+                objetoRequest.Estado.ErrCon = "[TareaController]";
+                return BadRequest(objetoRequest);
+            }
+
+            objetoRequest.Estado.Ack = true;
+            return Ok(objetoRequest);
+        }
+
     }
 }

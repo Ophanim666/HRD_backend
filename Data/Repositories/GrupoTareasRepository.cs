@@ -376,6 +376,67 @@ namespace Data.Repositories
             }
         }
 
+        //cambiar estodo de firma o rechazado en tabla GRUPO_TAREAS
+        public async Task<(int codErr, string desErr)> ActualizarEstadoGrupoTarea(int id, EstadoTareaDTO value)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ActualizarEstadoGrupoTarea", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // Agregar parámetros
+                    cmd.Parameters.Add(new SqlParameter("@ID", id));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", value.Estado.HasValue ? (object)value.Estado.Value : DBNull.Value));
+                    // Manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+
+                    await sql.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    // Retornar los códigos de error
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = cmd.Parameters["@des_err"].Value.ToString();
+
+                    return (codError, desError);
+                }
+            }
+        }
+
+
+
+        // cambiar estado de grupo de tareas por tarea a si o no ESTA ES EN TABLA GRUTPO_TAREAS_X_TAREA
+        public async Task<(int codErr, string desErr)> ActualizarEstadoTareaEnGrupo(int grupoTareaId, int tareaId, int? estado)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ActualizarEstadoTareaEnGrupo", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // Agregar parámetros
+                    cmd.Parameters.Add(new SqlParameter("@grupo_tarea_id", grupoTareaId));
+                    cmd.Parameters.Add(new SqlParameter("@tarea_id", tareaId));
+                    cmd.Parameters.Add(new SqlParameter("@estado", estado.HasValue ? (object)estado.Value : DBNull.Value));
+
+                    // Parámetros de salida
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.NVarChar, 100) { Direction = ParameterDirection.Output });
+
+                    await sql.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    // Leer los parámetros de salida
+                    int codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    string desError = cmd.Parameters["@des_err"].Value.ToString();
+
+                    return (codError, desError);
+                }
+            }
+        }
+
+
         //...........................................................MAPEO (recordar sacar lo de vaores nulos)....................................................
 
         private GrupoTareasDTO MapToGrupoTareasDTOListar(SqlDataReader reader)

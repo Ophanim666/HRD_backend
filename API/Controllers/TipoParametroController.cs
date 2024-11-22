@@ -25,7 +25,7 @@ namespace API.Controllers
             _mapper = mapper;
         }
         //---------------------------------------------------------------Listar tipoparametros---------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -50,7 +50,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------ejecucion Lsttipoparametros---------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize]
         [HttpGet("LstTipoParametros")]
         public async Task<ActionResult<ObjetoRequest>> LstTipoParametro()
         {
@@ -75,7 +75,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Insertar tipoparametros---------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarTipoParametro([FromBody] TipoParametroInsertDTO value)
         {
@@ -98,7 +98,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Actualizar tipo parametros---------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarTipoParametro(int id, [FromBody] TipoParametroUpdateDTO value)
         {
@@ -118,7 +118,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
-        //[Authorize(Policy = "AdminPolicy")]
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarTipoParametro(int id)
         {

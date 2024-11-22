@@ -3,6 +3,7 @@ using Data.Repositories;
 using DTO.Acta;
 using DTO;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -12,13 +13,17 @@ namespace API.Controllers
     {
         private readonly ActaRepository _actaRepositorio;
         private readonly IMapper _mapper;
-        public ActaController(ActaRepository actaRepositorio, IMapper mapper)
+        //
+        private readonly TokenService _tokenService;
+        public ActaController(ActaRepository actaRepositorio, IMapper mapper, TokenService tokenService)
         {
             _actaRepositorio = actaRepositorio;
             _mapper = mapper;
+            _tokenService = tokenService;
         }
 
         //---------------------------------------------------------------Listar Acta---------------------------------------------------------------
+        [Authorize]
         [HttpGet("Listar")]
         public async Task<ActionResult<ObjetoRequest>> ListAll()
         {
@@ -44,6 +49,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Insertar acta---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarActa([FromBody] ActaInsertDTO value)
         {
@@ -62,6 +68,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Actualizar acta---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarActa(int id, [FromBody] ActaUpdateDTO value)
         {
@@ -81,6 +88,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------------------Eliminar Acta---------------------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
         [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarActa(int id)
         {
@@ -100,5 +108,99 @@ namespace API.Controllers
 
 
         }
+
+        //funcion acta con usuario
+        [Authorize]
+        [HttpGet("user-actas")]
+        public async Task<ActionResult<ObjetoRequest>> ObtenerActasPorUsuario()
+        {
+            // Obtener el ID del usuario logueado desde el JWT
+            var usuarioId = HttpContext.User?.Claims
+                .FirstOrDefault(c => c.Type == "user_id")?.Value;
+
+            // Agregar un WriteLine para depuración
+            //debug.WriteLine($"ID del usuario autenticado: {usuarioId}");
+
+            // Validar si el usuario ID fue obtenido correctamente
+            if (string.IsNullOrEmpty(usuarioId) || !int.TryParse(usuarioId, out int id))
+            {
+                return Unauthorized(new { message = "Usuario no autenticado o ID inválido" });
+            }
+
+            // Llamar al repositorio para obtener las actas del usuario usando el ID
+            var actas = await _actaRepositorio.ObtenerActasPorUsuario(id);
+
+            // Crear el objeto de respuesta que sigue el formato definido
+            ObjetoRequest objetoRequest = new ObjetoRequest
+            {
+                Estado = new EstadoRequest()
+            };
+
+            if (actas == null || !actas.Any())
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No se encontraron actas para el usuario";
+                objetoRequest.Estado.ErrCon = "[ActaController]";
+                return NotFound(objetoRequest);
+            }
+
+            // Agregar las actas al cuerpo de la respuesta
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = actas
+            };
+
+            // Retornar las actas en formato de respuesta exitosa
+            return Ok(objetoRequest);
+        }
+
+        //funcion acta con usuario
+        [Authorize]
+        [HttpGet("revisor-actas")]
+        public async Task<ActionResult<ObjetoRequest>> ObtenerActasPorRevisor()
+        {
+            // Obtener el ID del usuario logueado desde el JWT
+            var usuarioId = HttpContext.User?.Claims
+                .FirstOrDefault(c => c.Type == "user_id")?.Value;
+
+            // Agregar un WriteLine para depuración
+            //debug.WriteLine($"ID del usuario autenticado: {usuarioId}");
+
+            // Validar si el usuario ID fue obtenido correctamente
+            if (string.IsNullOrEmpty(usuarioId) || !int.TryParse(usuarioId, out int id))
+            {
+                return Unauthorized(new { message = "Usuario no autenticado o ID inválido" });
+            }
+
+            // Llamar al repositorio para obtener las actas del usuario usando el ID
+            var actas = await _actaRepositorio.ObtenerActasPorRevisor(id);
+
+            // Crear el objeto de respuesta que sigue el formato definido
+            ObjetoRequest objetoRequest = new ObjetoRequest
+            {
+                Estado = new EstadoRequest()
+            };
+
+            if (actas == null || !actas.Any())
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "001.01";
+                objetoRequest.Estado.ErrDes = "No se encontraron actas para el usuario";
+                objetoRequest.Estado.ErrCon = "[ActaController]";
+                return NotFound(objetoRequest);
+            }
+
+            // Agregar las actas al cuerpo de la respuesta
+            objetoRequest.Body = new BodyRequest()
+            {
+                Response = actas
+            };
+
+            // Retornar las actas en formato de respuesta exitosa
+            return Ok(objetoRequest);
+        }
+
+
     }
 }

@@ -10,6 +10,7 @@ using DTO.Obra;
 using DTO.Acta;
 using Models.Entidades;
 using DTO.GrupoTareas;
+using DTO.Archivo;
 
 namespace API
 {
@@ -43,6 +44,12 @@ namespace API
             CreateMap<Obra, ObraDTO>().ReverseMap();
             CreateMap<Obra, ObraInsertDTO>().ReverseMap();
             CreateMap<Obra, ObraUpdateDTO>().ReverseMap();
+
+            //Automapeo para Archivos
+            CreateMap<Archivo, ArchivoDTO>().ReverseMap();
+            CreateMap<Archivo, ArchivoDTO>().ReverseMap();
+            CreateMap<Archivo, ArchivoInsertDTO>().ReverseMap();
+            CreateMap<Archivo, ArchivoUpdateDTO>().ReverseMap();
 
             //Automapeo de parametro
             CreateMap<Parametro, ParametroDTO>().ReverseMap();

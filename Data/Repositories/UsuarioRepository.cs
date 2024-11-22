@@ -57,14 +57,14 @@ namespace Data.Repositorios
         }
 
         //---------------------------------------------------------------Insertar Usuario--------------------------------------------------------------- 
-        public async Task<(int codErr, string desErr)> InsertarUsuario(UsuarioInsertDTO value)
+        // Insertar Usuario (modificado para incluir usuario_creacion)
+        public async Task<(int codErr, string desErr)> InsertarUsuario(UsuarioInsertDTO value, string usuarioCreacion)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
                 using (SqlCommand cmd = new SqlCommand("usp_InsertarUsuario", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                    // Hashear la contraseña antes de enviarla a la base de datos
                     string hashedPassword = HashPasswordBCrypt(value.Password);
 
                     cmd.Parameters.Add(new SqlParameter("@PRIMER_NOMBRE", value.Primer_nombre));
@@ -74,17 +74,17 @@ namespace Data.Repositorios
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.Rut));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.Dv));
                     cmd.Parameters.Add(new SqlParameter("@EMAIL", value.Email));
-                    cmd.Parameters.Add(new SqlParameter("@PASSWORD", hashedPassword)); // Recordar hacerle un hash a las contraseñas mas adelante //
+                    cmd.Parameters.Add(new SqlParameter("@PASSWORD", hashedPassword));
                     cmd.Parameters.Add(new SqlParameter("@ES_ADMINISTRADOR", value.Es_administrador));
                     cmd.Parameters.Add(new SqlParameter("@ROL_ID", value.Rol_id));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.Estado));
-                    //agregamos nuestro manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", usuarioCreacion)); // Asignamos el usuario que está creando
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+
                     await sql.OpenAsync();
                     await cmd.ExecuteNonQueryAsync();
 
-                    //lo que debemos retornar
                     codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
                     desError = (cmd.Parameters["@des_err"].Value).ToString();
 
@@ -92,6 +92,7 @@ namespace Data.Repositorios
                 }
             }
         }
+
 
         //----------------------------------------------------------Actualizar Usuario----------------------------------------------------
         public async Task<(int codErr, string desErr)> ActualizarUsuario(int id, UsuarioUpdateDTO value)
@@ -169,7 +170,7 @@ namespace Data.Repositorios
             return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
         }
 
-
+        //-----------------------------------------------------LogIn Admin----------------------------------------------------------
         public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> ObtenerUsuarioPorEmail(string email, string password)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
@@ -194,6 +195,8 @@ namespace Data.Repositorios
                             // Crear el objeto usuario
                             usuario = new UsuarioTokenDTO
                             {
+                                //aqui es importante declarar los datos entrantes para que en token service se pueda obtener y hacer una claim del dato entrante 
+                                Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
                                 Email = reader["Email"].ToString(),
                                 EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) : 0,
                             };
@@ -231,6 +234,66 @@ namespace Data.Repositorios
                 }
             }
         }
+
+        //-----------------------------------------------------LogIn Usuarios----------------------------------------------------------
+        public async Task<(UsuarioTokenDTO usuario, int codErr, string desErr)> LoginEstandar(string email, string password)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerUsuarioPorEmailYPassword", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@Email", email));
+
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 200) { Direction = ParameterDirection.Output });
+
+                    await sql.OpenAsync();
+
+                    UsuarioTokenDTO usuario = null;
+                    string passwordHash = null;
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            // Crear el objeto usuario
+                            usuario = new UsuarioTokenDTO
+                            {
+                                //aqui es importante declarar los datos entrantes para que en token service se pueda obtener y hacer una claim del dato entrante 
+                                Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
+                                Email = reader["Email"].ToString(),
+                                EsAdministrador = reader["es_administrador"] != DBNull.Value ? Convert.ToInt32(reader["es_administrador"]) : 0,
+                            };
+
+                            // Obtener el hash de la contraseña desde la base de datos
+                            passwordHash = reader["password"] != DBNull.Value ? reader["password"].ToString().Trim() : null;
+                        }
+                    }
+
+                    // Obtener los parámetros de salida
+                    int codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    string desError = cmd.Parameters["@des_err"].Value.ToString();
+
+                    // Validaciones adicionales
+                    if (usuario == null)
+                    {
+                        return (null, codError, desError);  // Usuario no encontrado o error en el procedimiento almacenado
+                    }
+
+                    // Verificación de la contraseña usando BCrypt
+                    if (VerifyPasswordBCrypt(password, passwordHash))
+                    {
+                        return (usuario, 0, "OK"); // Usuario válido y contraseña correcta
+                    }
+                    else
+                    {
+                        return (null, 10001, "Credenciales inválidas."); // Contraseña incorrecta
+                    }
+                }
+            }
+        }
+
 
 
         //...........................................................MAPEO (recorddar cambios donde se dejan pasar datos nulos)....................................................
