@@ -50,12 +50,14 @@ namespace API.Controllers
 
         //---------------------------------------------------Añadir Archivo---------------------------------------------------
         [HttpPost("add")]
-        public async Task<ActionResult<ObjetoRequest>> AñadirArchivo([FromForm] ArchivoInsertDTO value)
+        public async Task<ActionResult<ObjetoRequest>> AñadirArchivo([FromBody] ArchivoInsertDTO value)
         {
             var response = await _archivoRepository.AñadirArchivo(value);
 
-            ObjetoRequest objetoRequest = new ObjetoRequest();
-            objetoRequest.Estado = new EstadoRequest();
+            ObjetoRequest objetoRequest = new ObjetoRequest
+            {
+                Estado = new EstadoRequest()
+            };
 
             if (response.codErr != 0)
             {
@@ -64,8 +66,14 @@ namespace API.Controllers
                 objetoRequest.Estado.ErrDes = response.desErr.ToString();
                 objetoRequest.Estado.ErrCon = "[ArchivoController]";
             }
+            else
+            {
+                objetoRequest.Estado.Ack = true;
+            }
+
             return objetoRequest;
         }
+
 
         //---------------------------------------------------Eliminar Archivo---------------------------------------------------
         [HttpDelete("{id}")]

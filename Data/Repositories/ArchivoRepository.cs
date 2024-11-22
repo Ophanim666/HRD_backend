@@ -49,27 +49,33 @@ namespace Data.Repositories
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
-                using (SqlCommand cmd = new SqlCommand("usp_InsertarArchivo", sql))
+                using (SqlCommand cmd = new SqlCommand("usp_InsertarArchivoConGrupo", sql))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
+
+                    // Convertir el contenido Base64 a byte[]
+                    byte[] contenidoBytes = Convert.FromBase64String(value.ContenidoBase64);
 
                     cmd.Parameters.Add(new SqlParameter("@grupo_tarea_id", value.Grupo_Tarea_Id));
                     cmd.Parameters.Add(new SqlParameter("@nombre_archivo", value.Nombre_Archivo));
                     cmd.Parameters.Add(new SqlParameter("@ruta_archivo", value.Ruta_Archivo));
                     cmd.Parameters.Add(new SqlParameter("@tipo_imagen", value.Tipo_Imagen));
+                    cmd.Parameters.Add(new SqlParameter("@contenido", contenidoBytes));
 
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 200)).Direction = ParameterDirection.Output;
+
                     await sql.OpenAsync();
                     await cmd.ExecuteNonQueryAsync();
 
                     codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
-                    desError = (cmd.Parameters["@des_err"].Value).ToString();
+                    desError = cmd.Parameters["@des_err"].Value.ToString();
 
                     return (codError, desError);
                 }
             }
         }
+
 
         //---------------------------------------------------Eliminar Archivo---------------------------------------------------
         public async Task<(int codErr, string desErr)> EliminarArchivo(int id)
