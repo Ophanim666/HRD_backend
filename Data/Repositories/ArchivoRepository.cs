@@ -131,6 +131,35 @@ namespace Data.Repositories
         }
 
 
+        //para obtener la foto
+        public async Task<string> ObtenerArchivoBase64(int id)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerArchivoBase64", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ArchivoID", id);
+
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            // Convertir el contenido en byte[] de vuelta a Base64
+                            byte[] contenidoBytes = (byte[])reader["contenido"];
+                            return Convert.ToBase64String(contenidoBytes);
+                        }
+                    }
+                }
+            }
+
+            return null; // Retornar null si no se encuentra el archivo
+        }
+
+
+
         //---------------------------------------------------Mapeo de Archivo---------------------------------------------------
         private ArchivoDTO MapToArchivoDTO(SqlDataReader reader)
         {

@@ -122,6 +122,37 @@ namespace API.Controllers
 
             return objetoRequest;
         }
+
+
+
+        //para obtener el base64 de la foto
+        [HttpGet("ObtenerFoto/{id}")]
+        public async Task<ActionResult<ObjetoRequest>> ObtenerArchivoBase64(int id)
+        {
+            var archivoBase64 = await _archivoRepository.ObtenerArchivoBase64(id);
+
+            ObjetoRequest objetoRequest = new ObjetoRequest
+            {
+                Estado = new EstadoRequest()
+            };
+
+            if (string.IsNullOrEmpty(archivoBase64))
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "404";
+                objetoRequest.Estado.ErrDes = "Archivo no encontrado.";
+                return NotFound(objetoRequest);
+            }
+
+            objetoRequest.Body = new BodyRequest
+            {
+                Response = archivoBase64
+            };
+
+            objetoRequest.Estado.Ack = true;
+            return Ok(objetoRequest);
+        }
+
     }
 
 }
