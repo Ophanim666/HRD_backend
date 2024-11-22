@@ -87,6 +87,10 @@ builder.Services.AddScoped<ProveedorRepository>(provider => new ProveedorReposit
 //Obra
 builder.Services.AddScoped<ObraRepository>(provider => new ObraRepository(connectionString));
 
+//Obra
+builder.Services.AddScoped<ArchivoRepository>(provider => new ArchivoRepository(connectionString));
+
+
 
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
