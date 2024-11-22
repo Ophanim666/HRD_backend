@@ -153,6 +153,37 @@ namespace API.Controllers
             return Ok(objetoRequest);
         }
 
+        //archivos por gripo de tarea
+
+        [HttpGet("ObtenerArchivosPorGrupo/{grupoTareaId}")]
+        public async Task<ActionResult<ObjetoRequest>> ObtenerArchivosPorGrupo(int grupoTareaId)
+        {
+            var archivosBase64 = await _archivoRepository.ObtenerArchivosPorGrupoTarea(grupoTareaId);
+
+            ObjetoRequest objetoRequest = new ObjetoRequest
+            {
+                Estado = new EstadoRequest()
+            };
+
+            if (archivosBase64 == null || archivosBase64.Count == 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = "404";
+                objetoRequest.Estado.ErrDes = "No se encontraron archivos para este grupo de tareas.";
+                return NotFound(objetoRequest);
+            }
+
+            objetoRequest.Body = new BodyRequest
+            {
+                Response = archivosBase64 // Aquí enviamos la lista completa
+            };
+
+            objetoRequest.Estado.Ack = true;
+            return Ok(objetoRequest);
+        }
+
+
+
     }
 
 }

@@ -160,6 +160,37 @@ namespace Data.Repositories
 
 
 
+
+        //obtener archivos por grupo de tareas
+        public async Task<List<string>> ObtenerArchivosPorGrupoTarea(int grupoTareaId)
+        {
+            var archivosBase64 = new List<string>();
+
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerArchivosPorGrupoTarea", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@GrupoTareaID", grupoTareaId);
+
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            byte[] contenidoBytes = (byte[])reader["contenido"];
+                            archivosBase64.Add(Convert.ToBase64String(contenidoBytes));
+                        }
+                    }
+                }
+            }
+
+            return archivosBase64;
+        }
+
+
+
         //---------------------------------------------------Mapeo de Archivo---------------------------------------------------
         private ArchivoDTO MapToArchivoDTO(SqlDataReader reader)
         {
