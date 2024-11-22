@@ -193,6 +193,42 @@ namespace Data.Repositories
             }
         }
 
+        //funcion acta por revisor:
+        public async Task<List<ActaUsuarioDTO>> ObtenerActasPorRevisor(int id)
+        {
+            //Debug.WriteLine($"Repositorio - ID del usuario recibido: {id}");
+
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ObtenerActasPorRevisor", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@usuario_entrante_id", id);
+
+                    var response = new List<ActaUsuarioDTO>();
+                    await sql.OpenAsync();
+
+                    using (var reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var acta = new ActaUsuarioDTO
+                            {
+                                Grupo = reader.GetInt32(reader.GetOrdinal("grupo")),
+                                Acta = reader.GetInt32(reader.GetOrdinal("acta")),
+                                Rol = reader.GetInt32(reader.GetOrdinal("rol")),
+                                Encargado = reader.GetInt32(reader.GetOrdinal("encargado")),
+                                Tarea = reader.GetInt32(reader.GetOrdinal("tarea"))
+                            };
+                            response.Add(acta);
+                        }
+                    }
+
+                    return response;
+                }
+            }
+        }
+
 
 
 
