@@ -182,7 +182,8 @@ namespace Data.Repositories
                                 Acta = reader.GetInt32(reader.GetOrdinal("acta")),
                                 Rol = reader.GetInt32(reader.GetOrdinal("rol")),
                                 Encargado = reader.GetInt32(reader.GetOrdinal("encargado")),
-                                Tarea = reader.GetInt32(reader.GetOrdinal("tarea"))
+                                Tarea = reader.GetInt32(reader.GetOrdinal("tarea")),
+                                Estado = reader.IsDBNull(reader.GetOrdinal("estado")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("estado"))
                             };
                             response.Add(acta);
                         }

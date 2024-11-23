@@ -13,5 +13,7 @@ namespace DTO.Acta
         public int Rol { get; set; }
         public int Encargado { get; set; }
         public int Tarea { get; set; }
+        public int? Estado { get; set; }
+
     }
 }
