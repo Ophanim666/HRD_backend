@@ -4,6 +4,7 @@ using DTO.Acta;
 using DTO;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using DTO.GrupoTareas;
 
 namespace API.Controllers
 {
@@ -152,6 +153,31 @@ namespace API.Controllers
             };
 
             // Retornar las actas en formato de respuesta exitosa
+            return Ok(objetoRequest);
+        }
+
+        //-------------------------------------------------------------------------------------
+
+        //cambiar estodo de firma o rechazado en tabla GRUPO_TAREAS
+        [Authorize]
+        [HttpPut("ActualizarActaFirma/{id}")]
+        public async Task<ActionResult<ObjetoRequest>> ActualizarEstadoActa(int id, [FromBody] EstadoActaDTO value)
+        {
+            var response = await _actaRepositorio.ActualizarEstadoActa(id, value);
+
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+
+            if (response.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr;
+                objetoRequest.Estado.ErrCon = "[ActaController]";
+                return BadRequest(objetoRequest);
+            }
+
+            objetoRequest.Estado.Ack = true;
             return Ok(objetoRequest);
         }
 

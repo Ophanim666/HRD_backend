@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection.PortableExecutable;
 using System.Diagnostics;
+using DTO.GrupoTareas;
 
 namespace Data.Repositories
 {
@@ -230,6 +231,35 @@ namespace Data.Repositories
             }
         }
 
+
+
+        //cambiar estodo de firma o rechazado en tabla acta
+        public async Task<(int codErr, string desErr)> ActualizarEstadoActa(int id, EstadoActaDTO value)
+        {
+            using (SqlConnection sql = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("usp_ActualizarEstadoActa", sql))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    // Agregar parámetros
+                    cmd.Parameters.Add(new SqlParameter("@ID", id));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO_ID", value.IdEstado.HasValue ? (object)value.IdEstado.Value : DBNull.Value));
+                    // Manejo de errores
+                    cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(new SqlParameter("@des_err", SqlDbType.VarChar, 100)).Direction = ParameterDirection.Output;
+
+                    await sql.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+
+                    // Retornar los códigos de error
+                    codError = Convert.ToInt32(cmd.Parameters["@cod_err"].Value);
+                    desError = cmd.Parameters["@des_err"].Value.ToString();
+
+                    return (codError, desError);
+                }
+            }
+        }
 
 
 
