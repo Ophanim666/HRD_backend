@@ -49,32 +49,6 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-        //---------------------------------------------------Listar Tarea simple (nombre, id) ---------------------------------------------------
-        [Authorize]
-        [HttpGet("ListadoDeTareaSimple")]
-        public async Task<ActionResult<ObjetoRequest>> LstTarea()
-        {
-            var response = await _tareaRepository.LstTarea();
-            ObjetoRequest objetoRequest = new ObjetoRequest();
-            objetoRequest.Estado = new EstadoRequest();
-
-            if (response == null /*|| response.Count == 0*/)
-            {
-                objetoRequest.Estado.Ack = false;
-                objetoRequest.Estado.ErrNo = "001.01";
-                objetoRequest.Estado.ErrDes = "No hay Tareas registradas";
-                objetoRequest.Estado.ErrCon = "[Tareacontroller]";
-            }
-
-            var TareaDTOs = _mapper.Map<List<LstTareaDTO>>(response);
-
-            objetoRequest.Body = new BodyRequest()
-            {
-                Response = TareaDTOs
-            };
-            return objetoRequest;
-        }
-
         //---------------------------------------------------Añadir Tarea---------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
@@ -97,7 +71,7 @@ namespace API.Controllers
 
         //---------------------------------------------------Eliminar Tarea---------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
-        [HttpDelete("{id}")]
+        [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarTarea(int id)
         {
             var response = await _tareaRepository.EliminarTarea(id);
@@ -118,7 +92,7 @@ namespace API.Controllers
 
         //---------------------------------------------------SP para actualizar Tarea---------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
-        [HttpPut("{id}")]
+        [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarTarea(int id, [FromBody] TareaUpdateDTO value)
         {
             var response = await _tareaRepository.ActualizarTarea(id, value);

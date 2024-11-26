@@ -95,7 +95,7 @@ namespace API.Controllers
 
         //---------------------------------------------------Eliminar obras---------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
-        [HttpDelete("{id}")]
+        [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarObra(int id)
         {
             var response = await _obraRepository.EliminarObra(id);
@@ -114,7 +114,7 @@ namespace API.Controllers
 
         //---------------------------------------------------Actualizar obras---------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
-        [HttpPut("{id}")]
+        [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarObra(int id, [FromBody] ObraUpdateDTO value)
         {
             var response = await _obraRepository.ActualizarObra(id, value);

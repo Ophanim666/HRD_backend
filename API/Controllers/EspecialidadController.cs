@@ -95,7 +95,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Eliminar especialidades---------------------------------------------------
-        [HttpDelete("{id}")]
+        [HttpDelete("Eliminar/{id}")]
         [Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult<ObjetoRequest>> EliminarEspecialidad(int id)
         {
@@ -116,7 +116,7 @@ namespace API.Controllers
 
 
         //---------------------------------------------------SP para actualizar especialidad---------------------------------------------------
-        [HttpPut("{id}")]
+        [HttpPut("Actualizar/{id}")]
         [Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarEspecialidad(int id, [FromBody] EspecialidadUpdateDTO value)
         {

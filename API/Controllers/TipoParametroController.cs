@@ -99,7 +99,7 @@ namespace API.Controllers
 
         //---------------------------------------------------------------Actualizar tipo parametros---------------------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
-        [HttpPut("{id}")]
+        [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarTipoParametro(int id, [FromBody] TipoParametroUpdateDTO value)
         {
             var response = await _tipoParametroRepositorio.ActualizarTipoParametro(id, value);
@@ -119,7 +119,7 @@ namespace API.Controllers
 
         //---------------------------------------------------------------Eliminar TipoParametro por ID---------------------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
-        [HttpDelete("{id}")]
+        [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarTipoParametro(int id)
         {
             var response = await _tipoParametroRepositorio.EliminarTipoParametro(id);
