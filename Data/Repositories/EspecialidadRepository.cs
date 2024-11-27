@@ -72,7 +72,7 @@ namespace Data.Repositories
         }
 
         //---------------------------------------------------Función para añadir---------------------------------------------------
-        public async Task<(int codErr, string desErr)> AñadirEspecialidad(EspecialidadInsertDTO value)
+        public async Task<(int codErr, string desErr)> AñadirEspecialidad(EspecialidadInsertDTO value, string usuarioCreacion)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -83,7 +83,7 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
                     // se comenta por cambios de procediemitno almacenado ya no recibe estso campos
-                    //cmd.Parameters.AddWithValue("@USUARIO_CREACION", especialidad.USUARIO_CREACION);
+                    cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", usuarioCreacion)); // Asignamos el usuario que está creando
                     //cmd.Parameters.AddWithValue("@FECHA_CREACION", especialidad.FECHA_CREACION);
 
                     //agregamos nuestro manejo de errores

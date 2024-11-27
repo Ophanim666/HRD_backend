@@ -71,7 +71,7 @@ namespace Data.Repositories
         //}
 
         //---------------------------------------------------Función para añadir una obra---------------------------------------------------
-        public async Task<(int codErr, string desErr)> AñadirObra(ObraInsertDTO value)
+        public async Task<(int codErr, string desErr)> AñadirObra(ObraInsertDTO value, string usuarioCreacion)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -81,6 +81,8 @@ namespace Data.Repositories
 
                     cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
+                    cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", usuarioCreacion)); // Asignamos el usuario que está creando
+
 
                     // Manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;

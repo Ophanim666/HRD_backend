@@ -7,6 +7,7 @@ using AutoMapper;
 using DTO;
 using DTO.Tarea;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -54,7 +55,16 @@ namespace API.Controllers
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> AñadirTarea([FromBody] TareaInsertDTO value)
         {
-            var response = await _tareaRepository.AñadirTarea(value);
+            // Obtener el Email del usuario logueado desde el JWT
+            var usuarioCreacion = HttpContext.User?.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;  // Extrae el 'Email' o 'ID' del usuario logueado
+
+            if (usuarioCreacion == null)
+            {
+                return Unauthorized(new { message = "Usuario no autenticado" });
+            }
+
+            var response = await _tareaRepository.AñadirTarea(value, usuarioCreacion);
 
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();

@@ -9,6 +9,7 @@ using DTO;
 using System.Collections.Generic;
 using System;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -79,7 +80,15 @@ namespace API.Controllers
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarTipoParametro([FromBody] TipoParametroInsertDTO value)
         {
-            var response = await _tipoParametroRepositorio.InsertarTipoParametro(value);
+            // Obtener el Email del usuario logueado desde el JWT
+            var usuarioCreacion = HttpContext.User?.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;  // Extrae el 'Email' o 'ID' del usuario logueado
+
+            if (usuarioCreacion == null)
+            {
+                return Unauthorized(new { message = "Usuario no autenticado" });
+            }
+            var response = await _tipoParametroRepositorio.InsertarTipoParametro(value, usuarioCreacion);
 
 
             ObjetoRequest objetoRequest = new ObjetoRequest();

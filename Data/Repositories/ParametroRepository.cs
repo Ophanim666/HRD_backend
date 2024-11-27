@@ -61,7 +61,7 @@ namespace Data.Repositories
         }
 
         //---------------------------------------------------------------Insertar Parametro--------------------------------------------------------------- FUNCIONANDO
-        public async Task<(int codErr, string desErr)> InsertarParametro(ParametroInsertDTO value)
+        public async Task<(int codErr, string desErr)> InsertarParametro(ParametroInsertDTO value, string usuarioCreacion)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -74,7 +74,7 @@ namespace Data.Repositories
                     cmd.Parameters.Add(new SqlParameter("@ID_TIPO_PARAMETRO", value.ID_TIPO_PARAMETRO));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
                     //demomento mantenemos el usaurio creacion para insertar
-                    //cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", value.USUARIO_CREACION));
+                    cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", usuarioCreacion)); // Asignamos el usuario que está creando
 
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;

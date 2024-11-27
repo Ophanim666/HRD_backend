@@ -180,60 +180,6 @@ namespace Data.Repositories
             }
         }
 
-        //----------------------------------------------------------Listar proveedores con sus especialidades por GENERAL PARA LISTAR Y COMPROBAR------------------
-        public async Task<List<ProveedorEspecialidadGeneralDTO>> ObtenerProveedoresEspecialidadesGeneral()
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("usp_ObtenerProveedorConEspecialidad", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    var response = new List<ProveedorEspecialidadGeneralDTO>();
-                    await sql.OpenAsync();
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            // Obtener el ID y el nombre del proveedor
-                            int proveedorID = reader.GetInt32(reader.GetOrdinal("ID proveedor"));
-                            string proveedorNombre = reader.GetString(reader.GetOrdinal("Nombre Proveedor"));
-                            int especialidadID = reader.GetInt32(reader.GetOrdinal("ID especialidad"));
-                            string especialidadNombre = reader.GetString(reader.GetOrdinal("Nombre Especialidad"));
-
-                            // Buscar si ya existe un proveedor en la lista
-                            var proveedor = response.FirstOrDefault(p => p.IDproveedor == proveedorID);
-
-                            if (proveedor == null)
-                            {
-                                // Si no existe, añadir un nuevo proveedor con sus listas de especialidades
-                                proveedor = new ProveedorEspecialidadGeneralDTO
-                                {
-                                    IDproveedor = proveedorID,
-                                    ProveedorNombre = proveedorNombre,
-                                };
-
-                                // Añadir la especialidad inicial
-                                proveedor.IDespecialidades.Add(especialidadID);
-                                proveedor.EspecialidadNombres.Add(especialidadNombre);
-
-                                // Agregar a la lista de respuesta
-                                response.Add(proveedor);
-                            }
-                            else
-                            {
-                                // Si ya existe, solo añadir la especialidad a las listas
-                                proveedor.IDespecialidades.Add(especialidadID);
-                                proveedor.EspecialidadNombres.Add(especialidadNombre);
-                            }
-                        }
-                    }
-                    return response;
-                }
-            }
-        }
-
         //----------------------------------------------------------Insertar proveedor----------------------------------------------------------
         public async Task<(int codErr, string desErr, int? proveedorId)> InsertarProveedor(ProveedorInsertDTO value) //recordar el ?
         {
