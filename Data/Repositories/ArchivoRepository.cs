@@ -197,6 +197,7 @@ namespace Data.Repositories
             return new ArchivoDTO()
             {
                 Id = reader.GetInt32(reader.GetOrdinal("ID")),
+                Grupo_Tarea_Id = reader.GetInt32(reader.GetOrdinal("GRUPO_TAREA_ID")),
                 Nombre_Archivo = reader.GetString(reader.GetOrdinal("NOMBRE_ARCHIVO")),
                 Ruta_Archivo = reader.GetString(reader.GetOrdinal("RUTA_ARCHIVO")),
                 Tipo_Imagen = reader.GetString(reader.GetOrdinal("TIPO_IMAGEN")),
