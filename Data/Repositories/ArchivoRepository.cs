@@ -162,9 +162,9 @@ namespace Data.Repositories
 
 
         //obtener archivos por grupo de tareas
-        public async Task<List<string>> ObtenerArchivosPorGrupoTarea(int grupoTareaId)
+        public async Task<List<LstArchivoDTO>> ObtenerArchivosPorGrupoTarea(int grupoTareaId)
         {
-            var archivosBase64 = new List<string>();
+            var archivos = new List<LstArchivoDTO>();
 
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -179,15 +179,22 @@ namespace Data.Repositories
                     {
                         while (await reader.ReadAsync())
                         {
-                            byte[] contenidoBytes = (byte[])reader["contenido"];
-                            archivosBase64.Add(Convert.ToBase64String(contenidoBytes));
+                            var archivo = new LstArchivoDTO
+                            {
+                                Id = (int)reader["id"],
+                                NombreArchivo = reader["nombre_archivo"].ToString(),
+                                ContenidoBase64 = Convert.ToBase64String((byte[])reader["contenido"])
+                            };
+
+                            archivos.Add(archivo);
                         }
                     }
                 }
             }
 
-            return archivosBase64;
+            return archivos;
         }
+
 
 
 
