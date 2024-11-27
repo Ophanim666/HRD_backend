@@ -6,6 +6,7 @@ using DTO.Proveedor;
 using AutoMapper;
 using DTO;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 
 namespace API.Controllers
@@ -109,7 +110,17 @@ namespace API.Controllers
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> InsertarProveedor([FromBody] ProveedorInsertDTO value)
         {
-            var responseProveedor = await _proveedorRepository.InsertarProveedor(value);
+
+            // Obtener el Email del usuario logueado desde el JWT
+            var usuarioCreacion = HttpContext.User?.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;  // Extrae el 'Email' o 'ID' del usuario logueado
+
+            if (usuarioCreacion == null)
+            {
+                return Unauthorized(new { message = "Usuario no autenticado" });
+            }
+
+            var responseProveedor = await _proveedorRepository.InsertarProveedor(value, usuarioCreacion);
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
 
