@@ -49,31 +49,6 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-        //---------------------------------------------------Listar obras simple (nombre, id) para listarlas---------------------------------------------------
-        //[HttpGet("ListadoDeObrasSimple")]
-        //public async Task<ActionResult<ObjetoRequest>> LstObra()
-        //{
-        //    var response = await _obraRepository.LstObra();
-        //    ObjetoRequest objetoRequest = new ObjetoRequest();
-        //    objetoRequest.Estado = new EstadoRequest();
-
-        //    if (response == null /*|| response.Count == 0*/)
-        //    {
-        //        objetoRequest.Estado.Ack = false;
-        //        objetoRequest.Estado.ErrNo = "001.01";
-        //        objetoRequest.Estado.ErrDes = "No hay obras registradas";
-        //        objetoRequest.Estado.ErrCon = "[ObraController]";
-        //    }
-
-        //    var ObraDTOs = _mapper.Map<List<LstObraDTO>>(response);
-
-        //    objetoRequest.Body = new BodyRequest()
-        //    {
-        //        Response = ObraDTOs
-        //    };
-        //    return objetoRequest;
-        //}
-
         //---------------------------------------------------Añadir obras---------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
