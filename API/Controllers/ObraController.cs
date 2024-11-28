@@ -6,6 +6,7 @@ using DTO.Obra;
 using AutoMapper;
 using DTO;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -48,37 +49,21 @@ namespace API.Controllers
             return objetoRequest;
         }
 
-        //---------------------------------------------------Listar obras simple (nombre, id) para listarlas---------------------------------------------------
-        //[HttpGet("ListadoDeObrasSimple")]
-        //public async Task<ActionResult<ObjetoRequest>> LstObra()
-        //{
-        //    var response = await _obraRepository.LstObra();
-        //    ObjetoRequest objetoRequest = new ObjetoRequest();
-        //    objetoRequest.Estado = new EstadoRequest();
-
-        //    if (response == null /*|| response.Count == 0*/)
-        //    {
-        //        objetoRequest.Estado.Ack = false;
-        //        objetoRequest.Estado.ErrNo = "001.01";
-        //        objetoRequest.Estado.ErrDes = "No hay obras registradas";
-        //        objetoRequest.Estado.ErrCon = "[ObraController]";
-        //    }
-
-        //    var ObraDTOs = _mapper.Map<List<LstObraDTO>>(response);
-
-        //    objetoRequest.Body = new BodyRequest()
-        //    {
-        //        Response = ObraDTOs
-        //    };
-        //    return objetoRequest;
-        //}
-
         //---------------------------------------------------Añadir obras---------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
         [HttpPost("add")]
         public async Task<ActionResult<ObjetoRequest>> AñadirObra([FromBody] ObraInsertDTO value)
         {
-            var response = await _obraRepository.AñadirObra(value);
+            // Obtener el Email del usuario logueado desde el JWT
+            var usuarioCreacion = HttpContext.User?.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;  // Extrae el 'Email' o 'ID' del usuario logueado
+
+            if (usuarioCreacion == null)
+            {
+                return Unauthorized(new { message = "Usuario no autenticado" });
+            }
+
+            var response = await _obraRepository.AñadirObra(value, usuarioCreacion);
 
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
@@ -95,7 +80,7 @@ namespace API.Controllers
 
         //---------------------------------------------------Eliminar obras---------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
-        [HttpDelete("{id}")]
+        [HttpDelete("Eliminar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> EliminarObra(int id)
         {
             var response = await _obraRepository.EliminarObra(id);
@@ -114,7 +99,7 @@ namespace API.Controllers
 
         //---------------------------------------------------Actualizar obras---------------------------------------------------
         [Authorize(Policy = "AdminPolicy")]
-        [HttpPut("{id}")]
+        [HttpPut("Actualizar/{id}")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarObra(int id, [FromBody] ObraUpdateDTO value)
         {
             var response = await _obraRepository.ActualizarObra(id, value);

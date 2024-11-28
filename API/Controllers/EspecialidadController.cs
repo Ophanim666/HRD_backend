@@ -6,6 +6,7 @@ using DTO.Especialidad;
 using AutoMapper;
 using DTO;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -79,7 +80,15 @@ namespace API.Controllers
         [Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult<ObjetoRequest>> AñadirEspecialidad([FromBody] EspecialidadInsertDTO value)
         {
-            var response = await _especialidadRepository.AñadirEspecialidad(value);
+            // Obtener el Email del usuario logueado desde el JWT
+            var usuarioCreacion = HttpContext.User?.Claims
+                .FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;  // Extrae el 'Email' o 'ID' del usuario logueado
+
+            if (usuarioCreacion == null)
+            {
+                return Unauthorized(new { message = "Usuario no autenticado" });
+            }
+            var response = await _especialidadRepository.AñadirEspecialidad(value, usuarioCreacion);
 
             ObjetoRequest objetoRequest = new ObjetoRequest();
             objetoRequest.Estado = new EstadoRequest();
@@ -95,7 +104,7 @@ namespace API.Controllers
         }
 
         //---------------------------------------------------Eliminar especialidades---------------------------------------------------
-        [HttpDelete("{id}")]
+        [HttpDelete("Eliminar/{id}")]
         [Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult<ObjetoRequest>> EliminarEspecialidad(int id)
         {
@@ -116,7 +125,7 @@ namespace API.Controllers
 
 
         //---------------------------------------------------SP para actualizar especialidad---------------------------------------------------
-        [HttpPut("{id}")]
+        [HttpPut("Actualizar/{id}")]
         [Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult<ObjetoRequest>> ActualizarEspecialidad(int id, [FromBody] EspecialidadUpdateDTO value)
         {

@@ -193,26 +193,6 @@ namespace API.Controllers
             return Ok(objetoRequest);
         }
 
-        //----------------------------------------------------------------eliminar el grupo tarea por ID----------------------------------------------------
-        [Authorize(Policy = "AdminPolicy")]
-        [HttpDelete("Eliminar/{id}")]
-        public async Task<ActionResult<ObjetoRequest>> EliminarGrupoTarea(int id)
-        {
-            var response = await _grupoTareasRepository.EliminarGrupoTarea(id);
-            ObjetoRequest objetoRequest = new ObjetoRequest();
-            objetoRequest.Estado = new EstadoRequest();
-            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
-
-            if (response.codErr != 0)
-            {
-                objetoRequest.Estado.Ack = false;
-                objetoRequest.Estado.ErrNo = response.codErr.ToString();
-                objetoRequest.Estado.ErrDes = response.desErr.ToString();
-                objetoRequest.Estado.ErrCon = "[GrupoTareaController]";
-            }
-            return objetoRequest;
-        }
-
         //-------------------------------------------------------------------------------------
 
         //cambiar estodo de firma o rechazado en tabla GRUPO_TAREAS
@@ -260,6 +240,26 @@ namespace API.Controllers
 
             objetoRequest.Estado.Ack = true;
             return Ok(objetoRequest);
+        }
+
+        //----------------------------------------------------------------eliminar el grupo tarea por ID----------------------------------------------------
+        [Authorize(Policy = "AdminPolicy")]
+        [HttpDelete("Eliminar/{id}")]
+        public async Task<ActionResult<ObjetoRequest>> EliminarGrupoTarea(int id)
+        {
+            var response = await _grupoTareasRepository.EliminarGrupoTarea(id);
+            ObjetoRequest objetoRequest = new ObjetoRequest();
+            objetoRequest.Estado = new EstadoRequest();
+            //objetoRequest.Estado.ErrDes = response.desErr.ToString();
+
+            if (response.codErr != 0)
+            {
+                objetoRequest.Estado.Ack = false;
+                objetoRequest.Estado.ErrNo = response.codErr.ToString();
+                objetoRequest.Estado.ErrDes = response.desErr.ToString();
+                objetoRequest.Estado.ErrCon = "[GrupoTareaController]";
+            }
+            return objetoRequest;
         }
 
     }

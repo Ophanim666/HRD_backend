@@ -45,33 +45,8 @@ namespace Data.Repositories
             }
         }
 
-        ////---------------------------------------------------Listar obras simple (nombre, id)---------------------------------------------------
-        //public async Task<List<LstObraDTO>> LstObra()
-        //{
-        //    using (SqlConnection sql = new SqlConnection(_connectionString))
-        //    {
-        //        using (SqlCommand cmd = new SqlCommand("usp_LstObras", sql))
-        //        {
-        //            cmd.CommandType = CommandType.StoredProcedure;
-
-        //            var response = new List<LstObraDTO>();
-        //            await sql.OpenAsync();
-
-        //            using (var reader = await cmd.ExecuteReaderAsync())
-        //            {
-        //                while (await reader.ReadAsync())
-        //                {
-        //                    response.Add(MapToObraSimp(reader));
-        //                }
-        //            }
-
-        //            return response;
-        //        }
-        //    }
-        //}
-
         //---------------------------------------------------Función para añadir una obra---------------------------------------------------
-        public async Task<(int codErr, string desErr)> AñadirObra(ObraInsertDTO value)
+        public async Task<(int codErr, string desErr)> AñadirObra(ObraInsertDTO value, string usuarioCreacion)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -81,6 +56,8 @@ namespace Data.Repositories
 
                     cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
+                    cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", usuarioCreacion)); // Asignamos el usuario que está creando
+
 
                     // Manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
@@ -163,15 +140,5 @@ namespace Data.Repositories
                 FECHA_CREACION = reader.IsDBNull(reader.GetOrdinal("FECHA_CREACION")) ? DateTime.Now : reader.GetDateTime(reader.GetOrdinal("FECHA_CREACION"))
             };
         }
-
-        //// Mapeo simple de obra
-        //private LstObraDTO MapToObraSimp(SqlDataReader reader)
-        //{
-        //    return new LstObraDTO()
-        //    {
-        //        ID = reader.GetInt32(reader.GetOrdinal("ID")),
-        //        NOMBRE = reader.IsDBNull(reader.GetOrdinal("NOMBRE")) ? null : reader.GetString(reader.GetOrdinal("NOMBRE")),
-        //    };
-        //}
     }
 }

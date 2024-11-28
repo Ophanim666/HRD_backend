@@ -9,9 +9,7 @@ namespace DTO.Archivo
     public class LstArchivoDTO
     {
         public int Id { get; set; }
-        public int Grupo_Tarea_Id { get; set; }
-        public string Nombre_Archivo { get; set; }
-        public string Ruta_Archivo { get; set; }
-        public string Tipo_Imagen { get; set; }
+        public string NombreArchivo { get; set; }
+        public string ContenidoBase64 { get; set; }
     }
 }

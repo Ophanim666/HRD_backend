@@ -45,33 +45,8 @@ namespace Data.Repositories
             }
         }
 
-        //---------------------------------------------------Listar tareas simple (nombre, id) para listarlas---------------------------------------------------
-        public async Task<List<LstTareaDTO>> LstTarea()
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("usp_LstTareas", sql))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    var response = new List<LstTareaDTO>();
-                    await sql.OpenAsync();
-
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            response.Add(MapToTareaSimp(reader));
-                        }
-                    }
-
-                    return response;
-                }
-            }
-        }
-
         //---------------------------------------------------Función para añadir---------------------------------------------------
-        public async Task<(int codErr, string desErr)> AñadirTarea(TareaInsertDTO value)
+        public async Task<(int codErr, string desErr)> AñadirTarea(TareaInsertDTO value, string usuarioCreacion)
         {
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
@@ -81,6 +56,8 @@ namespace Data.Repositories
 
                     cmd.Parameters.Add(new SqlParameter("@NOMBRE", value.NOMBRE));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO", value.ESTADO));
+                    cmd.Parameters.Add(new SqlParameter("@USUARIO_CREACION", usuarioCreacion)); // Asignamos el usuario que está creando
+
 
                     //agregamos nuestro manejo de errores
                     cmd.Parameters.Add(new SqlParameter("@cod_err", SqlDbType.Int)).Direction = ParameterDirection.Output;
