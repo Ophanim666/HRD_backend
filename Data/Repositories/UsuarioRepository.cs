@@ -303,9 +303,9 @@ namespace Data.Repositorios
             {
                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                 Primer_nombre = reader.GetString(reader.GetOrdinal("Primer_Nombre")),
-                Segundo_nombre = reader.GetString(reader.GetOrdinal("Segundo_Nombre")),
+                Segundo_nombre = reader.IsDBNull(reader.GetOrdinal("Segundo_Nombre")) ? null : reader.GetString(reader.GetOrdinal("Segundo_Nombre")),
                 Primer_apellido = reader.GetString(reader.GetOrdinal("Primer_Apellido")),
-                Segundo_apellido = reader.GetString(reader.GetOrdinal("Segundo_apellido")),
+                Segundo_apellido = reader.IsDBNull(reader.GetOrdinal("Segundo_apellido")) ? null : reader.GetString(reader.GetOrdinal("Segundo_apellido")),
                 Rut = reader.GetString(reader.GetOrdinal("Rut")),
                 Dv = reader.GetString(reader.GetOrdinal("Dv")),
                 Email = reader.GetString(reader.GetOrdinal("Email")),
