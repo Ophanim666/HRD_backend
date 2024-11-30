@@ -5,6 +5,9 @@ Iván Diaz
 Javiera Bermúdez
 Natalia Montecinos
 
+CREDENCIALES PARA PODER ENTRAR A LA APLICACIÓN
+Correo: ar.vargas@profesor.duoc.cl
+Contraseña: arturo123
 
 Link de los repositorios:
 

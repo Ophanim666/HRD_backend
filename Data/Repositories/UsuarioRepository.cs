@@ -68,9 +68,9 @@ namespace Data.Repositorios
                     string hashedPassword = HashPasswordBCrypt(value.Password);
 
                     cmd.Parameters.Add(new SqlParameter("@PRIMER_NOMBRE", value.Primer_nombre));
-                    cmd.Parameters.Add(new SqlParameter("@SEGUNDO_NOMBRE", value.Segundo_nombre));
+                    cmd.Parameters.Add(new SqlParameter("@SEGUNDO_NOMBRE", value.Segundo_nombre ?? (object)DBNull.Value));
                     cmd.Parameters.Add(new SqlParameter("@PRIMER_APELLIDO", value.Primer_apellido));
-                    cmd.Parameters.Add(new SqlParameter("@SEGUNDO_APELLIDO", value.Segundo_apellido));
+                    cmd.Parameters.Add(new SqlParameter("@SEGUNDO_APELLIDO", value.Segundo_apellido ?? (object)DBNull.Value));
                     cmd.Parameters.Add(new SqlParameter("@RUT", value.Rut));
                     cmd.Parameters.Add(new SqlParameter("@DV", value.Dv));
                     cmd.Parameters.Add(new SqlParameter("@EMAIL", value.Email));

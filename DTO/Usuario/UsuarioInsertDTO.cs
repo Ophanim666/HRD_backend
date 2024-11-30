@@ -9,9 +9,9 @@ namespace DTO.Usuario
     public class UsuarioInsertDTO
     {
         public string Primer_nombre { get; set; }
-        public string Segundo_nombre { get; set; }
+        public string? Segundo_nombre { get; set; }
         public string Primer_apellido { get; set; }
-        public string Segundo_apellido { get; set; }
+        public string? Segundo_apellido { get; set; }
         public string Rut { get; set; }
         public string Dv { get; set; }
         public string Email { get; set; }
